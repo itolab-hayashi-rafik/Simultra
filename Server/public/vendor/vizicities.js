@@ -18646,6 +18646,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function VehicleLayer(models, options) {
 	    _classCallCheck(this, VehicleLayer);
 	
+	    var modelDefaults = {
+	      file: null,
+	      scale: 1,
+	      translation: { x: 0, y: 0, z: 0 },
+	      rotation: { rx: 0, ry: 0, rz: 0 }
+	    };
+	    for (key in models) {
+	      models[key] = (0, _lodashAssign2['default'])({}, modelDefaults, models[key]);
+	    }
+	
 	    var defaults = {
 	      output: true,
 	      interactive: false,
@@ -18661,8 +18671,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        transparent: false,
 	        opacity: 1,
 	        blending: _three2['default'].NormalBlending,
-	        height: 0,
-	        scale: 1
+	        height: 0
 	      }
 	    };
 	
@@ -18709,7 +18718,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      for (modelName in this._models) {
 	        this._geometries[modelName] = null;
 	
-	        bloader.load(this._models[modelName], function (geometry) {
+	        bloader.load(this._models[modelName].file, function (geometry) {
 	          self._geometries[modelName] = geometry;
 	
 	          counter++;
@@ -18744,6 +18753,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var vehicle = {
 	        vid: undefined,
 	        modelName: modelName,
+	        model: null,
 	        latlon: latlon,
 	        options: options,
 	        mesh: null,
@@ -18769,11 +18779,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_addVehicleInternal',
 	    value: function _addVehicleInternal(vehicle) {
 	      if (this._modelsLoaded) {
+	        var model = this._models[vehicle.modelName];
 	        var geometry = this._geometries[vehicle.modelName];
 	        var orange = new _three2['default'].MeshLambertMaterial({ color: 0x995500, opacity: 1.0, transparent: false });
 	        var mesh = new _three2['default'].Mesh(geometry, orange);
-	        mesh.scale.x = mesh.scale.y = mesh.scale.z = this._options.style.scale;
+	        mesh.scale.x = mesh.scale.y = mesh.scale.z = model.scale;
+	        mesh.rotateX(model.rotation.x);
+	        mesh.rotateY(model.rotation.y);
+	        mesh.rotateZ(model.rotation.z);
+	        mesh.translateX(model.translation.x);
+	        mesh.translateY(model.translation.y);
+	        mesh.translateZ(model.translation.z);
 	        this.add(mesh);
+	        vehicle.model = model;
 	        vehicle.mesh = mesh;
 	        vehicle.setLocation(vehicle.latlon.lat, vehicle.latlon.lon);
 	      }
@@ -18803,7 +18821,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var position = this._world.latLonToPoint(vehicle.latlon);
 	
 	          // update the location
-	          vehicle.mesh.position.set(position.x, 50, position.y);
+	          vehicle.mesh.position.set(vehicle.model.translation.x + position.x, vehicle.model.translation.y, // TODO: need to set the height of the ground
+	          vehicle.model.translation.z + position.y);
 	        }
 	      }
 	    }
@@ -18826,7 +18845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // if the vehicle mesh is created
 	        if (vehicle.mesh != null) {
 	          // update the position
-	          vehicle.mesh.position.set(point.x, 50, point.y);
+	          vehicle.mesh.position.set(vehicle.model.translation.x + point.x, vehicle.model.translation.y + 50, vehicle.model.translation.z + point.y);
 	        }
 	
 	        // calculate and update the location
@@ -18851,7 +18870,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // if the vehicle mesh is created
 	        if (vehicle.mesh != null) {
 	          // update the rotation
-	          vehicle.mesh.rotation.set(rx, ry, rz);
+	          vehicle.mesh.rotation.set(vehicle.model.rotation.rx + rx, vehicle.model.rotation.ry + ry, vehicle.model.rotation.rz + rz);
 	        }
 	      }
 	    }

@@ -1,7 +1,7 @@
-// London
-// var coords = [51.505, -0.09];
+// // London
+// // var coords = [51.505, -0.09];
 // Nitech
-var coords = [35.157236, 136.924981];
+var coords = [35.156324, 136.923108];
 
 var world = VIZI.world('world', {
   skybox: true,
@@ -12,8 +12,12 @@ var world = VIZI.world('world', {
 // world._environment._skybox.setInclination(0.3);
 world._environment._skybox.setInclination(0.1);
 
+// obtain camera
+var camera = world.getCamera();
+camera.position.set(-150, 75, 125);
+
 // Add controls
-VIZI.Controls.orbit().addTo(world);
+var control = VIZI.Controls.orbit().addTo(world);
 
 // CartoDB basemap
 VIZI.imageTileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
@@ -104,54 +108,46 @@ var topoJSONBuildingLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/os
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
 }).addTo(world);
 
+// ------------------------------------------------------------------------------------------
+
 // car layer
 var vehicleLayer = VIZI.vehicleLayer({
-  'veyron': '/javascripts/maps/objs/veyron/VeyronNoUv_bin.js'
+  'veyron': {
+    file: '/javascripts/maps/objs/veyron/VeyronNoUv_bin.js',
+    scale: 0.1,
+    translation: {x: 0, y: 0, z: 0},
+    rotation: {rx: 0, ry: 90*Math.PI/180, rz: 0}
+  }
 }, {
   style: {
-    scale: 1
+    height: 0
   }
 }).addTo(world);
 
-// add cars
-var veyrons = [];
-for (var i = 0; i < 3; i++) {
-  veyrons.push(
-    vehicleLayer.addVehicle('veyron', new VIZI.LatLon(35.157236, 136.924981 + 0.003*i))
-  );
-}
-
-// move cars
-var t = 0;
-world.on('preUpdate', function(delta) {
-  t += delta;
-  for (var i = 0; i < veyrons.length; i++) {
-    veyrons[i].setLocation(veyrons[i].latlon.lat + 0.0002*Math.sin(t), veyrons[i].latlon.lon + 0.0002*Math.cos(t));
-    veyrons[i].setRotation(0, 120*180/Math.PI + t, 0);
-  }
-});
-
-// London Underground lines
-// VIZI.geoJSONLayer('https://rawgit.com/robhawkes/4acb9d6a6a5f00a377e2/raw/30ae704a44e10f2e13fb7e956e80c3b22e8e7e81/tfl_lines.json', {
-//   output: true,
-//   interactive: true,
-//   style: function(feature) {
-//     var colour = feature.properties.lines[0].colour || '#ffffff';
+// // add cars
+// var veyrons = [];
+// for (var i = 0; i < 3; i++) {
+//   veyrons.push(
+//     vehicleLayer.addVehicle('veyron', new VIZI.LatLon(35.157236, 136.924981 + 0.003*i))
+//   );
+// }
 //
-//     return {
-//       lineColor: colour,
-//       lineHeight: 20,
-//       lineWidth: 3,
-//       lineTransparent: true,
-//       lineOpacity: 0.5,
-//       lineBlending: THREE.AdditiveBlending,
-//       lineRenderOrder: 2
-//     };
-//   },
-//   onEachFeature: function(feature, layer) {
-//     layer.on('click', function(layer, point2d, point3d, intersects) {
-//       console.log(layer, point2d, point3d, intersects);
-//     });
-//   },
-//   attribution: '&copy; Transport for London.'
-// }).addTo(world);
+// // move cars
+// var t = 0;
+// world.on('preUpdate', function(delta) {
+//   t += delta;
+//   for (var i = 0; i < veyrons.length; i++) {
+//     veyrons[i].setLocation(veyrons[i].latlon.lat + 0.0002*Math.sin(t), veyrons[i].latlon.lon + 0.0002*Math.cos(t));
+//     veyrons[i].setRotation(0, 120*180/Math.PI + t, 0);
+//   }
+// });
+
+// ------------------------------------------------------------------------------------------
+
+(function($) {
+  if (typeof Simultra != 'function') {
+    console.error('class Simultra not loaded!');
+  }
+
+  var simultra = new Simultra(vehicleLayer).addTo(world);
+})($);
