@@ -1,0 +1,61 @@
+{
+  "name": "simultra",
+  "version": "0.0.1",
+  "description": "A Distributed Multi-Agent Traffic Simulator",
+  "main": "dist/simultra.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/itolab-hayashi-rafik/Simultra.git"
+  },
+  "keywords": [
+    "mapping",
+    "geography",
+    "cities",
+    "3d",
+    "webgl",
+    "three.js",
+    "maps",
+    "data",
+    "visualisation",
+    "geojson",
+    "gis"
+  ],
+  "author": "Simultra <simultra@itolab.nitech.ac.jp>",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/itolab-hayashi-rafik/Simultra/issues"
+  },
+  "homepage": "https://github.com/itolab-hayashi-rafik/Simultra",
+  "devDependencies": {
+    "babel-core": "^6.10.4",
+    "babel-eslint": "^6.1.2",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-register": "^6.9.0",
+    "del": "^2.2.1",
+    "glob": "^7.0.5",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-eslint": "^3.0.1",
+    "gulp-filter": "^4.0.0",
+    "gulp-istanbul": "^1.0.0",
+    "gulp-jscs": "^4.0.0",
+    "gulp-livereload": "^3.8.1",
+    "gulp-load-plugins": "^1.2.4",
+    "gulp-mocha": "^2.2.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.5.4",
+    "gulp-util": "^3.0.7",
+    "isparta": "^4.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "webpack": "^1.13.1",
+    "webpack-stream": "^3.2.0"
+  },
+  "babelBoilerplateOptions": {
+    "entryFileName": "simultra",
+    "mainVarName": "Simultra",
+    "mochaGlobals": []
+  }
+}
