@@ -6,4 +6,9 @@ router.get('/', function(req, res, next) {
   res.render('maps/index');
 });
 
+/* GET static map page */
+router.get('/static', function(req, res, next) {
+  res.render('maps/static');
+});
+
 module.exports = router;
