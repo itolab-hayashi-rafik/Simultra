@@ -128,7 +128,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilIndex = __webpack_require__(79);
+	var _utilIndex = __webpack_require__(87);
 	
 	var _utilIndex2 = _interopRequireDefault(_utilIndex);
 	
@@ -13423,7 +13423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // this._mesh.add(mesh);
 	
 	      this._ready = true;
-	      console.timeEnd(this._tile);
+	      // console.timeEnd(this._tile); // for debug
 	    }
 	  }, {
 	    key: '_abortRequest',
@@ -18628,17 +18628,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utilExtrudePolygon2 = _interopRequireDefault(_utilExtrudePolygon);
 	
-	var _enginePickingMaterial = __webpack_require__(70);
-	
-	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
-	
 	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
-	var _BinaryLoader = __webpack_require__(78);
+	var _vendorGPUComputationRenderer = __webpack_require__(78);
 	
-	var _BinaryLoader2 = _interopRequireDefault(_BinaryLoader);
+	var _vendorGPUComputationRenderer2 = _interopRequireDefault(_vendorGPUComputationRenderer);
+	
+	var _VehicleModel = __webpack_require__(79);
+	
+	var _VehicleModel2 = _interopRequireDefault(_VehicleModel);
+	
+	var _ModelRepository = __webpack_require__(81);
+	
+	var _ModelRepository2 = _interopRequireDefault(_ModelRepository);
+	
+	var _Vehicle = __webpack_require__(82);
+	
+	var _Vehicle2 = _interopRequireDefault(_Vehicle);
+	
+	var _vendorBinaryLoader = __webpack_require__(80);
+	
+	var _vendorBinaryLoader2 = _interopRequireDefault(_vendorBinaryLoader);
+	
+	var _VehicleVelocityShader = __webpack_require__(83);
+	
+	var _VehicleVelocityShader2 = _interopRequireDefault(_VehicleVelocityShader);
+	
+	var _VehiclePositionShader = __webpack_require__(84);
+	
+	var _VehiclePositionShader2 = _interopRequireDefault(_VehiclePositionShader);
+	
+	var _VehicleShader = __webpack_require__(85);
+	
+	var _VehicleShader2 = _interopRequireDefault(_VehicleShader);
+	
+	var _utilObjectUtils = __webpack_require__(86);
+	
+	var _utilObjectUtils2 = _interopRequireDefault(_utilObjectUtils);
 	
 	var VehicleLayer = (function (_Layer) {
 	  _inherits(VehicleLayer, _Layer);
@@ -18658,13 +18686,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var defaults = {
 	      output: true,
-	      interactive: false,
-	      // Custom material override
-	      //
-	      // TODO: Should this be in the style object?
-	      material: null,
-	      onMesh: null,
-	      onBufferAttributes: null,
+	      // simulation:
+	      simWidth: 2,
 	      // This default style is separate to Util.GeoJSON.defaultStyle
 	      style: {
 	        color: '#ffffff',
@@ -18682,29 +18705,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._modelsLoaded = false;
 	    this._models = (0, _lodashAssign2['default'])({}, models);
 	    this._geometries = {};
+	    this._textures = {};
 	    this._vehicles = [];
+	    this._gpuCompute = null;
 	  }
 	
 	  _createClass(VehicleLayer, [{
 	    key: '_onAdd',
 	    value: function _onAdd(world) {
-	      if (this._options.interactive) {
-	        // Only add to picking mesh if this layer is controlling output
-	        //
-	        // Otherwise, assume another component will eventually add a mesh to
-	        // the picking scene
-	        if (this.isOutput()) {
-	          this._pickingMesh = new _three2['default'].Object3D();
-	          this.addToPicking(this._pickingMesh);
-	        }
-	      }
+	      var self = this;
 	
 	      if (this.isOutput()) {
+	        // initialize GPUComputeRenderer
+	        this._initComputeRenderer();
+	
 	        // add callback
 	        this.on('loadCompleted', this._onLoadCompleted);
 	
 	        // add car
 	        this._loadModels();
+	
+	        // add listener
+	        world.on('preUpdate', function (delta) {
+	          self._onWorldUpdate(delta);
+	        });
 	      }
 	    }
 	  }, {
@@ -18712,20 +18736,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _loadModels() {
 	      var self = this;
 	
-	      var bloader = new _BinaryLoader2['default']();
+	      // load models iteratively
+	      var models = this._models;
+	      Object.keys(models).forEach(function (modelName) {
+	        var model = models[modelName];
+	
+	        var scale = 1.0;
+	        var translation = new _three2['default'].Vector3();
+	        var rotation = new _three2['default'].Vector3();
+	        var wheelOffset = null;
+	
+	        if (model.scale) {
+	          scale = model.scale;
+	        }
+	        if (model.translation) {
+	          translation.set(model.translation.x, model.translation.y, model.translation.z);
+	        }
+	        if (model.rotation) {
+	          rotation.set(model.rotation.x, model.rotation.y, model.rotation.z);
+	        }
+	        if (model.wheelOffset) {
+	          wheelOffset = new _three2['default'].Vector3(model.wheelOffset.x, model.wheelOffset.y, model.wheelOffset.z);
+	        }
+	
+	        // create a model
+	        var vehicleModel = new _VehicleModel2['default']({
+	          bodyURL: model.file.body,
+	          wheelURL: model.file.wheel,
+	          scale: scale,
+	          translation: translation,
+	          rotation: rotation,
+	          wheelOffset: wheelOffset
+	        }, callback);
+	
+	        // register to the repos
+	        _ModelRepository2['default'].add(modelName, vehicleModel);
+	      });
+	
+	      // callback
 	      var counter = 0;
-	      var len = Object.keys(this._models).length;
-	      for (modelName in this._models) {
-	        this._geometries[modelName] = null;
-	
-	        bloader.load(this._models[modelName].file, function (geometry) {
-	          self._geometries[modelName] = geometry;
-	
-	          counter++;
-	          if (counter >= len) {
-	            self.emit('loadCompleted');
-	          }
-	        });
+	      var len = Object.keys(models).length;
+	      function callback(scope) {
+	        if (++counter >= len) {
+	          // loaded all models
+	          self.emit('loadCompleted');
+	        }
 	      }
 	    }
 	  }, {
@@ -18736,15 +18791,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // iterate over all the vehicles already added and add meshes to the world
 	      for (var i = 0; i < this._vehicles.length; i++) {
 	        var vehicle = this._vehicles[i];
-	        if (vehicle.mesh == null) {
+	        if (vehicle.vehicle === null) {
 	          this._addVehicleInternal(vehicle);
 	        }
 	      }
 	    }
 	  }, {
+	    key: '_onWorldUpdate',
+	    value: function _onWorldUpdate(delta) {
+	      if (this._gpuCompute) {
+	        this._performUpdate(delta);
+	      }
+	    }
+	  }, {
 	    key: 'addVehicle',
-	    value: function addVehicle(modelName, latlon, options) {
-	      if (!(modelName in this._geometries)) {
+	    value: function addVehicle(modelName, latlon, angle, options) {
+	      if (!_ModelRepository2['default'].contains(modelName)) {
 	        throw new Error('Vehicle model ' + modelName + ' does not exist.');
 	      }
 	
@@ -18755,16 +18817,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        modelName: modelName,
 	        model: null,
 	        latlon: latlon,
+	        angle: angle,
 	        options: options,
-	        mesh: null,
-	        setLocation: function setLocation(lat, lon) {
-	          self.setLocation(this.vid, lat, lon);
+	        vehicle: null,
+	        setLocation: function setLocation(lat, lon, angle) {
+	          self.setLocation(this.vid, lat, lon, angle);
 	        },
-	        setPosition: function setPosition(x, y) {
-	          self.setPosition(this.vid, x, y);
-	        },
-	        setRotation: function setRotation(rx, ry, rz) {
-	          self.setRotation(this.vid, rx, ry, rz);
+	        setPosition: function setPosition(x, y, z, angle) {
+	          self.setPosition(this.vid, x, y, z, angle);
 	        }
 	      };
 	      var total = this._vehicles.push(vehicle);
@@ -18779,22 +18839,123 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_addVehicleInternal',
 	    value: function _addVehicleInternal(vehicle) {
 	      if (this._modelsLoaded) {
-	        var model = this._models[vehicle.modelName];
-	        var geometry = this._geometries[vehicle.modelName];
-	        var orange = new _three2['default'].MeshLambertMaterial({ color: 0x995500, opacity: 1.0, transparent: false });
-	        var mesh = new _three2['default'].Mesh(geometry, orange);
-	        mesh.scale.x = mesh.scale.y = mesh.scale.z = model.scale;
-	        mesh.rotateX(model.rotation.x);
-	        mesh.rotateY(model.rotation.y);
-	        mesh.rotateZ(model.rotation.z);
-	        mesh.translateX(model.translation.x);
-	        mesh.translateY(model.translation.y);
-	        mesh.translateZ(model.translation.z);
-	        this.add(mesh);
-	        vehicle.model = model;
-	        vehicle.mesh = mesh;
-	        vehicle.setLocation(vehicle.latlon.lat, vehicle.latlon.lon);
+	
+	        var vehicleModel = _ModelRepository2['default'].get(vehicle.modelName);
+	        var v = new _Vehicle2['default'](vehicleModel);
+	        this.add(v.root);
+	
+	        vehicle.vehicle = v;
+	
+	        // var vid = vehicle.vid;
+	        //
+	        // var model = this._models[vehicle.modelName];
+	        // var geometry = this._geometries[vehicle.modelName];
+	        //
+	        // var material = new THREE.MeshLambertMaterial({ color: 0x995500, opacity: 1.0, transparent: false });
+	        // // var material = new THREE.ShaderMaterial({
+	        // //   uniforms: {
+	        // //     'reference':        { type: 'v2', value: null },
+	        // //     'texturePosition':  { type: 't',  value: null },
+	        // //     'texture':          { type: 't',  value: null },
+	        // //     'color':            { type: 'c',  value: new THREE.Color(0x995500) }
+	        // //   },
+	        // //   vertexShader: VehicleShader.vertexShader,
+	        // //   fragmentShader: VehicleShader.fragmentShader
+	        // // });
+	        // // material.uniforms.reference.value = new THREE.Vector2(x, y);
+	        //
+	        // var mesh = new THREE.Mesh(geometry, material);
+	        // mesh.scale.x = mesh.scale.y = mesh.scale.z = model.scale;
+	        // mesh.rotation.set(model.rotation.rx, model.rotation.ry, model.rotation.rz);
+	        // mesh.position.set(model.translation.x, model.translation.y, model.translation.z);
+	        //
+	        // this.add(mesh);
+	        // vehicle.model = model;
+	        // vehicle.mesh = mesh;
+	        // vehicle.setLocation(vehicle.latlon.lat, vehicle.latlon.lon, vehicle.angle);
 	      }
+	    }
+	
+	    // initialize GPUComputationRenderer
+	  }, {
+	    key: '_initComputeRenderer',
+	    value: function _initComputeRenderer() {
+	      var gpuCompute = new _vendorGPUComputationRenderer2['default'](this._options.simWidth, this._options.simWidth, this._world._engine._renderer);
+	
+	      // create textures
+	      var textureAcceleration = gpuCompute.createTexture();
+	      var textureVelocity = gpuCompute.createTexture();
+	      var texturePosition = gpuCompute.createTexture();
+	
+	      var velocityVariable = gpuCompute.addVariable('textureVelocity', _VehicleVelocityShader2['default'], textureVelocity);
+	      var positionVariable = gpuCompute.addVariable('texturePosition', _VehiclePositionShader2['default'], texturePosition);
+	
+	      gpuCompute.setVariableDependencies(velocityVariable, [positionVariable, velocityVariable]);
+	      gpuCompute.setVariableDependencies(positionVariable, [positionVariable, velocityVariable]);
+	
+	      var positionUniforms = positionVariable.material.uniforms;
+	      var velocityUniforms = velocityVariable.material.uniforms;
+	
+	      velocityVariable.wrapS = _three2['default'].RepeatWrapping;
+	      velocityVariable.wrapT = _three2['default'].RepeatWrapping;
+	      positionVariable.wrapS = _three2['default'].RepeatWrapping;
+	      positionVariable.wrapT = _three2['default'].RepeatWrapping;
+	
+	      velocityUniforms.textureAcceleration.value = textureAcceleration;
+	
+	      var error = gpuCompute.init();
+	      if (error !== null) {
+	        console.error(error);
+	      }
+	
+	      this._gpuCompute = gpuCompute;
+	      this._textureAcceleration = textureAcceleration;
+	      this._textureVelocity = textureVelocity;
+	      this._texturePosition = texturePosition;
+	      this._positionVariable = positionVariable;
+	      this._velocityVariable = velocityVariable;
+	      this._positionUniforms = positionUniforms;
+	      this._velocityUniforms = velocityUniforms;
+	    }
+	
+	    // perform update
+	  }, {
+	    key: '_performUpdate',
+	    value: function _performUpdate(delta) {
+	      var now = performance.now();
+	
+	      this._positionUniforms.time.value = now;
+	      this._positionUniforms.delta.value = delta;
+	      this._velocityUniforms.time.value = now;
+	      this._velocityUniforms.delta.value = delta;
+	
+	      this._gpuCompute.compute();
+	
+	      // transfer vehicles' parameters from gpu to cpu
+	      var texturePosition = this._gpuCompute.readVariable(this._positionVariable, this._texturePosition);
+	      for (var i = 0; i < this._vehicles.length; i++) {
+	        var vehicle = this._vehicles[i];
+	        if (vehicle.vehicle) {
+	          var x = texturePosition.image.data[i * 4 + 0];
+	          var y = texturePosition.image.data[i * 4 + 1];
+	          var z = texturePosition.image.data[i * 4 + 2];
+	          var angle = texturePosition.image.data[i * 4 + 3];
+	          vehicle.setPosition(x, y, z, angle);
+	
+	          // TODO: transfer textureVelocity and update the rendering object
+	        }
+	      }
+	
+	      // (for gpgpu rendering (no transfer to cpu))
+	      // for (var i = 0; i < this._vehicles.length; i++) {
+	      //   var vehicle = this._vehicles[i];
+	      //   if (vehicle.mesh) {
+	      //     vehicle.mesh.material.uniforms.texturePosition.value = this._gpuCompute.getCurrentRenderTarget(this._positionVariable).texture;
+	      //     if (vehicle.mesh.material.uniforms.texture) {
+	      //       vehicle.mesh.material.uniforms.texture.value = this._textures[vehicle.modelName];
+	      //     }
+	      //   }
+	      // }
 	    }
 	
 	    /**
@@ -18803,10 +18964,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {number} vid vehicle id
 	     * @param {number} lat latitude
 	     * @param {number} lon longitude
+	     * @param {number} angle angle
 	     */
 	  }, {
 	    key: 'setLocation',
-	    value: function setLocation(vid, lat, lon) {
+	    value: function setLocation(vid, lat, lon, angle) {
+	      this._setLocation(vid, lat, lon, angle);
+	
+	      if (this._gpuCompute) {
+	        // console.log('this._setSimPosition(' + vid + ', ' + point.x + ', ' + 0 + ', ' + point.y + ', ' + angle + ')');
+	        this._setSimPosition(vid, point.x, 0, point.y, angle);
+	      }
+	    }
+	
+	    // internal helper for setLocation()
+	  }, {
+	    key: '_setLocation',
+	    value: function _setLocation(vid, lat, lon, angle) {
 	      // if the vehicle exists
 	      if (vid in this._vehicles) {
 	        var vehicle = this._vehicles[vid];
@@ -18815,14 +18989,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        vehicle.latlon.lat = lat;
 	        vehicle.latlon.lon = lon;
 	
-	        // if the vehicle mesh is created
-	        if (vehicle.mesh != null) {
+	        if (vehicle.vehicle) {
 	          // calculate the position
-	          var position = this._world.latLonToPoint(vehicle.latlon);
+	          var point = this._world.latLonToPoint(vehicle.latlon);
 	
-	          // update the location
-	          vehicle.mesh.position.set(vehicle.model.translation.x + position.x, vehicle.model.translation.y, // TODO: need to set the height of the ground
-	          vehicle.model.translation.z + position.y);
+	          // update the vehicle
+	          vehicle.vehicle.setPosition(point.x, 0.0, point.y);
+	          vehicle.vehicle.setAngle(angle);
 	        }
 	      }
 	    }
@@ -18836,42 +19009,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	  }, {
 	    key: 'setPosition',
-	    value: function setPosition(vid, x, y) {
-	      if (vid in this._vehicles) {
-	        var vehicle = this._vehicles[vid];
+	    value: function setPosition(vid, x, y, z, angle) {
+	      this._setPosition(vid, x, y, z, angle);
 	
-	        var point = new _geoPoint.point(x, y);
-	
-	        // if the vehicle mesh is created
-	        if (vehicle.mesh != null) {
-	          // update the position
-	          vehicle.mesh.position.set(vehicle.model.translation.x + point.x, vehicle.model.translation.y + 50, vehicle.model.translation.z + point.y);
-	        }
-	
-	        // calculate and update the location
-	        vehicle.latlon = this._world.pointToLatLon(point);
+	      if (this._gpuCompute) {
+	        this._setPosition(vid, x, y, z, angle);
 	      }
 	    }
 	
-	    /**
-	     * Set the rotation of a specific vehicle
-	     *
-	     * @param {number} vid vehicle id
-	     * @param {number} rx rotation x
-	     * @param {number} ry rotation y
-	     * @param {number} rz rotation z
-	     */
+	    // internal helper for setPosition()
 	  }, {
-	    key: 'setRotation',
-	    value: function setRotation(vid, rx, ry, rz) {
+	    key: '_setPosition',
+	    value: function _setPosition(vid, x, y, z, angle) {
+	      // if the vehicle exists
 	      if (vid in this._vehicles) {
 	        var vehicle = this._vehicles[vid];
 	
-	        // if the vehicle mesh is created
-	        if (vehicle.mesh != null) {
-	          // update the rotation
-	          vehicle.mesh.rotation.set(vehicle.model.rotation.rx + rx, vehicle.model.rotation.ry + ry, vehicle.model.rotation.rz + rz);
+	        if (vehicle.vehicle) {
+	          // update the vehicle
+	          vehicle.vehicle.setPosition(x, y, z);
+	          vehicle.vehicle.setAngle(-angle);
 	        }
+	
+	        // calculate and update the location
+	        vehicle.latlon = this._world.pointToLatLon(new _geoPoint.point(x, z));
 	      }
 	    }
 	
@@ -18887,16 +19048,160 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // For example, not coordinates for a MultiPolygon GeoJSON feature
 	  }, {
 	    key: 'destroy',
-	
-	    // TODO: Make sure this is cleaning everything
 	    value: function destroy() {
-	      if (this._pickingMesh) {
-	        // TODO: Properly dispose of picking mesh
-	        this._pickingMesh = null;
-	      }
-	
 	      // Run common destruction logic from parent
 	      _get(Object.getPrototypeOf(VehicleLayer.prototype), 'destroy', this).call(this);
+	    }
+	  }, {
+	    key: '_setSimLocation',
+	    value: function _setSimLocation(vid, lat, lon, angle) {
+	      var point = self._world.latLonToPoint(new _geoLatLon.latLon(lat, lon));
+	      var position = { x: position.x, y: 0.0, z: position.y, angle: angle };
+	
+	      this._setPosition(position);
+	    }
+	  }, {
+	    key: '_setSimPosition',
+	    value: function _setSimPosition(vid, x, y, z, angle) {
+	      // console.log('_setSimPosition: ' + vid + ', ' + x + ', ' + y + ', ' + z + ', ' + angle + ')');
+	
+	      // transmit from gpu to cpu
+	      var texturePosition = this._gpuCompute.readVariable(this._positionVariable, this._texturePosition);
+	
+	      // (for extrapolation) update data
+	      texturePosition.image.data[vid * 4 + 0] = x;
+	      texturePosition.image.data[vid * 4 + 1] = y;
+	      texturePosition.image.data[vid * 4 + 2] = z;
+	      texturePosition.image.data[vid * 4 + 3] = angle;
+	      texturePosition.needsUpdate = true;
+	
+	      // transmit from cpu to gpu
+	      this._gpuCompute.updateVariable(this._positionVariable, texturePosition);
+	    }
+	  }, {
+	    key: '_setSimVelocity',
+	    value: function _setSimVelocity(vid, vx, vy, vz, wheel) {
+	      // transmit from gpu to cpu
+	      var textureVelocity = this._gpuCompute.readVariable(this._velocityVariable, this._textureVelocity);
+	
+	      // update data
+	      textureVelocity.image.data[vid * 4 + 0] = vx;
+	      textureVelocity.image.data[vid * 4 + 1] = vy;
+	      textureVelocity.image.data[vid * 4 + 2] = vz;
+	      textureVelocity.image.data[vid * 4 + 3] = wheel;
+	      textureVelocity.needsUpdate = true;
+	
+	      console.log(textureVelocity.image.data);
+	
+	      // transmit from cpu to gpu
+	      this._gpuCompute.updateVariable(this._velocityVariable, textureVelocity);
+	    }
+	  }, {
+	    key: '_setSimAcceleration',
+	    value: function _setSimAcceleration(vid, ax, ay, az, aw) {
+	      // update data in cpu-memory
+	      this._velocityUniforms.textureAcceleration.value.image.data[vid * 4 + 0] = ax;
+	      this._velocityUniforms.textureAcceleration.value.image.data[vid * 4 + 1] = ay;
+	      this._velocityUniforms.textureAcceleration.value.image.data[vid * 4 + 2] = az;
+	      this._velocityUniforms.textureAcceleration.value.image.data[vid * 4 + 3] = aw;
+	      this._velocityUniforms.textureAcceleration.value.needsUpdate = true;
+	    }
+	
+	    //
+	    // locations = {
+	    //   0: {lat: 0.0, lon: 0.0, angle: 0.0},
+	    //   1: {lat: 1.0, lon: 1.0, angle: 0.0},
+	    //   ...
+	    //   vid: {lat: lat, lon: lon, angle: angle}
+	    // }
+	    //
+	  }, {
+	    key: '_setSimLocations',
+	    value: function _setSimLocations(locations) {
+	      var self = this;
+	
+	      var positions = {};
+	      Object.keys(locations).forEach(function (vid) {
+	        var point = self._world.latLonToPoint(new _geoLatLon.latLon(locations[vid].lat, locations[vid].lon));
+	        positions[vid] = { x: point.x, y: 0.0, z: point.y, angle: locations[vid].angle };
+	      });
+	
+	      this._setSimPositions(positions);
+	    }
+	
+	    //
+	    // positions = {
+	    //   0: {x: 0.0, y: 0.0, z: 0.0, angle: 0.0},
+	    //   1: {x: 1.0, y: 1.0, z: 1.0, angle: 0.0},
+	    //   ...
+	    //   vid: {x: x, y: y, z: z, angle: angle}
+	    // }
+	    //
+	  }, {
+	    key: '_setSimPositions',
+	    value: function _setSimPositions(positions) {
+	      if (this._gpuCompute) {
+	        // transmit from gpu to cpu
+	        var texturePosition = this._gpuCompute.readVariable(this._positionVariable, this._texturePosition);
+	
+	        // update data
+	        Object.keys(positions).forEach(function (vid) {
+	          // (for extrapolation)
+	          texturePosition.image.data[vid * 4 + 0] = positions[vid].x;
+	          texturePosition.image.data[vid * 4 + 1] = positions[vid].y;
+	          texturePosition.image.data[vid * 4 + 2] = positions[vid].z;
+	          texturePosition.image.data[vid * 4 + 3] = positions[vid].angle;
+	        });
+	        texturePosition.needsUpdate = true;
+	
+	        // transmit from cpu to gpu
+	        this._gpuCompute.updateVariable(this._positionVariable, texturePosition);
+	      }
+	    }
+	
+	    //
+	    // velocities = {
+	    //   0: {vx: 0.0, vy: 0.0, vz: 0.0, wheel: 0.0},
+	    //   1: {vx: 1.0, vy: 1.0, vz: 1.0, wheel: 0.0},
+	    //   ...
+	    //   vid: {vx: vx, vy: vy, vz: vz, wheel: wheel}
+	    // }
+	    //
+	  }, {
+	    key: '_setSimVelocities',
+	    value: function _setSimVelocities(velocities) {
+	      if (this._gpuCompute) {
+	        // transmit from gpu to cpu
+	        var textureVelocity = this._gpuCompute.readVariable(this._velocityVariable, this._textureVelocity);
+	
+	        // update data
+	        Object.keys(velocities).forEach(function (vid) {
+	          textureVelocity.image.data[vid * 4 + 0] = velocities[vid].vx;
+	          textureVelocity.image.data[vid * 4 + 1] = velocities[vid].vy;
+	          textureVelocity.image.data[vid * 4 + 2] = velocities[vid].vz;
+	          textureVelocity.image.data[vid * 4 + 3] = velocities[vid].wheel;
+	        });
+	        textureVelocity.needsUpdate = true;
+	
+	        // transmit from cpu to gpu
+	        this._gpuCompute.updateVariable(this._velocityVariable, textureVelocity);
+	      }
+	    }
+	  }, {
+	    key: '_setSimAccelerations',
+	    value: function _setSimAccelerations(accelerations) {
+	      // TODO: implement a function to update all of the vehicles' accelerations
+	    }
+	  }, {
+	    key: '_debug',
+	    value: function _debug() {
+	      var texturePosition = this._gpuCompute.readVariable(this._positionVariable);
+	      var textureVelocity = this._gpuCompute.readVariable(this._velocityVariable);
+	
+	      console.log('texturePosition:');
+	      console.log(texturePosition.image.data);
+	      console.log('textureVelocity:');
+	      console.log(textureVelocity.image.data);
 	    }
 	  }], [{
 	    key: 'isSingle',
@@ -18918,662 +19223,421 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 78 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
 	// jscs:disable
+	/* eslint-disable */
+	/**
+	 * @author yomboprime https://github.com/yomboprime
+	 *
+	 * GPUComputationRenderer, based on SimulationRenderer by zz85
+	 *
+	 * The GPUComputationRenderer uses the concept of variables. These variables are RGBA float textures that hold 4 floats
+	 * for each compute element (texel)
+	 *
+	 * Each variable has a fragment shader that defines the computation made to obtain the variable in question.
+	 * You can use as many variables you need, and make dependencies so you can use textures of other variables in the shader
+	 * (the sampler uniforms are added automatically) Most of the variables will need themselves as dependency.
+	 *
+	 * The renderer has actually two render targets per variable, to make ping-pong. Textures from the current frame are used
+	 * as inputs to render the textures of the next frame.
+	 *
+	 * The render targets of the variables can be used as input textures for your visualization shaders.
+	 *
+	 * Variable names should be valid identifiers and should not collide with THREE GLSL used identifiers.
+	 * a common approach could be to use 'texture' prefixing the variable name; i.e texturePosition, textureVelocity...
+	 *
+	 * The size of the computation (sizeX * sizeY) is defined as 'resolution' automatically in the shader. For example:
+	 * #DEFINE resolution vec2( 1024.0, 1024.0 )
+	 *
+	 * -------------
+	 *
+	 * Basic use:
+	 *
+	 * // Initialization...
+	 *
+	 * // Create computation renderer
+	 * var gpuCompute = new GPUComputationRenderer( 1024, 1024, renderer );
+	 *
+	 * // Create initial state float textures
+	 * var pos0 = gpuCompute.createTexture();
+	 * var vel0 = gpuCompute.createTexture();
+	 * // and fill in here the texture data...
+	 *
+	 * // Add texture variables
+	 * var velVar = gpuCompute.addVariable( "textureVelocity", fragmentShaderVel, pos0 );
+	 * var posVar = gpuCompute.addVariable( "texturePosition", fragmentShaderPos, vel0 );
+	 *
+	 * // Add variable dependencies
+	 * gpuCompute.setVariableDependencies( velVar, [ velVar, posVar ] );
+	 * gpuCompute.setVariableDependencies( posVar, [ velVar, posVar ] );
+	 *
+	 * // Add custom uniforms
+	 * velVar.material.uniforms.time = { value: 0.0 };
+	 *
+	 * // Check for completeness
+	 * var error = gpuCompute.init();
+	 * if ( error !== null ) {
+	 *		console.error( error );
+	 * }
+	 *
+	 *
+	 * // In each frame...
+	 *
+	 * // Compute!
+	 * gpuCompute.compute();
+	 *
+	 * // Update texture uniforms in your visualization materials with the gpu renderer output
+	 * myMaterial.uniforms.myTexture.value = gpuCompute.getCurrentRenderTarget( posVar ).texture;
+	 *
+	 * // Do your rendering
+	 * renderer.render( myScene, myCamera );
+	 *
+	 *
+	 * // If needed...
+	 *
+	 * // transmit texture data from gpu-memory to cpu-memory
+	 * var vel = gpuCompute.readVariable( velVar );
+	 * var pos = gpuCompute.readVariable( posVar );
+	 *
+	 * // update texture in cpu-memory
+	 * vel.image.data[0] += 1.0;
+	 * pos.image.data[0] += 2.0;
+	 *
+	 * // transmit texture data from cpu-memory to gpu-memory
+	 * gpuCompute.updateVariable( velVar, vel );
+	 * gpuCompute.updateVariable( posVar, pos );
+	 *
+	 * -------------
+	 *
+	 * Also, you can use utility functions to create ShaderMaterial and perform computations (rendering between textures)
+	 * Note that the shaders can have multiple input textures.
+	 *
+	 * var myFilter1 = gpuCompute.createShaderMaterial( myFilterFragmentShader1, { theTexture: { value: null } } );
+	 * var myFilter2 = gpuCompute.createShaderMaterial( myFilterFragmentShader2, { theTexture: { value: null } } );
+	 *
+	 * var inputTexture = gpuCompute.createTexture();
+	 *
+	 * // Fill in here inputTexture...
+	 *
+	 * myFilter1.uniforms.theTexture.value = inputTexture;
+	 *
+	 * var myRenderTarget = gpuCompute.createRenderTarget();
+	 * myFilter2.uniforms.theTexture.value = myRenderTarget.texture;
+	 *
+	 * var outputRenderTarget = gpuCompute.createRenderTarget();
+	 *
+	 * // Now use the output texture where you want:
+	 * myMaterial.uniforms.map.value = outputRenderTarget.texture;
+	 *
+	 * // And compute each frame, before rendering to screen:
+	 * gpuCompute.doRenderTarget( myFilter1, myRenderTarget );
+	 * gpuCompute.doRenderTarget( myFilter2, outputRenderTarget );
+	 *
+	 *
+	 *
+	 * @param {int} sizeX Computation problem size is always 2d: sizeX * sizeY elements.
+	 * @param {int} sizeY Computation problem size is always 2d: sizeX * sizeY elements.
+	 * @param {WebGLRenderer} renderer The renderer
+	 */
 	
-	var _eventemitter3 = __webpack_require__(2);
+	function GPUComputationRenderer(sizeX, sizeY, renderer) {
 	
-	var _eventemitter32 = _interopRequireDefault(_eventemitter3);
+	  this.variables = [];
 	
-	var _lodashAssign = __webpack_require__(3);
+	  this.currentTextureIndex = 0;
 	
-	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	  var scene = new THREE.Scene();
 	
-	var _three = __webpack_require__(10);
+	  var camera = new THREE.Camera();
+	  camera.position.z = 1;
 	
-	var _three2 = _interopRequireDefault(_three);
+	  var passThruUniforms = {
+	    texture: { value: null }
+	  };
 	
-	var BinaryLoader = (function (_EventEmitter) {
-	  _inherits(BinaryLoader, _EventEmitter);
+	  var passThruShader = createShaderMaterial(getPassThroughFragmentShader(), passThruUniforms);
 	
-	  function BinaryLoader(options) {
-	    _classCallCheck(this, BinaryLoader);
+	  var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), passThruShader);
+	  scene.add(mesh);
 	
-	    _get(Object.getPrototypeOf(BinaryLoader.prototype), 'constructor', this).call(this);
+	  // modified by Masayuki (2016-07-12)
+	  this.addVariable = function (variableName, shader, initialValueTexture) {
 	
-	    var defaults = {};
-	    this._options = (0, _lodashAssign2['default'])({}, defaults, options);
-	    this.manager = _three2['default'].DefaultLoadingManager;
+	    if (shader.vertexShader) {
+	      console.warn("GPUComputationRenderer: Shader's property vertexShader will be ignored");
+	    }
+	    if (!shader.fragmentShader) {
+	      throw new Error("Shader does not have the property: fragmentShader");
+	    }
+	
+	    var material = this.createShaderMaterial(shader.fragmentShader, shader.uniforms);
+	
+	    var variable = {
+	      name: variableName,
+	      initialValueTexture: initialValueTexture,
+	      material: material,
+	      dependencies: null,
+	      renderTargets: [],
+	      wrapS: null,
+	      wrapT: null,
+	      minFilter: THREE.NearestFilter,
+	      magFilter: THREE.NearestFilter
+	    };
+	
+	    this.variables.push(variable);
+	
+	    return variable;
+	  };
+	
+	  // this.addVariable = function( variableName, computeFragmentShader, initialValueTexture ) {
+	  //
+	  //   var material = this.createShaderMaterial( computeFragmentShader );
+	  //
+	  //   var variable = {
+	  //     name: variableName,
+	  //     initialValueTexture: initialValueTexture,
+	  //     material: material,
+	  //     dependencies: null,
+	  //     renderTargets: [],
+	  //     wrapS: null,
+	  //     wrapT: null,
+	  //     minFilter: THREE.NearestFilter,
+	  //     magFilter: THREE.NearestFilter
+	  //   };
+	  //
+	  //   this.variables.push( variable );
+	  //
+	  //   return variable;
+	  //
+	  // };
+	
+	  this.setVariableDependencies = function (variable, dependencies) {
+	
+	    variable.dependencies = dependencies;
+	  };
+	
+	  this.init = function () {
+	
+	    if (!renderer.extensions.get("OES_texture_float")) {
+	
+	      return "No OES_texture_float support for float textures.";
+	    }
+	
+	    if (renderer.capabilities.maxVertexTextures === 0) {
+	
+	      return "No support for vertex shader textures.";
+	    }
+	
+	    for (var i = 0; i < this.variables.length; i++) {
+	
+	      var variable = this.variables[i];
+	
+	      // Creates rendertargets and initialize them with input texture
+	      variable.renderTargets[0] = this.createRenderTarget(sizeX, sizeY, variable.wrapS, variable.wrapT, variable.minFilter, variable.magFilter);
+	      variable.renderTargets[1] = this.createRenderTarget(sizeX, sizeY, variable.wrapS, variable.wrapT, variable.minFilter, variable.magFilter);
+	      this.renderTexture(variable.initialValueTexture, variable.renderTargets[0]);
+	      this.renderTexture(variable.initialValueTexture, variable.renderTargets[1]);
+	
+	      // Adds dependencies uniforms to the ShaderMaterial
+	      var material = variable.material;
+	      var uniforms = material.uniforms;
+	      if (variable.dependencies !== null) {
+	
+	        for (var d = 0; d < variable.dependencies.length; d++) {
+	
+	          var depVar = variable.dependencies[d];
+	
+	          if (depVar.name !== variable.name) {
+	
+	            // Checks if variable exists
+	            var found = false;
+	            for (var j = 0; j < this.variables.length; j++) {
+	
+	              if (depVar.name === this.variables[j].name) {
+	                found = true;
+	                break;
+	              }
+	            }
+	            if (!found) {
+	              return "Variable dependency not found. Variable=" + variable.name + ", dependency=" + depVar.name;
+	            }
+	          }
+	
+	          uniforms[depVar.name] = { value: null };
+	
+	          material.fragmentShader = "\nuniform sampler2D " + depVar.name + ";\n" + material.fragmentShader;
+	        }
+	      }
+	    }
+	
+	    this.currentTextureIndex = 0;
+	
+	    return null;
+	  };
+	
+	  this.compute = function () {
+	
+	    var currentTextureIndex = this.currentTextureIndex;
+	    var nextTextureIndex = this.currentTextureIndex === 0 ? 1 : 0;
+	
+	    for (var i = 0, il = this.variables.length; i < il; i++) {
+	
+	      var variable = this.variables[i];
+	
+	      // Sets texture dependencies uniforms
+	      if (variable.dependencies !== null) {
+	
+	        var uniforms = variable.material.uniforms;
+	        for (var d = 0, dl = variable.dependencies.length; d < dl; d++) {
+	
+	          var depVar = variable.dependencies[d];
+	
+	          uniforms[depVar.name].value = depVar.renderTargets[currentTextureIndex].texture;
+	        }
+	      }
+	
+	      // Performs the computation for this variable
+	      this.doRenderTarget(variable.material, variable.renderTargets[nextTextureIndex]);
+	    }
+	
+	    this.currentTextureIndex = nextTextureIndex;
+	  };
+	
+	  this.getCurrentRenderTarget = function (variable) {
+	
+	    return variable.renderTargets[this.currentTextureIndex];
+	  };
+	
+	  this.getAlternateRenderTarget = function (variable) {
+	
+	    return variable.renderTargets[this.currentTextureIndex === 0 ? 1 : 0];
+	  };
+	
+	  function addResolutionDefine(materialShader) {
+	
+	    materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed(1) + ', ' + sizeY.toFixed(1) + " )";
+	  };
+	  this.addResolutionDefine = addResolutionDefine;
+	
+	  // The following functions can be used to compute things manually
+	
+	  function createShaderMaterial(computeFragmentShader, uniforms) {
+	
+	    uniforms = uniforms || {};
+	
+	    var material = new THREE.ShaderMaterial({
+	      uniforms: uniforms,
+	      vertexShader: getPassThroughVertexShader(),
+	      fragmentShader: computeFragmentShader
+	    });
+	
+	    addResolutionDefine(material);
+	
+	    return material;
+	  };
+	  this.createShaderMaterial = createShaderMaterial;
+	
+	  this.createRenderTarget = function (sizeXTexture, sizeYTexture, wrapS, wrapT, minFilter, magFilter) {
+	
+	    sizeXTexture = sizeXTexture || sizeX;
+	    sizeYTexture = sizeYTexture || sizeY;
+	
+	    wrapS = wrapS || THREE.ClampToEdgeWrapping;
+	    wrapT = wrapT || THREE.ClampToEdgeWrapping;
+	
+	    minFilter = minFilter || THREE.NearestFilter;
+	    magFilter = magFilter || THREE.NearestFilter;
+	
+	    var renderTarget = new THREE.WebGLRenderTarget(sizeXTexture, sizeYTexture, {
+	      wrapS: wrapS,
+	      wrapT: wrapT,
+	      minFilter: minFilter,
+	      magFilter: magFilter,
+	      format: THREE.RGBAFormat,
+	      type: THREE.FloatType,
+	      stencilBuffer: false
+	    });
+	
+	    return renderTarget;
+	  };
+	
+	  this.createTexture = function (sizeXTexture, sizeYTexture) {
+	
+	    sizeXTexture = sizeXTexture || sizeX;
+	    sizeYTexture = sizeYTexture || sizeY;
+	
+	    var a = new Float32Array(sizeXTexture * sizeYTexture * 4);
+	    var texture = new THREE.DataTexture(a, sizeX, sizeY, THREE.RGBAFormat, THREE.FloatType);
+	    texture.needsUpdate = true;
+	
+	    return texture;
+	  };
+	
+	  this.renderTexture = function (input, output) {
+	
+	    // Takes a texture, and render out in rendertarget
+	    // input = Texture
+	    // output = RenderTarget
+	
+	    passThruUniforms.texture.value = input;
+	
+	    this.doRenderTarget(passThruShader, output);
+	
+	    passThruUniforms.texture.value = null;
+	  };
+	
+	  this.doRenderTarget = function (material, output, forceClear) {
+	
+	    mesh.material = material;
+	    renderer.render(scene, camera, output, forceClear || false);
+	    mesh.material = passThruShader;
+	  };
+	
+	  // The following functions are added by Masayuki (2016-07-13)
+	
+	  this.readVariable = function (variable, output) {
+	
+	    // reads pixels in a texture on gpu into a buffer on cpu
+	    // variable = Variable
+	    // output = Texture
+	
+	    var renderTarget = this.getCurrentRenderTarget(variable);
+	    var texture = renderTarget.texture;
+	    output = output || this.createTexture(renderTarget.width, renderTarget.height);
+	
+	    this.renderTexture(texture, this.getAlternateRenderTarget(variable));
+	
+	    var gl = renderer.getContext();
+	    gl.readPixels(0, 0, renderTarget.width, renderTarget.height, gl.RGBA, gl.FLOAT, output.image.data);
+	    output.needsUpdate = true;
+	
+	    return output;
+	  };
+	
+	  this.updateVariable = function (variable, texture) {
+	    this.renderTexture(texture, variable.renderTargets[0]);
+	    this.renderTexture(texture, variable.renderTargets[1]);
+	  };
+	
+	  // Shaders
+	
+	  function getPassThroughVertexShader() {
+	
+	    return "void main()	{\n" + "\n" + "	gl_Position = vec4( position, 1.0 );\n" + "\n" + "}\n";
 	  }
 	
-	  _createClass(BinaryLoader, [{
-	    key: 'load',
-	    value: function load(url, onLoad, onProgress, onError) {
+	  function getPassThroughFragmentShader() {
 	
-	      // todo: unify load API to for easier SceneLoader use
+	    return "uniform sampler2D texture;\n" + "\n" + "void main() {\n" + "\n" + "	vec2 uv = gl_FragCoord.xy / resolution.xy;\n" + "\n" + "	gl_FragColor = texture2D( texture, uv );\n" + "\n" + "}\n";
+	  }
+	}
 	
-	      var texturePath = this.texturePath || _three2['default'].Loader.prototype.extractUrlBase(url);
-	      var binaryPath = this.binaryPath || _three2['default'].Loader.prototype.extractUrlBase(url);
-	
-	      // #1 load JS part via web worker
-	
-	      var scope = this;
-	
-	      var jsonloader = new _three2['default'].XHRLoader(this.manager);
-	      jsonloader.load(url, function (data) {
-	
-	        var json = JSON.parse(data);
-	
-	        var bufferUrl = binaryPath + json.buffers;
-	
-	        var bufferLoader = new _three2['default'].XHRLoader(scope.manager);
-	        bufferLoader.setResponseType('arraybuffer');
-	        bufferLoader.load(bufferUrl, function (bufData) {
-	
-	          // IEWEBGL needs this ???
-	          //buffer = ( new Uint8Array( xhr.responseBody ) ).buffer;
-	
-	          //// iOS and other XMLHttpRequest level 1 ???
-	
-	          scope.parse(bufData, onLoad, texturePath, json.materials);
-	        }, onProgress, onError);
-	      }, onProgress, onError);
-	    }
-	  }, {
-	    key: 'setBinaryPath',
-	    value: function setBinaryPath(value) {
-	
-	      this.binaryPath = value;
-	    }
-	  }, {
-	    key: 'setCrossOrigin',
-	    value: function setCrossOrigin(value) {
-	
-	      this.crossOrigin = value;
-	    }
-	  }, {
-	    key: 'setTexturePath',
-	    value: function setTexturePath(value) {
-	
-	      this.texturePath = value;
-	    }
-	  }, {
-	    key: 'parse',
-	    value: function parse(data, callback, texturePath, jsonMaterials) {
-	
-	      var Model = function Model(texturePath) {
-	
-	        var scope = this,
-	            currentOffset = 0,
-	            md,
-	            normals = [],
-	            uvs = [],
-	            start_tri_flat,
-	            start_tri_smooth,
-	            start_tri_flat_uv,
-	            start_tri_smooth_uv,
-	            start_quad_flat,
-	            start_quad_smooth,
-	            start_quad_flat_uv,
-	            start_quad_smooth_uv,
-	            tri_size,
-	            quad_size,
-	            len_tri_flat,
-	            len_tri_smooth,
-	            len_tri_flat_uv,
-	            len_tri_smooth_uv,
-	            len_quad_flat,
-	            len_quad_smooth,
-	            len_quad_flat_uv,
-	            len_quad_smooth_uv;
-	
-	        _three2['default'].Geometry.call(this);
-	
-	        md = parseMetaData(data, currentOffset);
-	
-	        currentOffset += md.header_bytes;
-	        /*
-	         md.vertex_index_bytes = Uint32Array.BYTES_PER_ELEMENT;
-	         md.material_index_bytes = Uint16Array.BYTES_PER_ELEMENT;
-	         md.normal_index_bytes = Uint32Array.BYTES_PER_ELEMENT;
-	         md.uv_index_bytes = Uint32Array.BYTES_PER_ELEMENT;
-	         */
-	        // buffers sizes
-	
-	        tri_size = md.vertex_index_bytes * 3 + md.material_index_bytes;
-	        quad_size = md.vertex_index_bytes * 4 + md.material_index_bytes;
-	
-	        len_tri_flat = md.ntri_flat * tri_size;
-	        len_tri_smooth = md.ntri_smooth * (tri_size + md.normal_index_bytes * 3);
-	        len_tri_flat_uv = md.ntri_flat_uv * (tri_size + md.uv_index_bytes * 3);
-	        len_tri_smooth_uv = md.ntri_smooth_uv * (tri_size + md.normal_index_bytes * 3 + md.uv_index_bytes * 3);
-	
-	        len_quad_flat = md.nquad_flat * quad_size;
-	        len_quad_smooth = md.nquad_smooth * (quad_size + md.normal_index_bytes * 4);
-	        len_quad_flat_uv = md.nquad_flat_uv * (quad_size + md.uv_index_bytes * 4);
-	        len_quad_smooth_uv = md.nquad_smooth_uv * (quad_size + md.normal_index_bytes * 4 + md.uv_index_bytes * 4);
-	
-	        // read buffers
-	
-	        currentOffset += init_vertices(currentOffset);
-	
-	        currentOffset += init_normals(currentOffset);
-	        currentOffset += handlePadding(md.nnormals * 3);
-	
-	        currentOffset += init_uvs(currentOffset);
-	
-	        start_tri_flat = currentOffset;
-	        start_tri_smooth = start_tri_flat + len_tri_flat + handlePadding(md.ntri_flat * 2);
-	        start_tri_flat_uv = start_tri_smooth + len_tri_smooth + handlePadding(md.ntri_smooth * 2);
-	        start_tri_smooth_uv = start_tri_flat_uv + len_tri_flat_uv + handlePadding(md.ntri_flat_uv * 2);
-	
-	        start_quad_flat = start_tri_smooth_uv + len_tri_smooth_uv + handlePadding(md.ntri_smooth_uv * 2);
-	        start_quad_smooth = start_quad_flat + len_quad_flat + handlePadding(md.nquad_flat * 2);
-	        start_quad_flat_uv = start_quad_smooth + len_quad_smooth + handlePadding(md.nquad_smooth * 2);
-	        start_quad_smooth_uv = start_quad_flat_uv + len_quad_flat_uv + handlePadding(md.nquad_flat_uv * 2);
-	
-	        // have to first process faces with uvs
-	        // so that face and uv indices match
-	
-	        init_triangles_flat_uv(start_tri_flat_uv);
-	        init_triangles_smooth_uv(start_tri_smooth_uv);
-	
-	        init_quads_flat_uv(start_quad_flat_uv);
-	        init_quads_smooth_uv(start_quad_smooth_uv);
-	
-	        // now we can process untextured faces
-	
-	        init_triangles_flat(start_tri_flat);
-	        init_triangles_smooth(start_tri_smooth);
-	
-	        init_quads_flat(start_quad_flat);
-	        init_quads_smooth(start_quad_smooth);
-	
-	        this.computeFaceNormals();
-	
-	        function handlePadding(n) {
-	
-	          return n % 4 ? 4 - n % 4 : 0;
-	        }
-	
-	        function parseMetaData(data, offset) {
-	
-	          var metaData = {
-	
-	            'signature': parseString(data, offset, 12),
-	            'header_bytes': parseUChar8(data, offset + 12),
-	
-	            'vertex_coordinate_bytes': parseUChar8(data, offset + 13),
-	            'normal_coordinate_bytes': parseUChar8(data, offset + 14),
-	            'uv_coordinate_bytes': parseUChar8(data, offset + 15),
-	
-	            'vertex_index_bytes': parseUChar8(data, offset + 16),
-	            'normal_index_bytes': parseUChar8(data, offset + 17),
-	            'uv_index_bytes': parseUChar8(data, offset + 18),
-	            'material_index_bytes': parseUChar8(data, offset + 19),
-	
-	            'nvertices': parseUInt32(data, offset + 20),
-	            'nnormals': parseUInt32(data, offset + 20 + 4 * 1),
-	            'nuvs': parseUInt32(data, offset + 20 + 4 * 2),
-	
-	            'ntri_flat': parseUInt32(data, offset + 20 + 4 * 3),
-	            'ntri_smooth': parseUInt32(data, offset + 20 + 4 * 4),
-	            'ntri_flat_uv': parseUInt32(data, offset + 20 + 4 * 5),
-	            'ntri_smooth_uv': parseUInt32(data, offset + 20 + 4 * 6),
-	
-	            'nquad_flat': parseUInt32(data, offset + 20 + 4 * 7),
-	            'nquad_smooth': parseUInt32(data, offset + 20 + 4 * 8),
-	            'nquad_flat_uv': parseUInt32(data, offset + 20 + 4 * 9),
-	            'nquad_smooth_uv': parseUInt32(data, offset + 20 + 4 * 10)
-	
-	          };
-	          /*
-	           console.log( "signature: " + metaData.signature );
-	           console.log( "header_bytes: " + metaData.header_bytes );
-	           console.log( "vertex_coordinate_bytes: " + metaData.vertex_coordinate_bytes );
-	           console.log( "normal_coordinate_bytes: " + metaData.normal_coordinate_bytes );
-	           console.log( "uv_coordinate_bytes: " + metaData.uv_coordinate_bytes );
-	           console.log( "vertex_index_bytes: " + metaData.vertex_index_bytes );
-	           console.log( "normal_index_bytes: " + metaData.normal_index_bytes );
-	           console.log( "uv_index_bytes: " + metaData.uv_index_bytes );
-	           console.log( "material_index_bytes: " + metaData.material_index_bytes );
-	           console.log( "nvertices: " + metaData.nvertices );
-	           console.log( "nnormals: " + metaData.nnormals );
-	           console.log( "nuvs: " + metaData.nuvs );
-	           console.log( "ntri_flat: " + metaData.ntri_flat );
-	           console.log( "ntri_smooth: " + metaData.ntri_smooth );
-	           console.log( "ntri_flat_uv: " + metaData.ntri_flat_uv );
-	           console.log( "ntri_smooth_uv: " + metaData.ntri_smooth_uv );
-	           console.log( "nquad_flat: " + metaData.nquad_flat );
-	           console.log( "nquad_smooth: " + metaData.nquad_smooth );
-	           console.log( "nquad_flat_uv: " + metaData.nquad_flat_uv );
-	           console.log( "nquad_smooth_uv: " + metaData.nquad_smooth_uv );
-	           var total = metaData.header_bytes
-	           + metaData.nvertices * metaData.vertex_coordinate_bytes * 3
-	           + metaData.nnormals * metaData.normal_coordinate_bytes * 3
-	           + metaData.nuvs * metaData.uv_coordinate_bytes * 2
-	           + metaData.ntri_flat * ( metaData.vertex_index_bytes*3 + metaData.material_index_bytes )
-	           + metaData.ntri_smooth * ( metaData.vertex_index_bytes*3 + metaData.material_index_bytes + metaData.normal_index_bytes*3 )
-	           + metaData.ntri_flat_uv * ( metaData.vertex_index_bytes*3 + metaData.material_index_bytes + metaData.uv_index_bytes*3 )
-	           + metaData.ntri_smooth_uv * ( metaData.vertex_index_bytes*3 + metaData.material_index_bytes + metaData.normal_index_bytes*3 + metaData.uv_index_bytes*3 )
-	           + metaData.nquad_flat * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes )
-	           + metaData.nquad_smooth * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.normal_index_bytes*4 )
-	           + metaData.nquad_flat_uv * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.uv_index_bytes*4 )
-	           + metaData.nquad_smooth_uv * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.normal_index_bytes*4 + metaData.uv_index_bytes*4 );
-	           console.log( "total bytes: " + total );
-	           */
-	
-	          return metaData;
-	        }
-	
-	        function parseString(data, offset, length) {
-	
-	          var charArray = new Uint8Array(data, offset, length);
-	
-	          var text = '';
-	
-	          for (var i = 0; i < length; i++) {
-	
-	            text += String.fromCharCode(charArray[offset + i]);
-	          }
-	
-	          return text;
-	        }
-	
-	        function parseUChar8(data, offset) {
-	
-	          var charArray = new Uint8Array(data, offset, 1);
-	
-	          return charArray[0];
-	        }
-	
-	        function parseUInt32(data, offset) {
-	
-	          var intArray = new Uint32Array(data, offset, 1);
-	
-	          return intArray[0];
-	        }
-	
-	        function init_vertices(start) {
-	
-	          var nElements = md.nvertices;
-	
-	          var coordArray = new Float32Array(data, start, nElements * 3);
-	
-	          var i, x, y, z;
-	
-	          for (i = 0; i < nElements; i++) {
-	
-	            x = coordArray[i * 3];
-	            y = coordArray[i * 3 + 1];
-	            z = coordArray[i * 3 + 2];
-	
-	            scope.vertices.push(new _three2['default'].Vector3(x, y, z));
-	          }
-	
-	          return nElements * 3 * Float32Array.BYTES_PER_ELEMENT;
-	        }
-	
-	        function init_normals(start) {
-	
-	          var nElements = md.nnormals;
-	
-	          if (nElements) {
-	
-	            var normalArray = new Int8Array(data, start, nElements * 3);
-	
-	            var i, x, y, z;
-	
-	            for (i = 0; i < nElements; i++) {
-	
-	              x = normalArray[i * 3];
-	              y = normalArray[i * 3 + 1];
-	              z = normalArray[i * 3 + 2];
-	
-	              normals.push(x / 127, y / 127, z / 127);
-	            }
-	          }
-	
-	          return nElements * 3 * Int8Array.BYTES_PER_ELEMENT;
-	        }
-	
-	        function init_uvs(start) {
-	
-	          var nElements = md.nuvs;
-	
-	          if (nElements) {
-	
-	            var uvArray = new Float32Array(data, start, nElements * 2);
-	
-	            var i, u, v;
-	
-	            for (i = 0; i < nElements; i++) {
-	
-	              u = uvArray[i * 2];
-	              v = uvArray[i * 2 + 1];
-	
-	              uvs.push(u, v);
-	            }
-	          }
-	
-	          return nElements * 2 * Float32Array.BYTES_PER_ELEMENT;
-	        }
-	
-	        function init_uvs3(nElements, offset) {
-	
-	          var i, uva, uvb, uvc, u1, u2, u3, v1, v2, v3;
-	
-	          var uvIndexBuffer = new Uint32Array(data, offset, 3 * nElements);
-	
-	          for (i = 0; i < nElements; i++) {
-	
-	            uva = uvIndexBuffer[i * 3];
-	            uvb = uvIndexBuffer[i * 3 + 1];
-	            uvc = uvIndexBuffer[i * 3 + 2];
-	
-	            u1 = uvs[uva * 2];
-	            v1 = uvs[uva * 2 + 1];
-	
-	            u2 = uvs[uvb * 2];
-	            v2 = uvs[uvb * 2 + 1];
-	
-	            u3 = uvs[uvc * 2];
-	            v3 = uvs[uvc * 2 + 1];
-	
-	            scope.faceVertexUvs[0].push([new _three2['default'].Vector2(u1, v1), new _three2['default'].Vector2(u2, v2), new _three2['default'].Vector2(u3, v3)]);
-	          }
-	        }
-	
-	        function init_uvs4(nElements, offset) {
-	
-	          var i, uva, uvb, uvc, uvd, u1, u2, u3, u4, v1, v2, v3, v4;
-	
-	          var uvIndexBuffer = new Uint32Array(data, offset, 4 * nElements);
-	
-	          for (i = 0; i < nElements; i++) {
-	
-	            uva = uvIndexBuffer[i * 4];
-	            uvb = uvIndexBuffer[i * 4 + 1];
-	            uvc = uvIndexBuffer[i * 4 + 2];
-	            uvd = uvIndexBuffer[i * 4 + 3];
-	
-	            u1 = uvs[uva * 2];
-	            v1 = uvs[uva * 2 + 1];
-	
-	            u2 = uvs[uvb * 2];
-	            v2 = uvs[uvb * 2 + 1];
-	
-	            u3 = uvs[uvc * 2];
-	            v3 = uvs[uvc * 2 + 1];
-	
-	            u4 = uvs[uvd * 2];
-	            v4 = uvs[uvd * 2 + 1];
-	
-	            scope.faceVertexUvs[0].push([new _three2['default'].Vector2(u1, v1), new _three2['default'].Vector2(u2, v2), new _three2['default'].Vector2(u4, v4)]);
-	
-	            scope.faceVertexUvs[0].push([new _three2['default'].Vector2(u2, v2), new _three2['default'].Vector2(u3, v3), new _three2['default'].Vector2(u4, v4)]);
-	          }
-	        }
-	
-	        function init_faces3_flat(nElements, offsetVertices, offsetMaterials) {
-	
-	          var i, a, b, c, m;
-	
-	          var vertexIndexBuffer = new Uint32Array(data, offsetVertices, 3 * nElements);
-	          var materialIndexBuffer = new Uint16Array(data, offsetMaterials, nElements);
-	
-	          for (i = 0; i < nElements; i++) {
-	
-	            a = vertexIndexBuffer[i * 3];
-	            b = vertexIndexBuffer[i * 3 + 1];
-	            c = vertexIndexBuffer[i * 3 + 2];
-	
-	            m = materialIndexBuffer[i];
-	
-	            scope.faces.push(new _three2['default'].Face3(a, b, c, null, null, m));
-	          }
-	        }
-	
-	        function init_faces4_flat(nElements, offsetVertices, offsetMaterials) {
-	
-	          var i, a, b, c, d, m;
-	
-	          var vertexIndexBuffer = new Uint32Array(data, offsetVertices, 4 * nElements);
-	          var materialIndexBuffer = new Uint16Array(data, offsetMaterials, nElements);
-	
-	          for (i = 0; i < nElements; i++) {
-	
-	            a = vertexIndexBuffer[i * 4];
-	            b = vertexIndexBuffer[i * 4 + 1];
-	            c = vertexIndexBuffer[i * 4 + 2];
-	            d = vertexIndexBuffer[i * 4 + 3];
-	
-	            m = materialIndexBuffer[i];
-	
-	            scope.faces.push(new _three2['default'].Face3(a, b, d, null, null, m));
-	            scope.faces.push(new _three2['default'].Face3(b, c, d, null, null, m));
-	          }
-	        }
-	
-	        function init_faces3_smooth(nElements, offsetVertices, offsetNormals, offsetMaterials) {
-	
-	          var i, a, b, c, m;
-	          var na, nb, nc;
-	
-	          var vertexIndexBuffer = new Uint32Array(data, offsetVertices, 3 * nElements);
-	          var normalIndexBuffer = new Uint32Array(data, offsetNormals, 3 * nElements);
-	          var materialIndexBuffer = new Uint16Array(data, offsetMaterials, nElements);
-	
-	          for (i = 0; i < nElements; i++) {
-	
-	            a = vertexIndexBuffer[i * 3];
-	            b = vertexIndexBuffer[i * 3 + 1];
-	            c = vertexIndexBuffer[i * 3 + 2];
-	
-	            na = normalIndexBuffer[i * 3];
-	            nb = normalIndexBuffer[i * 3 + 1];
-	            nc = normalIndexBuffer[i * 3 + 2];
-	
-	            m = materialIndexBuffer[i];
-	
-	            var nax = normals[na * 3],
-	                nay = normals[na * 3 + 1],
-	                naz = normals[na * 3 + 2],
-	                nbx = normals[nb * 3],
-	                nby = normals[nb * 3 + 1],
-	                nbz = normals[nb * 3 + 2],
-	                ncx = normals[nc * 3],
-	                ncy = normals[nc * 3 + 1],
-	                ncz = normals[nc * 3 + 2];
-	
-	            scope.faces.push(new _three2['default'].Face3(a, b, c, [new _three2['default'].Vector3(nax, nay, naz), new _three2['default'].Vector3(nbx, nby, nbz), new _three2['default'].Vector3(ncx, ncy, ncz)], null, m));
-	          }
-	        }
-	
-	        function init_faces4_smooth(nElements, offsetVertices, offsetNormals, offsetMaterials) {
-	
-	          var i, a, b, c, d, m;
-	          var na, nb, nc, nd;
-	
-	          var vertexIndexBuffer = new Uint32Array(data, offsetVertices, 4 * nElements);
-	          var normalIndexBuffer = new Uint32Array(data, offsetNormals, 4 * nElements);
-	          var materialIndexBuffer = new Uint16Array(data, offsetMaterials, nElements);
-	
-	          for (i = 0; i < nElements; i++) {
-	
-	            a = vertexIndexBuffer[i * 4];
-	            b = vertexIndexBuffer[i * 4 + 1];
-	            c = vertexIndexBuffer[i * 4 + 2];
-	            d = vertexIndexBuffer[i * 4 + 3];
-	
-	            na = normalIndexBuffer[i * 4];
-	            nb = normalIndexBuffer[i * 4 + 1];
-	            nc = normalIndexBuffer[i * 4 + 2];
-	            nd = normalIndexBuffer[i * 4 + 3];
-	
-	            m = materialIndexBuffer[i];
-	
-	            var nax = normals[na * 3],
-	                nay = normals[na * 3 + 1],
-	                naz = normals[na * 3 + 2],
-	                nbx = normals[nb * 3],
-	                nby = normals[nb * 3 + 1],
-	                nbz = normals[nb * 3 + 2],
-	                ncx = normals[nc * 3],
-	                ncy = normals[nc * 3 + 1],
-	                ncz = normals[nc * 3 + 2],
-	                ndx = normals[nd * 3],
-	                ndy = normals[nd * 3 + 1],
-	                ndz = normals[nd * 3 + 2];
-	
-	            scope.faces.push(new _three2['default'].Face3(a, b, d, [new _three2['default'].Vector3(nax, nay, naz), new _three2['default'].Vector3(nbx, nby, nbz), new _three2['default'].Vector3(ndx, ndy, ndz)], null, m));
-	
-	            scope.faces.push(new _three2['default'].Face3(b, c, d, [new _three2['default'].Vector3(nbx, nby, nbz), new _three2['default'].Vector3(ncx, ncy, ncz), new _three2['default'].Vector3(ndx, ndy, ndz)], null, m));
-	          }
-	        }
-	
-	        function init_triangles_flat(start) {
-	
-	          var nElements = md.ntri_flat;
-	
-	          if (nElements) {
-	
-	            var offsetMaterials = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
-	            init_faces3_flat(nElements, start, offsetMaterials);
-	          }
-	        }
-	
-	        function init_triangles_flat_uv(start) {
-	
-	          var nElements = md.ntri_flat_uv;
-	
-	          if (nElements) {
-	
-	            var offsetUvs = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
-	            var offsetMaterials = offsetUvs + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
-	
-	            init_faces3_flat(nElements, start, offsetMaterials);
-	            init_uvs3(nElements, offsetUvs);
-	          }
-	        }
-	
-	        function init_triangles_smooth(start) {
-	
-	          var nElements = md.ntri_smooth;
-	
-	          if (nElements) {
-	
-	            var offsetNormals = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
-	            var offsetMaterials = offsetNormals + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
-	
-	            init_faces3_smooth(nElements, start, offsetNormals, offsetMaterials);
-	          }
-	        }
-	
-	        function init_triangles_smooth_uv(start) {
-	
-	          var nElements = md.ntri_smooth_uv;
-	
-	          if (nElements) {
-	
-	            var offsetNormals = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
-	            var offsetUvs = offsetNormals + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
-	            var offsetMaterials = offsetUvs + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
-	
-	            init_faces3_smooth(nElements, start, offsetNormals, offsetMaterials);
-	            init_uvs3(nElements, offsetUvs);
-	          }
-	        }
-	
-	        function init_quads_flat(start) {
-	
-	          var nElements = md.nquad_flat;
-	
-	          if (nElements) {
-	
-	            var offsetMaterials = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
-	            init_faces4_flat(nElements, start, offsetMaterials);
-	          }
-	        }
-	
-	        function init_quads_flat_uv(start) {
-	
-	          var nElements = md.nquad_flat_uv;
-	
-	          if (nElements) {
-	
-	            var offsetUvs = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
-	            var offsetMaterials = offsetUvs + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
-	
-	            init_faces4_flat(nElements, start, offsetMaterials);
-	            init_uvs4(nElements, offsetUvs);
-	          }
-	        }
-	
-	        function init_quads_smooth(start) {
-	
-	          var nElements = md.nquad_smooth;
-	
-	          if (nElements) {
-	
-	            var offsetNormals = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
-	            var offsetMaterials = offsetNormals + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
-	
-	            init_faces4_smooth(nElements, start, offsetNormals, offsetMaterials);
-	          }
-	        }
-	
-	        function init_quads_smooth_uv(start) {
-	
-	          var nElements = md.nquad_smooth_uv;
-	
-	          if (nElements) {
-	
-	            var offsetNormals = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
-	            var offsetUvs = offsetNormals + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
-	            var offsetMaterials = offsetUvs + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
-	
-	            init_faces4_smooth(nElements, start, offsetNormals, offsetMaterials);
-	            init_uvs4(nElements, offsetUvs);
-	          }
-	        }
-	      };
-	
-	      Model.prototype = Object.create(_three2['default'].Geometry.prototype);
-	      Model.prototype.constructor = Model;
-	
-	      var geometry = new Model(texturePath);
-	      var materials = _three2['default'].Loader.prototype.initMaterials(jsonMaterials, texturePath, this.crossOrigin);
-	
-	      callback(geometry, materials);
-	    }
-	  }]);
-	
-	  return BinaryLoader;
-	})(_eventemitter32['default']);
-	
-	exports['default'] = BinaryLoader;
-	
-	var noNew = function noNew(options) {
-	  return new BinaryLoader(options);
-	};
-	
-	exports.binaryLoader = noNew;
+	exports["default"] = GPUComputationRenderer;
+	module.exports = exports["default"];
 
 /***/ },
 /* 79 */
@@ -19585,9 +19649,1219 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
+	/**
+	 * Created by masayuki on 17/07/2016.
+	 */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _vendorBinaryLoader = __webpack_require__(80);
+	
+	var _vendorBinaryLoader2 = _interopRequireDefault(_vendorBinaryLoader);
+	
+	var VehicleModel = function VehicleModel(parameters, callback) {
+	
+	  var scope = this;
+	  var p = parameters;
+	
+	  // file paths
+	  this.bodyURL = p.bodyURL || null;
+	  this.wheelURL = p.wheelURL || null;
+	
+	  // parameters
+	  this.scale = p.scale || 1.0;
+	  this.translation = p.translation || new _three2['default'].Vector3();
+	  this.rotation = p.rotation || new _three2['default'].Vector3();
+	  this.wheelOffset = p.wheelOffset || new _three2['default'].Vector3();
+	  this.autoWheelOffset = p.autoWheelOffset || true;
+	
+	  // properties
+	  this.wheelDiameter = 1.0;
+	
+	  // callback
+	  this.callback = callback;
+	
+	  // status
+	  this.loaded = false;
+	
+	  // internal use
+	  this.bodyGeometry = null;
+	  this.bodyMaterials = null;
+	
+	  this.wheelGeometry = null;
+	  this.wheelMaterials = null;
+	
+	  // construct
+	  if (scope.bodyURL && scope.wheelURL) {
+	    // load binaries
+	    var bloader = new _three2['default'].BinaryLoader();
+	    bloader.load(scope.bodyURL, function (geometry, materials) {
+	      createBody(geometry, materials);
+	    });
+	    bloader.load(scope.wheelURL, function (geometry, materials) {
+	      createWheel(geometry, materials);
+	    });
+	  }
+	
+	  // internal helper methods
+	  function createBody(geometry, materials) {
+	    scope.bodyGeometry = geometry;
+	    scope.bodyMaterials = materials;
+	
+	    onCreated();
+	  }
+	  function createWheel(geometry, materials) {
+	    scope.wheelGeometry = geometry;
+	    scope.wheelMaterials = materials;
+	
+	    onCreated();
+	  }
+	  function onCreated() {
+	    if (scope.bodyGeometry && scope.wheelGeometry) {
+	      scope.loaded = true;
+	
+	      // wheel
+	      scope.wheelGeometry.computeBoundingBox();
+	      var wbb = scope.wheelGeometry.boundingBox;
+	
+	      // compute wheel diameter
+	      scope.wheelDiameter = wbb.max.y - wbb.min.y;
+	
+	      // compute wheel offsets
+	      if (scope.autoWheelOffset) {
+	        scope.wheelOffset.addVectors(wbb.min, wbb.max);
+	        scope.wheelOffset.multiplyScalar(0.5);
+	
+	        scope.wheelGeometry.center();
+	      }
+	
+	      // callback
+	      if (scope.callback) {
+	        scope.callback(scope);
+	      }
+	    }
+	  }
+	};
+	
+	exports['default'] = VehicleModel;
+	module.exports = exports['default'];
+
+/***/ },
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	/**
+	 * @author alteredq / http://alteredqualia.com/
+	 */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var BinaryLoader = function BinaryLoader(manager) {
+	
+	  if (typeof manager === 'boolean') {
+	
+	    console.warn('THREE.BinaryLoader: showStatus parameter has been removed from constructor.');
+	    manager = undefined;
+	  }
+	
+	  this.manager = manager !== undefined ? manager : _three2['default'].DefaultLoadingManager;
+	};
+	
+	BinaryLoader.prototype = {
+	
+	  constructor: _three2['default'].BinaryLoader,
+	
+	  // Load models generated by slim OBJ converter with BINARY option (converter_obj_three_slim.py -t binary)
+	  //  - binary models consist of two files: JS and BIN
+	  //  - parameters
+	  //		- url (required)
+	  //		- callback (required)
+	  //		- texturePath (optional: if not specified, textures will be assumed to be in the same folder as JS model file)
+	  //		- binaryPath (optional: if not specified, binary file will be assumed to be in the same folder as JS model file)
+	  load: function load(url, onLoad, onProgress, onError) {
+	
+	    // todo: unify load API to for easier SceneLoader use
+	
+	    var texturePath = this.texturePath || _three2['default'].Loader.prototype.extractUrlBase(url);
+	    var binaryPath = this.binaryPath || _three2['default'].Loader.prototype.extractUrlBase(url);
+	
+	    // #1 load JS part via web worker
+	
+	    var scope = this;
+	
+	    var jsonloader = new _three2['default'].XHRLoader(this.manager);
+	    jsonloader.load(url, function (data) {
+	
+	      var json = JSON.parse(data);
+	
+	      var bufferUrl = binaryPath + json.buffers;
+	
+	      var bufferLoader = new _three2['default'].XHRLoader(scope.manager);
+	      bufferLoader.setResponseType('arraybuffer');
+	      bufferLoader.load(bufferUrl, function (bufData) {
+	
+	        // IEWEBGL needs this ???
+	        //buffer = ( new Uint8Array( xhr.responseBody ) ).buffer;
+	
+	        //// iOS and other XMLHttpRequest level 1 ???
+	
+	        scope.parse(bufData, onLoad, texturePath, json.materials);
+	      }, onProgress, onError);
+	    }, onProgress, onError);
+	  },
+	
+	  setBinaryPath: function setBinaryPath(value) {
+	
+	    this.binaryPath = value;
+	  },
+	
+	  setCrossOrigin: function setCrossOrigin(value) {
+	
+	    this.crossOrigin = value;
+	  },
+	
+	  setTexturePath: function setTexturePath(value) {
+	
+	    this.texturePath = value;
+	  },
+	
+	  parse: function parse(data, callback, texturePath, jsonMaterials) {
+	
+	    var Model = function Model(texturePath) {
+	
+	      var scope = this,
+	          currentOffset = 0,
+	          md,
+	          normals = [],
+	          uvs = [],
+	          start_tri_flat,
+	          start_tri_smooth,
+	          start_tri_flat_uv,
+	          start_tri_smooth_uv,
+	          start_quad_flat,
+	          start_quad_smooth,
+	          start_quad_flat_uv,
+	          start_quad_smooth_uv,
+	          tri_size,
+	          quad_size,
+	          len_tri_flat,
+	          len_tri_smooth,
+	          len_tri_flat_uv,
+	          len_tri_smooth_uv,
+	          len_quad_flat,
+	          len_quad_smooth,
+	          len_quad_flat_uv,
+	          len_quad_smooth_uv;
+	
+	      _three2['default'].Geometry.call(this);
+	
+	      md = parseMetaData(data, currentOffset);
+	
+	      currentOffset += md.header_bytes;
+	      /*
+	       md.vertex_index_bytes = Uint32Array.BYTES_PER_ELEMENT;
+	       md.material_index_bytes = Uint16Array.BYTES_PER_ELEMENT;
+	       md.normal_index_bytes = Uint32Array.BYTES_PER_ELEMENT;
+	       md.uv_index_bytes = Uint32Array.BYTES_PER_ELEMENT;
+	       */
+	      // buffers sizes
+	
+	      tri_size = md.vertex_index_bytes * 3 + md.material_index_bytes;
+	      quad_size = md.vertex_index_bytes * 4 + md.material_index_bytes;
+	
+	      len_tri_flat = md.ntri_flat * tri_size;
+	      len_tri_smooth = md.ntri_smooth * (tri_size + md.normal_index_bytes * 3);
+	      len_tri_flat_uv = md.ntri_flat_uv * (tri_size + md.uv_index_bytes * 3);
+	      len_tri_smooth_uv = md.ntri_smooth_uv * (tri_size + md.normal_index_bytes * 3 + md.uv_index_bytes * 3);
+	
+	      len_quad_flat = md.nquad_flat * quad_size;
+	      len_quad_smooth = md.nquad_smooth * (quad_size + md.normal_index_bytes * 4);
+	      len_quad_flat_uv = md.nquad_flat_uv * (quad_size + md.uv_index_bytes * 4);
+	      len_quad_smooth_uv = md.nquad_smooth_uv * (quad_size + md.normal_index_bytes * 4 + md.uv_index_bytes * 4);
+	
+	      // read buffers
+	
+	      currentOffset += init_vertices(currentOffset);
+	
+	      currentOffset += init_normals(currentOffset);
+	      currentOffset += handlePadding(md.nnormals * 3);
+	
+	      currentOffset += init_uvs(currentOffset);
+	
+	      start_tri_flat = currentOffset;
+	      start_tri_smooth = start_tri_flat + len_tri_flat + handlePadding(md.ntri_flat * 2);
+	      start_tri_flat_uv = start_tri_smooth + len_tri_smooth + handlePadding(md.ntri_smooth * 2);
+	      start_tri_smooth_uv = start_tri_flat_uv + len_tri_flat_uv + handlePadding(md.ntri_flat_uv * 2);
+	
+	      start_quad_flat = start_tri_smooth_uv + len_tri_smooth_uv + handlePadding(md.ntri_smooth_uv * 2);
+	      start_quad_smooth = start_quad_flat + len_quad_flat + handlePadding(md.nquad_flat * 2);
+	      start_quad_flat_uv = start_quad_smooth + len_quad_smooth + handlePadding(md.nquad_smooth * 2);
+	      start_quad_smooth_uv = start_quad_flat_uv + len_quad_flat_uv + handlePadding(md.nquad_flat_uv * 2);
+	
+	      // have to first process faces with uvs
+	      // so that face and uv indices match
+	
+	      init_triangles_flat_uv(start_tri_flat_uv);
+	      init_triangles_smooth_uv(start_tri_smooth_uv);
+	
+	      init_quads_flat_uv(start_quad_flat_uv);
+	      init_quads_smooth_uv(start_quad_smooth_uv);
+	
+	      // now we can process untextured faces
+	
+	      init_triangles_flat(start_tri_flat);
+	      init_triangles_smooth(start_tri_smooth);
+	
+	      init_quads_flat(start_quad_flat);
+	      init_quads_smooth(start_quad_smooth);
+	
+	      this.computeFaceNormals();
+	
+	      function handlePadding(n) {
+	
+	        return n % 4 ? 4 - n % 4 : 0;
+	      }
+	
+	      function parseMetaData(data, offset) {
+	
+	        var metaData = {
+	
+	          'signature': parseString(data, offset, 12),
+	          'header_bytes': parseUChar8(data, offset + 12),
+	
+	          'vertex_coordinate_bytes': parseUChar8(data, offset + 13),
+	          'normal_coordinate_bytes': parseUChar8(data, offset + 14),
+	          'uv_coordinate_bytes': parseUChar8(data, offset + 15),
+	
+	          'vertex_index_bytes': parseUChar8(data, offset + 16),
+	          'normal_index_bytes': parseUChar8(data, offset + 17),
+	          'uv_index_bytes': parseUChar8(data, offset + 18),
+	          'material_index_bytes': parseUChar8(data, offset + 19),
+	
+	          'nvertices': parseUInt32(data, offset + 20),
+	          'nnormals': parseUInt32(data, offset + 20 + 4 * 1),
+	          'nuvs': parseUInt32(data, offset + 20 + 4 * 2),
+	
+	          'ntri_flat': parseUInt32(data, offset + 20 + 4 * 3),
+	          'ntri_smooth': parseUInt32(data, offset + 20 + 4 * 4),
+	          'ntri_flat_uv': parseUInt32(data, offset + 20 + 4 * 5),
+	          'ntri_smooth_uv': parseUInt32(data, offset + 20 + 4 * 6),
+	
+	          'nquad_flat': parseUInt32(data, offset + 20 + 4 * 7),
+	          'nquad_smooth': parseUInt32(data, offset + 20 + 4 * 8),
+	          'nquad_flat_uv': parseUInt32(data, offset + 20 + 4 * 9),
+	          'nquad_smooth_uv': parseUInt32(data, offset + 20 + 4 * 10)
+	
+	        };
+	        /*
+	         console.log( "signature: " + metaData.signature );
+	          console.log( "header_bytes: " + metaData.header_bytes );
+	         console.log( "vertex_coordinate_bytes: " + metaData.vertex_coordinate_bytes );
+	         console.log( "normal_coordinate_bytes: " + metaData.normal_coordinate_bytes );
+	         console.log( "uv_coordinate_bytes: " + metaData.uv_coordinate_bytes );
+	          console.log( "vertex_index_bytes: " + metaData.vertex_index_bytes );
+	         console.log( "normal_index_bytes: " + metaData.normal_index_bytes );
+	         console.log( "uv_index_bytes: " + metaData.uv_index_bytes );
+	         console.log( "material_index_bytes: " + metaData.material_index_bytes );
+	          console.log( "nvertices: " + metaData.nvertices );
+	         console.log( "nnormals: " + metaData.nnormals );
+	         console.log( "nuvs: " + metaData.nuvs );
+	          console.log( "ntri_flat: " + metaData.ntri_flat );
+	         console.log( "ntri_smooth: " + metaData.ntri_smooth );
+	         console.log( "ntri_flat_uv: " + metaData.ntri_flat_uv );
+	         console.log( "ntri_smooth_uv: " + metaData.ntri_smooth_uv );
+	          console.log( "nquad_flat: " + metaData.nquad_flat );
+	         console.log( "nquad_smooth: " + metaData.nquad_smooth );
+	         console.log( "nquad_flat_uv: " + metaData.nquad_flat_uv );
+	         console.log( "nquad_smooth_uv: " + metaData.nquad_smooth_uv );
+	          var total = metaData.header_bytes
+	         + metaData.nvertices * metaData.vertex_coordinate_bytes * 3
+	         + metaData.nnormals * metaData.normal_coordinate_bytes * 3
+	         + metaData.nuvs * metaData.uv_coordinate_bytes * 2
+	         + metaData.ntri_flat * ( metaData.vertex_index_bytes*3 + metaData.material_index_bytes )
+	         + metaData.ntri_smooth * ( metaData.vertex_index_bytes*3 + metaData.material_index_bytes + metaData.normal_index_bytes*3 )
+	         + metaData.ntri_flat_uv * ( metaData.vertex_index_bytes*3 + metaData.material_index_bytes + metaData.uv_index_bytes*3 )
+	         + metaData.ntri_smooth_uv * ( metaData.vertex_index_bytes*3 + metaData.material_index_bytes + metaData.normal_index_bytes*3 + metaData.uv_index_bytes*3 )
+	         + metaData.nquad_flat * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes )
+	         + metaData.nquad_smooth * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.normal_index_bytes*4 )
+	         + metaData.nquad_flat_uv * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.uv_index_bytes*4 )
+	         + metaData.nquad_smooth_uv * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.normal_index_bytes*4 + metaData.uv_index_bytes*4 );
+	         console.log( "total bytes: " + total );
+	         */
+	
+	        return metaData;
+	      }
+	
+	      function parseString(data, offset, length) {
+	
+	        var charArray = new Uint8Array(data, offset, length);
+	
+	        var text = "";
+	
+	        for (var i = 0; i < length; i++) {
+	
+	          text += String.fromCharCode(charArray[offset + i]);
+	        }
+	
+	        return text;
+	      }
+	
+	      function parseUChar8(data, offset) {
+	
+	        var charArray = new Uint8Array(data, offset, 1);
+	
+	        return charArray[0];
+	      }
+	
+	      function parseUInt32(data, offset) {
+	
+	        var intArray = new Uint32Array(data, offset, 1);
+	
+	        return intArray[0];
+	      }
+	
+	      function init_vertices(start) {
+	
+	        var nElements = md.nvertices;
+	
+	        var coordArray = new Float32Array(data, start, nElements * 3);
+	
+	        var i, x, y, z;
+	
+	        for (i = 0; i < nElements; i++) {
+	
+	          x = coordArray[i * 3];
+	          y = coordArray[i * 3 + 1];
+	          z = coordArray[i * 3 + 2];
+	
+	          scope.vertices.push(new _three2['default'].Vector3(x, y, z));
+	        }
+	
+	        return nElements * 3 * Float32Array.BYTES_PER_ELEMENT;
+	      }
+	
+	      function init_normals(start) {
+	
+	        var nElements = md.nnormals;
+	
+	        if (nElements) {
+	
+	          var normalArray = new Int8Array(data, start, nElements * 3);
+	
+	          var i, x, y, z;
+	
+	          for (i = 0; i < nElements; i++) {
+	
+	            x = normalArray[i * 3];
+	            y = normalArray[i * 3 + 1];
+	            z = normalArray[i * 3 + 2];
+	
+	            normals.push(x / 127, y / 127, z / 127);
+	          }
+	        }
+	
+	        return nElements * 3 * Int8Array.BYTES_PER_ELEMENT;
+	      }
+	
+	      function init_uvs(start) {
+	
+	        var nElements = md.nuvs;
+	
+	        if (nElements) {
+	
+	          var uvArray = new Float32Array(data, start, nElements * 2);
+	
+	          var i, u, v;
+	
+	          for (i = 0; i < nElements; i++) {
+	
+	            u = uvArray[i * 2];
+	            v = uvArray[i * 2 + 1];
+	
+	            uvs.push(u, v);
+	          }
+	        }
+	
+	        return nElements * 2 * Float32Array.BYTES_PER_ELEMENT;
+	      }
+	
+	      function init_uvs3(nElements, offset) {
+	
+	        var i, uva, uvb, uvc, u1, u2, u3, v1, v2, v3;
+	
+	        var uvIndexBuffer = new Uint32Array(data, offset, 3 * nElements);
+	
+	        for (i = 0; i < nElements; i++) {
+	
+	          uva = uvIndexBuffer[i * 3];
+	          uvb = uvIndexBuffer[i * 3 + 1];
+	          uvc = uvIndexBuffer[i * 3 + 2];
+	
+	          u1 = uvs[uva * 2];
+	          v1 = uvs[uva * 2 + 1];
+	
+	          u2 = uvs[uvb * 2];
+	          v2 = uvs[uvb * 2 + 1];
+	
+	          u3 = uvs[uvc * 2];
+	          v3 = uvs[uvc * 2 + 1];
+	
+	          scope.faceVertexUvs[0].push([new _three2['default'].Vector2(u1, v1), new _three2['default'].Vector2(u2, v2), new _three2['default'].Vector2(u3, v3)]);
+	        }
+	      }
+	
+	      function init_uvs4(nElements, offset) {
+	
+	        var i, uva, uvb, uvc, uvd, u1, u2, u3, u4, v1, v2, v3, v4;
+	
+	        var uvIndexBuffer = new Uint32Array(data, offset, 4 * nElements);
+	
+	        for (i = 0; i < nElements; i++) {
+	
+	          uva = uvIndexBuffer[i * 4];
+	          uvb = uvIndexBuffer[i * 4 + 1];
+	          uvc = uvIndexBuffer[i * 4 + 2];
+	          uvd = uvIndexBuffer[i * 4 + 3];
+	
+	          u1 = uvs[uva * 2];
+	          v1 = uvs[uva * 2 + 1];
+	
+	          u2 = uvs[uvb * 2];
+	          v2 = uvs[uvb * 2 + 1];
+	
+	          u3 = uvs[uvc * 2];
+	          v3 = uvs[uvc * 2 + 1];
+	
+	          u4 = uvs[uvd * 2];
+	          v4 = uvs[uvd * 2 + 1];
+	
+	          scope.faceVertexUvs[0].push([new _three2['default'].Vector2(u1, v1), new _three2['default'].Vector2(u2, v2), new _three2['default'].Vector2(u4, v4)]);
+	
+	          scope.faceVertexUvs[0].push([new _three2['default'].Vector2(u2, v2), new _three2['default'].Vector2(u3, v3), new _three2['default'].Vector2(u4, v4)]);
+	        }
+	      }
+	
+	      function init_faces3_flat(nElements, offsetVertices, offsetMaterials) {
+	
+	        var i, a, b, c, m;
+	
+	        var vertexIndexBuffer = new Uint32Array(data, offsetVertices, 3 * nElements);
+	        var materialIndexBuffer = new Uint16Array(data, offsetMaterials, nElements);
+	
+	        for (i = 0; i < nElements; i++) {
+	
+	          a = vertexIndexBuffer[i * 3];
+	          b = vertexIndexBuffer[i * 3 + 1];
+	          c = vertexIndexBuffer[i * 3 + 2];
+	
+	          m = materialIndexBuffer[i];
+	
+	          scope.faces.push(new _three2['default'].Face3(a, b, c, null, null, m));
+	        }
+	      }
+	
+	      function init_faces4_flat(nElements, offsetVertices, offsetMaterials) {
+	
+	        var i, a, b, c, d, m;
+	
+	        var vertexIndexBuffer = new Uint32Array(data, offsetVertices, 4 * nElements);
+	        var materialIndexBuffer = new Uint16Array(data, offsetMaterials, nElements);
+	
+	        for (i = 0; i < nElements; i++) {
+	
+	          a = vertexIndexBuffer[i * 4];
+	          b = vertexIndexBuffer[i * 4 + 1];
+	          c = vertexIndexBuffer[i * 4 + 2];
+	          d = vertexIndexBuffer[i * 4 + 3];
+	
+	          m = materialIndexBuffer[i];
+	
+	          scope.faces.push(new _three2['default'].Face3(a, b, d, null, null, m));
+	          scope.faces.push(new _three2['default'].Face3(b, c, d, null, null, m));
+	        }
+	      }
+	
+	      function init_faces3_smooth(nElements, offsetVertices, offsetNormals, offsetMaterials) {
+	
+	        var i, a, b, c, m;
+	        var na, nb, nc;
+	
+	        var vertexIndexBuffer = new Uint32Array(data, offsetVertices, 3 * nElements);
+	        var normalIndexBuffer = new Uint32Array(data, offsetNormals, 3 * nElements);
+	        var materialIndexBuffer = new Uint16Array(data, offsetMaterials, nElements);
+	
+	        for (i = 0; i < nElements; i++) {
+	
+	          a = vertexIndexBuffer[i * 3];
+	          b = vertexIndexBuffer[i * 3 + 1];
+	          c = vertexIndexBuffer[i * 3 + 2];
+	
+	          na = normalIndexBuffer[i * 3];
+	          nb = normalIndexBuffer[i * 3 + 1];
+	          nc = normalIndexBuffer[i * 3 + 2];
+	
+	          m = materialIndexBuffer[i];
+	
+	          var nax = normals[na * 3],
+	              nay = normals[na * 3 + 1],
+	              naz = normals[na * 3 + 2],
+	              nbx = normals[nb * 3],
+	              nby = normals[nb * 3 + 1],
+	              nbz = normals[nb * 3 + 2],
+	              ncx = normals[nc * 3],
+	              ncy = normals[nc * 3 + 1],
+	              ncz = normals[nc * 3 + 2];
+	
+	          scope.faces.push(new _three2['default'].Face3(a, b, c, [new _three2['default'].Vector3(nax, nay, naz), new _three2['default'].Vector3(nbx, nby, nbz), new _three2['default'].Vector3(ncx, ncy, ncz)], null, m));
+	        }
+	      }
+	
+	      function init_faces4_smooth(nElements, offsetVertices, offsetNormals, offsetMaterials) {
+	
+	        var i, a, b, c, d, m;
+	        var na, nb, nc, nd;
+	
+	        var vertexIndexBuffer = new Uint32Array(data, offsetVertices, 4 * nElements);
+	        var normalIndexBuffer = new Uint32Array(data, offsetNormals, 4 * nElements);
+	        var materialIndexBuffer = new Uint16Array(data, offsetMaterials, nElements);
+	
+	        for (i = 0; i < nElements; i++) {
+	
+	          a = vertexIndexBuffer[i * 4];
+	          b = vertexIndexBuffer[i * 4 + 1];
+	          c = vertexIndexBuffer[i * 4 + 2];
+	          d = vertexIndexBuffer[i * 4 + 3];
+	
+	          na = normalIndexBuffer[i * 4];
+	          nb = normalIndexBuffer[i * 4 + 1];
+	          nc = normalIndexBuffer[i * 4 + 2];
+	          nd = normalIndexBuffer[i * 4 + 3];
+	
+	          m = materialIndexBuffer[i];
+	
+	          var nax = normals[na * 3],
+	              nay = normals[na * 3 + 1],
+	              naz = normals[na * 3 + 2],
+	              nbx = normals[nb * 3],
+	              nby = normals[nb * 3 + 1],
+	              nbz = normals[nb * 3 + 2],
+	              ncx = normals[nc * 3],
+	              ncy = normals[nc * 3 + 1],
+	              ncz = normals[nc * 3 + 2],
+	              ndx = normals[nd * 3],
+	              ndy = normals[nd * 3 + 1],
+	              ndz = normals[nd * 3 + 2];
+	
+	          scope.faces.push(new _three2['default'].Face3(a, b, d, [new _three2['default'].Vector3(nax, nay, naz), new _three2['default'].Vector3(nbx, nby, nbz), new _three2['default'].Vector3(ndx, ndy, ndz)], null, m));
+	
+	          scope.faces.push(new _three2['default'].Face3(b, c, d, [new _three2['default'].Vector3(nbx, nby, nbz), new _three2['default'].Vector3(ncx, ncy, ncz), new _three2['default'].Vector3(ndx, ndy, ndz)], null, m));
+	        }
+	      }
+	
+	      function init_triangles_flat(start) {
+	
+	        var nElements = md.ntri_flat;
+	
+	        if (nElements) {
+	
+	          var offsetMaterials = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+	          init_faces3_flat(nElements, start, offsetMaterials);
+	        }
+	      }
+	
+	      function init_triangles_flat_uv(start) {
+	
+	        var nElements = md.ntri_flat_uv;
+	
+	        if (nElements) {
+	
+	          var offsetUvs = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+	          var offsetMaterials = offsetUvs + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+	
+	          init_faces3_flat(nElements, start, offsetMaterials);
+	          init_uvs3(nElements, offsetUvs);
+	        }
+	      }
+	
+	      function init_triangles_smooth(start) {
+	
+	        var nElements = md.ntri_smooth;
+	
+	        if (nElements) {
+	
+	          var offsetNormals = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+	          var offsetMaterials = offsetNormals + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+	
+	          init_faces3_smooth(nElements, start, offsetNormals, offsetMaterials);
+	        }
+	      }
+	
+	      function init_triangles_smooth_uv(start) {
+	
+	        var nElements = md.ntri_smooth_uv;
+	
+	        if (nElements) {
+	
+	          var offsetNormals = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+	          var offsetUvs = offsetNormals + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+	          var offsetMaterials = offsetUvs + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+	
+	          init_faces3_smooth(nElements, start, offsetNormals, offsetMaterials);
+	          init_uvs3(nElements, offsetUvs);
+	        }
+	      }
+	
+	      function init_quads_flat(start) {
+	
+	        var nElements = md.nquad_flat;
+	
+	        if (nElements) {
+	
+	          var offsetMaterials = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+	          init_faces4_flat(nElements, start, offsetMaterials);
+	        }
+	      }
+	
+	      function init_quads_flat_uv(start) {
+	
+	        var nElements = md.nquad_flat_uv;
+	
+	        if (nElements) {
+	
+	          var offsetUvs = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+	          var offsetMaterials = offsetUvs + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+	
+	          init_faces4_flat(nElements, start, offsetMaterials);
+	          init_uvs4(nElements, offsetUvs);
+	        }
+	      }
+	
+	      function init_quads_smooth(start) {
+	
+	        var nElements = md.nquad_smooth;
+	
+	        if (nElements) {
+	
+	          var offsetNormals = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+	          var offsetMaterials = offsetNormals + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+	
+	          init_faces4_smooth(nElements, start, offsetNormals, offsetMaterials);
+	        }
+	      }
+	
+	      function init_quads_smooth_uv(start) {
+	
+	        var nElements = md.nquad_smooth_uv;
+	
+	        if (nElements) {
+	
+	          var offsetNormals = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+	          var offsetUvs = offsetNormals + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+	          var offsetMaterials = offsetUvs + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+	
+	          init_faces4_smooth(nElements, start, offsetNormals, offsetMaterials);
+	          init_uvs4(nElements, offsetUvs);
+	        }
+	      }
+	    };
+	
+	    Model.prototype = Object.create(_three2['default'].Geometry.prototype);
+	    Model.prototype.constructor = Model;
+	
+	    var geometry = new Model(texturePath);
+	    var materials = _three2['default'].Loader.prototype.initMaterials(jsonMaterials, texturePath, this.crossOrigin);
+	
+	    callback(geometry, materials);
+	  }
+	
+	};
+	
+	exports['default'] = BinaryLoader;
+	
+	_three2['default'].BinaryLoader = BinaryLoader;
+	module.exports = exports['default'];
+
+/***/ },
+/* 81 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	/**
+	 * Created by masayuki on 17/07/2016.
+	 */
+	
+	var ModelRepository = (function () {
+	  function ModelRepository() {
+	    _classCallCheck(this, ModelRepository);
+	
+	    this._map = {};
+	  }
+	
+	  _createClass(ModelRepository, [{
+	    key: "add",
+	    value: function add(modelName, vehicleModel) {
+	      this._map[modelName] = vehicleModel;
+	    }
+	  }, {
+	    key: "get",
+	    value: function get(modelName) {
+	      return this._map[modelName];
+	    }
+	  }, {
+	    key: "contains",
+	    value: function contains(modelName) {
+	      return modelName in this._map;
+	    }
+	  }]);
+	
+	  return ModelRepository;
+	})();
+	
+	var modelRepository = new ModelRepository();
+	
+	exports["default"] = modelRepository;
+	module.exports = exports["default"];
+
+/***/ },
+/* 82 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	// jscs:disable
+	/* eslint-disable */
+	
+	/**
+	 * Created by masayuki on 17/07/2016.
+	 */
+	
+	var Vehicle = function Vehicle(vehicleModel) {
+	
+	  var scope = this;
+	
+	  // parameters
+	  this.model = vehicleModel;
+	  this.callback = function (scope) {};
+	
+	  // properties
+	  this.angle = 0.0;
+	  this.wheelAngle = 0.0;
+	  this.velocity = 0.0;
+	  this.wheelDiameter = 1.0;
+	  this.updatePosition = true;
+	  this.updateWheel = true;
+	
+	  // 3D Object
+	  this.root = new THREE.Object3D();
+	  this.frontLeftWheelRoot = new THREE.Object3D();
+	  this.frontRightWheelRoot = new THREE.Object3D();
+	
+	  // Meshes
+	  this.bodyMesh = null;
+	  this.frontLeftWheelMesh = null;
+	  this.frontRightWheelMesh = null;
+	  this.rearLeftWheelMesh = null;
+	  this.rearRightWheelMesh = null;
+	
+	  // --- constants
+	  this.STEERING_RADIUS_RATIO = 0.0023;
+	
+	  // --- construct
+	  createVehicle();
+	
+	  // --- API
+	  /**
+	   * sets the vehicle position
+	   * @param x x
+	   * @param y y
+	   * @param z z
+	   */
+	  this.setPosition = function (x, y, z) {
+	    var t = scope.model.translation;
+	    this.root.position.set(t.x + x, t.y + y, t.z + z);
+	  };
+	
+	  /**
+	   * sets the vehicle angle
+	   * @param angle angle in [rad]
+	   */
+	  this.setAngle = function (angle) {
+	    this.angle = angle;
+	
+	    var r = scope.model.rotation;
+	    this.root.rotation.y = r.y + angle;
+	  };
+	
+	  /**
+	   * sets the vehicle's wheel angle, relative to the vehicle
+	   * @param wheel angle in [rad]
+	   */
+	  this.setWheelAngle = function (wheel) {
+	    wheelAngle = wheel;
+	
+	    this.frontLeftWheelRoot.rotation.y = wheel;
+	    this.frontRightWheelRoot.rotation.y = wheel;
+	  };
+	
+	  /**
+	   * sets the vehicle's velocity
+	   * @param velocity velocity in [m/s]
+	   */
+	  this.setVelocity = function (velocity) {
+	    this.velocity = velocity;
+	  };
+	
+	  /**
+	   * update the vehicle
+	   * @param delta
+	   */
+	  this.update = function (delta) {
+	
+	    var forwardDelta = delta * this.velocity;
+	
+	    // position
+	    if (this.updatePosition) {
+	      this.angle += forwardDelta * this.STEERING_RADIUS_RATIO * this.wheelAngle;
+	
+	      this.root.position.x += Math.sin(this.angle) * forwardDelta;
+	      this.root.position.z += Math.cos(this.angle) * forwardDelta;
+	
+	      this.root.rotation.y = this.angle;
+	    }
+	
+	    // wheels rolling
+	    if (this.updateWheel) {
+	      var angularSpeedRatio = 1 / (this.modelScale * (this.wheelDiameter / 2));
+	      var wheelDelta = forwardDelta * angularSpeedRatio;
+	      if (this.loaded) {
+	        this.frontLeftWheelMesh.rotation.x += wheelDelta;
+	        this.frontRightWheelMesh.rotation.x += wheelDelta;
+	        this.backLeftWheelMesh.rotation.x += wheelDelta;
+	        this.backRightWheelMesh.rotation.x += wheelDelta;
+	      }
+	    }
+	  };
+	
+	  // --- internal helper methods
+	  function createVehicle() {
+	    if (scope.model.loaded) {
+	      // retrieve parameters from vehicleModel
+	      var modelScale = scope.model.scale;
+	      var modelTranslation = scope.model.translation;
+	      var modelRotation = scope.model.rotation;
+	      var wheelOffset = scope.model.wheelOffset;
+	      var wheelDiameter = scope.model.wheelDiameter;
+	      var bodyGeometry = scope.model.bodyGeometry;
+	      var bodyMaterials = scope.model.bodyMaterials;
+	      var wheelGeometry = scope.model.wheelGeometry;
+	      var wheelMaterials = scope.model.wheelMaterials;
+	
+	      // properties
+	      scope.wheelDiameter = wheelDiameter;
+	
+	      // temporary variables
+	      var s = modelScale,
+	          t = modelTranslation,
+	          r = modelRotation;
+	      var delta = new THREE.Vector3();
+	
+	      // setup combined materials
+	      var bodyFaceMaterial = new THREE.MultiMaterial(bodyMaterials);
+	      var wheelFaceMaterial = new THREE.MultiMaterial(wheelMaterials);
+	
+	      // create body mesh
+	      scope.bodyMesh = new THREE.Mesh(bodyGeometry, bodyFaceMaterial);
+	      scope.bodyMesh.scale.set(s, s, s);
+	      scope.root.add(scope.bodyMesh);
+	
+	      // create wheel meshes
+	      // front left
+	      delta.multiplyVectors(wheelOffset, new THREE.Vector3(s, s, s));
+	      scope.frontLeftWheelRoot.position.add(delta);
+	      scope.frontLeftWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
+	      scope.frontLeftWheelMesh.scale.set(s, s, s);
+	      scope.frontLeftWheelRoot.add(scope.frontLeftWheelMesh);
+	      scope.root.add(scope.frontLeftWheelRoot);
+	      // front right
+	      delta.multiplyVectors(wheelOffset, new THREE.Vector3(-s, s, s));
+	      scope.frontRightWheelRoot.position.add(delta);
+	      scope.frontRightWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
+	      scope.frontRightWheelMesh.scale.set(s, s, s);
+	      scope.frontRightWheelRoot.add(scope.frontRightWheelMesh);
+	      scope.root.add(scope.frontRightWheelRoot);
+	      // rear left
+	      delta.multiplyVectors(wheelOffset, new THREE.Vector3(s, s, -s));
+	      scope.rearLeftWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
+	      scope.rearLeftWheelMesh.scale.set(s, s, s);
+	      scope.rearLeftWheelMesh.position.add(delta);
+	      scope.root.add(scope.rearLeftWheelMesh);
+	      // rear right
+	      delta.multiplyVectors(wheelOffset, new THREE.Vector3(-s, s, -s));
+	      scope.rearRightWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
+	      scope.rearRightWheelMesh.scale.set(s, s, s);
+	      scope.rearRightWheelMesh.position.add(delta);
+	      scope.root.add(scope.rearRightWheelMesh);
+	
+	      // translation and rotation
+	      scope.root.position.set(t.x, t.y, t.z);
+	      scope.root.rotation.set(r.x, r.y, r.z);
+	
+	      // callback
+	      if (scope.callback) {
+	        scope.callback(scope);
+	      }
+	    }
+	  }
+	  // ---
+	};
+	
+	exports["default"] = Vehicle;
+	module.exports = exports["default"];
+
+/***/ },
+/* 83 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	// jscs:disable
+	/* eslint-disable */
+	
+	/* To be used by GPUComputationRenderer */
+	var VehicleVelocityShader = {
+	
+	  uniforms: {
+	
+	    "time": { type: "f", value: 0.0 },
+	    "delta": { type: "f", value: 0.0 },
+	    "textureAcceleration": { type: "t", value: null }
+	
+	  },
+	
+	  vertexShader: [].join('\n'),
+	
+	  fragmentShader: ["uniform float time;", "uniform float delta; // about 0.016", "uniform sampler2D textureAcceleration;", "const float PI = 3.141592653589793;", "const float PI_05 = PI / 2.0;", "const float PI_2 = PI * 2.0;", "const float L = 2.0;", "const float SPEED_LIMIT = 10.0;", "void main() {", " vec2 uv = gl_FragCoord.xy / resolution.xy;", " vec4 selfVelocity = texture2D( textureVelocity, uv );", " vec4 selfAcceleration = texture2D( textureAcceleration, uv );", " float velocity = selfVelocity.x;", " float wheel = selfVelocity.w;", " float acceleration = selfAcceleration.x;", " // update velocity", " //velocity += acceleration;", " gl_FragColor = vec4(velocity, 0.0, 0.0, wheel);",
+	
+	  // " vec4 selfVelocity = texture2D( textureVelocity, uv );",
+	  // " vec3 velocity = selfVelocity.xyz;",
+	  // " float velocityScalar = length( velocity );",
+	  // " float wheel = selfVelocity.w;",
+	  //
+	  // " vec3 selfAcceleration = texture2D( textureAcceleration, uv ).xyz;",
+	  //
+	  // " // update the velocity in accordance with the centripetal force",
+	  // " float a = wheel / L * velocityScalar * velocityScalar;",
+	  // " vec3 centripetalAcceleration = vec3( - a / velocityScalar * velocity.z, 0.0, a / velocityScalar * velocity.x );",
+	  // " velocity += delta * centripetalAcceleration;",
+	  // " velocity *= velocityScalar / length( velocity );",
+	  //
+	  // " // update velocity",
+	  // " velocity += delta * selfAcceleration;",
+	  //
+	  // "	float limit = SPEED_LIMIT;",
+	  //
+	  // "	// Speed Limits",
+	  // "	//if ( length( velocity ) > limit ) {",
+	  // "	//	velocity = normalize( velocity ) * limit;",
+	  // "	//}",
+	  //
+	  // "	gl_FragColor = vec4( velocity, wheel );",
+	
+	  "}"].join('\n')
+	
+	};
+	
+	exports["default"] = VehicleVelocityShader;
+	module.exports = exports["default"];
+
+/***/ },
+/* 84 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	// jscs:disable
+	/* eslint-disable */
+	
+	var VehiclePositionShader = {
+	
+	  uniforms: {
+	
+	    "time": { type: "f", value: 0.0 },
+	    "delta": { type: "f", value: 0.0 }
+	  },
+	
+	  // "textureTargetPosition":  {type: "t", value: null}, // (for interpolation)
+	  // "t":                {type: "f", value: 0.0}, // (for interpolation)
+	
+	  vertexShader: [].join('\n'),
+	
+	  fragmentShader: ["uniform float time;", "uniform float delta;", "uniform sampler2D textureTargetPosition;", "uniform float t;", "const float PI = 3.141592653589793;", "const float L = 2.0;", "const float T = 1.0;", "void main() {", " vec2 uv = gl_FragCoord.xy / resolution.xy;",
+	
+	  // (for extrapolation)
+	  " vec4 selfPosition = texture2D( texturePosition, uv );", " vec4 selfVelocity = texture2D( textureVelocity, uv );", " vec3 position = selfPosition.xyz;", " float velocity = selfVelocity.x;", " float angle = selfPosition.w;", " float wheel = selfVelocity.w;", " float angular_velocity = wheel / L * velocity;", " angle += delta * angular_velocity;", " if( angle >  PI ) { angle -= 2.0 * PI; }", " if( angle < -PI ) { angle += 2.0 * PI; }", " position.x += delta * velocity * cos( angle );", " position.z += delta * velocity * sin( angle );", " gl_FragColor = vec4( position, angle );",
+	
+	  // (for interpolation)
+	  // " vec4 selfPosition = texture2D( texturePosition, uv );",
+	  // " vec4 selfTargetPosition = texture2D( textureTargetPosition, uv );",
+	  //
+	  // " selfPosition.x = mix( selfPosition.x, selfTargetPosition.x, t / T );",
+	  // " selfPosition.y = mix( selfPosition.y, selfTargetPosition.y, t / T );",
+	  // " selfPosition.z = mix( selfPosition.z, selfTargetPosition.z, t / T );",
+	  // " selfPosition.w = mix( selfPosition.w, selfTargetPosition.w, t / T );",
+	  //
+	  // " gl_FragColor = selfPosition;",
+	
+	  // " vec4 selfPosition = texture2D( texturePosition, uv );",
+	  // " vec4 selfVelocity = texture2D( textureVelocity, uv );",
+	  //
+	  // " vec3 position = selfPosition.xyz;",
+	  // " vec3 velocity = selfVelocity.xyz;",
+	  // " float angle = selfPosition.w;",
+	  // " float wheel = selfVelocity.w;",
+	  //
+	  // " // calculate the angular velocity",
+	  // " float angular_velocity = wheel / L * length( velocity );",
+	  //
+	  // " // update the position",
+	  // " position += delta * velocity;",
+	  // " angle += delta * angular_velocity;",
+	  // " if ( angle >  PI ) { angle -= 2.*PI; }",
+	  // " if ( angle < -PI ) { angle += 2.*PI; }",
+	  //
+	  // " gl_FragColor = vec4( position, angle );",
+	
+	  "}"].join('\n')
+	
+	};
+	
+	exports["default"] = VehiclePositionShader;
+	module.exports = exports["default"];
+
+/***/ },
+/* 85 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var VehicleShader = {
+	
+	  uniforms: {
+	
+	    "reference": { type: "v2", value: null },
+	    "texturePosition": { type: "t", value: null },
+	    "texture": { type: "t", value: null },
+	    "color": { type: "c", value: new _three2["default"].Color(0xff2200) }
+	
+	  },
+	
+	  vertexShader: ["uniform vec2 reference;", "uniform sampler2D texturePosition;", "varying vec2 vUv;", "mat4 rotationMatrix(vec3 axis, float angle)", "{", "    axis = normalize(axis);", "    float s = sin(angle);", "    float c = cos(angle);", "    float oc = 1.0 - c;", "    ", "    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,", "                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,", "                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,", "                0.0,                                0.0,                                0.0,                                1.0);", "}", "void main() {", " vUv = uv;", " // retrieve the simulated position of this vehicle", " vec4 selfPosition = texture2D( texturePosition, reference );", "	vec3 simPos = selfPosition.xyz;", " float angle = selfPosition.w;", " // tmp", " vec4 newPosition = vec4( position, 1.0 );", " // rotate", " mat4 rotYMatrix = rotationMatrix( vec3( 0., 1., 0. ), angle );", " newPosition = rotYMatrix * newPosition;", " // calcuate the actual position by adding the simulated position", "	newPosition = modelMatrix * newPosition;", " newPosition.xyz += simPos;", "	gl_Position = projectionMatrix * viewMatrix * newPosition;", "}"].join('\n'),
+	
+	  fragmentShader: ["uniform sampler2D texture;", "uniform vec3 color;", "varying vec2 vUv;", "void main() {", " gl_FragColor = texture2D( texture, vUv );", "// gl_FragColor = vec4( color, 1. );", "}"].join('\n')
+	
+	};
+	
+	exports["default"] = VehicleShader;
+	module.exports = exports["default"];
+
+/***/ },
+/* 86 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	/*
+	 * Object helpers
+	 */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var ObjectUtils = (function () {
+	
+	  // Create UV from geometry's faces
+	  var createUV = function createUV(geometry) {
+	    geometry.computeBoundingBox();
+	
+	    var max = geometry.boundingBox.max;
+	    var min = geometry.boundingBox.min;
+	    var offset = new _three2['default'].Vector2(0 - min.x, 0 - min.y);
+	    var range = new _three2['default'].Vector2(max.x - min.x, max.y - min.y);
+	    var faces = geometry.faces;
+	
+	    geometry.faceVertexUvs[0] = [];
+	
+	    for (var i = 0; i < faces.length; i++) {
+	      var v1 = geometry.vertices[faces[i].a];
+	      var v2 = geometry.vertices[faces[i].b];
+	      var v3 = geometry.vertices[faces[i].c];
+	
+	      geometry.faceVertexUvs[0].push([new _three2['default'].Vector2((v1.x + offset.x) / range.x, (v1.y + offset.y) / range.y), new _three2['default'].Vector2((v2.x + offset.x) / range.x, (v2.y + offset.y) / range.y), new _three2['default'].Vector2((v3.x + offset.x) / range.x, (v3.y + offset.y) / range.y)]);
+	    }
+	
+	    geometry.uvsNeedUpdate = true;
+	  };
+	
+	  return {
+	    createUV: createUV
+	  };
+	})();
+	
+	exports['default'] = ObjectUtils;
+	module.exports = exports['default'];
+
+/***/ },
+/* 87 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
 	// TODO: A lot of these utils don't need to be in separate, tiny files
 	
-	var _wrapNum = __webpack_require__(80);
+	var _wrapNum = __webpack_require__(88);
 	
 	var _wrapNum2 = _interopRequireDefault(_wrapNum);
 	
@@ -19614,7 +20888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 80 */
+/* 88 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
