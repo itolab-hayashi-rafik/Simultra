@@ -1,28 +1,28 @@
 Simultra
 =========
 
-# Setup the development environment
+## Setup the development environment
 
-## checkout dependent project: vizicities
+### 1. checkout dependent project: vizicities
 
 ```
 $ git https://github.com/itolab-hayashi-rafik/vizicities.git
 ```
 
-## checkout this project
+### 2. checkout this project
 
 ```
 $ git clone https://github.com/itolab-hayashi-rafik/Simultra.git
 ```
 
-## install the dependencies
+### 3. install the dependencies
 
 ```
 $ cd Simultra/Simultra
 $ npm install
 ```
 
-## (for a better enviornment) use linklocal to link the projects
+### 4. (for a better enviornment) use linklocal to link the projects
 
 ```
 $ sudo npm install -g linklocal
