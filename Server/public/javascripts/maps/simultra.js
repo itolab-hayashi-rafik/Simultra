@@ -36,10 +36,12 @@ Simultra.prototype.addTo = function(world) {
 Simultra.prototype._onAdd = function(world) {
   var self = this;
 
-  // add event listeners
-  world.on('preUpdate', function (delta) {
-    self.interpolateVehicles(delta);
-  });
+  // // add event listeners
+  // world.on('preUpdate', function (delta) {
+  //   self.extrapolateVehicles(delta);
+  // });
+
+  this.interval = 10;
 
   // start retrieving data from server
   this.updateVehicles();
@@ -48,9 +50,9 @@ Simultra.prototype._onAdd = function(world) {
 var hasError = false;
 
 /**
- * Interpolate and update vehicle locations
+ * Extrapolate and update vehicle locations
  */
-Simultra.prototype.interpolateVehicles = function(delta) {
+Simultra.prototype.extrapolateVehicles = function(delta) {
   if (hasError) return;
 
   // TODO: run this computation on a different thread / multi-thread using Worker
@@ -87,6 +89,10 @@ Simultra.prototype.updateVehicles = function() {
 
   $.get('/api/v1/vehicles', function(data) {
 
+    var locations = {};
+    var velocities = {};
+    var accelerations = {};
+
     // add vehicles to the world
     data.forEach(function(vehicle) {
       // if vehicle does not exist
@@ -94,7 +100,8 @@ Simultra.prototype.updateVehicles = function() {
         // add to vehicle layer
         var object = self._vehicleLayer.addVehicle(
           vehicle.type,
-          new VIZI.LatLon(vehicle.location.lat, vehicle.location.lon)
+          new VIZI.LatLon(vehicle.location.lat, vehicle.location.lon),
+          vehicle.angle
         );
         // add entry to dictionary
         self.vehicles[vehicle.id] = {
@@ -114,12 +121,37 @@ Simultra.prototype.updateVehicles = function() {
 
         console.log('updated vehicle: '+JSON.stringify(vehicle));
       }
+
+      // for simulation
+      locations[vehicle.id] = {
+        lat: vehicle.location.lat, lon: vehicle.location.lon, angle: vehicle.angle
+      };
+      velocities[vehicle.id] = {
+        vx: vehicle.velocity, vy: 0.0, vz: 0.0, wheel: vehicle.wheel
+      };
+      accelerations[vehicle.id] = {
+        ax: vehicle.acceleration, ay: 0.0, az: 0.0
+      };
+      // locations[vehicle.id] = {
+      //   lat: vehicle.location.lat, lon: vehicle.location.lon, angle: vehicle.angle
+      // };
+      // velocities[vehicle.id] = {
+      //   vx: vehicle.velocity.vx, vy: vehicle.velocity.vy, vz: vehicle.velocity.vz, wheel: vehicle.wheel
+      // };
+      // accelerations[vehicle.id] = {
+      //   ax: vehicle.acceleration.ax, ay: vehicle.acceleration.ay, az: vehicle.acceleration.az
+      // };
     });
+
+    // update simulation parameter
+    self._vehicleLayer._setSimLocations(locations);
+    self._vehicleLayer._setSimVelocities(velocities);
+    self._vehicleLayer._setSimAccelerations(accelerations);
 
     // continue updating
     setTimeout(function() {
       self.updateVehicles();
-    }, 10000);
+    }, self.interval);
 
   });
 };

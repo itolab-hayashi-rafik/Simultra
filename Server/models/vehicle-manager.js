@@ -20,7 +20,7 @@ VehicleManager.prototype.createNew = function(data) {
     velocity: 0, // [m/s]
     acceleration: 0, // [m/ss]
     angle: 0, // [rad]
-    angular_velocity: 0 // [rad/s]
+    wheel: 0 // [rad/s]
   };
   var vehicle = extend(_default, data);
   vehicle.id = this.vehicles.push(vehicle) - 1;
