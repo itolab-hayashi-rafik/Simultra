@@ -6,7 +6,7 @@ Simultra
 ### 1. checkout dependent project: vizicities
 
 ```
-$ git https://github.com/itolab-hayashi-rafik/vizicities.git
+$ git clone https://github.com/itolab-hayashi-rafik/vizicities.git
 ```
 
 ### 2. checkout this project
