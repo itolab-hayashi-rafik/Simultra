@@ -57,5 +57,8 @@
     "entryFileName": "simultra",
     "mainVarName": "Simultra",
     "mochaGlobals": []
+  },
+  "dependencies": {
+    "vizicities": "file:../../vizicities"
   }
 }
