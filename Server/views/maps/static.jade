@@ -6,6 +6,7 @@ html(lang="ja")
         title Simultra
         link(rel="stylesheet", href="/stylesheets/maps/main.css")
         link(rel="stylesheet", href="/vendor/vizicities.css")
+        link(rel="stylesheet", href="/vendor/simultra.css")
     body
         div(id="world")
         script(src="/vendor/three.min.js")
@@ -13,6 +14,11 @@ html(lang="ja")
         script(src="/vendor/vizicities.min.js")
 
         script(src="/vendor/jquery-3.0.0.min.js")
-        script(src="/javascripts/maps/simultra.js")
-        script(src="/javascripts/maps/utils.js")
-        script(src="/javascripts/maps/main-static.js")
+        script(src="/vendor/simultra.js")
+        script(type='text/javascript').
+            // FIXME: something is wrong with the Simultra compilation. it's not UMD...
+            window.Simultra = window.Simultra.default;
+
+            if (typeof Simultra === 'function') {
+                simultra = new Simultra('http://localhost:3000');
+            }
