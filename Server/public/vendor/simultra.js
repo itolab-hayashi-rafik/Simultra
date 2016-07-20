@@ -78,15 +78,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _BuildingLayer2 = _interopRequireDefault(_BuildingLayer);
 	
-	var _HighwayLayer = __webpack_require__(10);
+	var _FootwayLayer = __webpack_require__(10);
+	
+	var _FootwayLayer2 = _interopRequireDefault(_FootwayLayer);
+	
+	var _HighwayLayer = __webpack_require__(12);
 	
 	var _HighwayLayer2 = _interopRequireDefault(_HighwayLayer);
 	
-	var _VehicleLayer = __webpack_require__(11);
+	var _VehicleLayer = __webpack_require__(13);
 	
 	var _VehicleLayer2 = _interopRequireDefault(_VehicleLayer);
 	
-	var _API = __webpack_require__(12);
+	var _API = __webpack_require__(14);
 	
 	var _API2 = _interopRequireDefault(_API);
 	
@@ -147,6 +151,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._basemapLayer = new _BasemapLayer2.default().addTo(this);
 	      // Highway
 	      this._highwayLayer = new _HighwayLayer2.default().addTo(this);
+	      // Footway
+	      this._footwayLayer = new _FootwayLayer2.default().addTo(this);
 	      // Building
 	      this._buildingLayer = new _BuildingLayer2.default().addTo(this);
 	      // Vehicle
@@ -1119,9 +1125,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
-	var _index = __webpack_require__(6);
+	var _BuildingUtils = __webpack_require__(7);
 	
-	var _index2 = _interopRequireDefault(_index);
+	var _BuildingUtils2 = _interopRequireDefault(_BuildingUtils);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1154,8 +1160,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Buildings from Mapzen
 	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
 	        interactive: false,
+	        maxLOD: 16,
 	        style: function style(feature) {
-	          return _index2.default.BuildingUtils.style(feature, {
+	          return _BuildingUtils2.default.style(feature, {
 	            height: 1,
 	            lineColor: '#f7c616',
 	            lineWidth: 1,
@@ -1206,9 +1213,189 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
-	var _index = __webpack_require__(6);
+	var _FootwayUtils = __webpack_require__(11);
 	
-	var _index2 = _interopRequireDefault(_index);
+	var _FootwayUtils2 = _interopRequireDefault(_FootwayUtils);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var FootwayLayer = function (_Layer) {
+	  _inherits(FootwayLayer, _Layer);
+	
+	  function FootwayLayer(options) {
+	    _classCallCheck(this, FootwayLayer);
+	
+	    var defaultOptions = {};
+	
+	    var _options = (0, _extend2.default)({}, defaultOptions, options);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(FootwayLayer).call(this, _options));
+	
+	    _this._setup();
+	    return _this;
+	  }
+	
+	  _createClass(FootwayLayer, [{
+	    key: '_setup',
+	    value: function _setup() {
+	
+	      var self = this;
+	
+	      // Landuses from Mapzen
+	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/landuse,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+	        interactive: false,
+	        maxLOD: 18,
+	        style: function style(feature) {
+	          if (feature.properties.lanes) {
+	            console.log(feature);
+	          }
+	          if (feature.properties.width) {
+	            console.log(feature);
+	          }
+	
+	          return _FootwayUtils2.default.style(feature, {
+	            height: 0.5
+	          });
+	        },
+	        filter: function filter(feature) {
+	          // Don't show points
+	          if (feature.geometry.type === 'Point') {
+	            return false;
+	          }
+	
+	          // pedestrian (Polygon)
+	          if (feature.properties.kind === 'pedestrian') {
+	            return true;
+	          }
+	
+	          // footway (LineString)
+	          if (feature.properties.highway === 'footway') {
+	            return true;
+	          }
+	
+	          return false;
+	        },
+	        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
+	      });
+	
+	      // set the instance properties
+	      this._setViziLayer(viziLayer);
+	    }
+	  }]);
+	
+	  return FootwayLayer;
+	}(_Layer3.default);
+	
+	exports.default = FootwayLayer;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _vizi = __webpack_require__(1);
+	
+	var _vizi2 = _interopRequireDefault(_vizi);
+	
+	var _extend = __webpack_require__(4);
+	
+	var _extend2 = _interopRequireDefault(_extend);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	/**
+	 * Footway Utilities
+	 */
+	
+	
+	var FootwayUtils = function () {
+	
+	  /**
+	   * Return the style for a specific footway
+	   *
+	   * @param {Object} feature
+	   * @param {Object} defaultValues
+	   */
+	  var style = function style(feature, defaultValues) {
+	    var style;
+	
+	    // Polygon
+	    if (feature.geometry.type === 'Polygon') {
+	      style = {
+	        color: '#ecebe9',
+	        transparent: true,
+	        opacity: 0.2
+	      };
+	    }
+	    // Line
+	    else if (feature.geometry.type === 'LineString') {
+	        style = {
+	          lineColor: '#cad9d4',
+	          lineWidth: 1,
+	          lineTransparent: true,
+	          lineOpacity: 0.2,
+	          lineBlending: THREE.AdditiveBlending,
+	          lineRenderOrder: 2
+	        };
+	      }
+	      // Point
+	      else {
+	          style = {
+	            pointWidth: 1.0,
+	            pointHeight: 1.0,
+	            pointColor: '#0000ff'
+	          };
+	        }
+	
+	    return (0, _extend2.default)({}, defaultValues, style);
+	  };
+	
+	  // return utility object
+	  return {
+	    style: style
+	  };
+	}();
+	
+	exports.default = FootwayUtils;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _vizi = __webpack_require__(1);
+	
+	var _vizi2 = _interopRequireDefault(_vizi);
+	
+	var _extend = __webpack_require__(4);
+	
+	var _extend2 = _interopRequireDefault(_extend);
+	
+	var _Layer2 = __webpack_require__(5);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _HighwayUtils = __webpack_require__(8);
+	
+	var _HighwayUtils2 = _interopRequireDefault(_HighwayUtils);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1243,6 +1430,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Roads from Mapzen
 	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
 	        interactive: false,
+	        maxLOD: 18,
 	        style: function style(feature) {
 	          if (feature.properties.lanes) {
 	            console.log(feature);
@@ -1251,7 +1439,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            console.log(feature);
 	          }
 	
-	          return _index2.default.HighwayUtils.style(feature, {
+	          return _HighwayUtils2.default.style(feature, {
 	            height: 0,
 	            opacity: 0.2
 	          });
@@ -1264,16 +1452,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          // Convert LineString to polygon
 	          if (feature.geometry.type === 'LineString') {
-	            var lineWidth = _index2.default.HighwayUtils.lineWidth(feature, 1.0);
-	            var outCoordss = _index2.default.HighwayUtils.lineStringToPolygon(self._getViziWorld(), feature.geometry.coordinates, lineWidth);
+	            var lineWidth = _HighwayUtils2.default.lineWidth(feature, 1.0);
+	            var outCoordss = _HighwayUtils2.default.lineStringToPolygon(self._getViziWorld(), feature.geometry.coordinates, lineWidth);
 	
 	            feature.geometry.type = 'MultiPolygon';
 	            feature.geometry.coordinates = outCoordss;
 	          }
 	          // Convert MultiLineString to Polygon
 	          else if (feature.geometry.type === 'MultiLineString') {
-	              var lineWidth = _index2.default.HighwayUtils.lineWidth(feature, 1.0);
-	              var outCoordss = _index2.default.HighwayUtils.multiLineStringToPolygon(self._getViziWorld(), feature.geometry.coordinates, lineWidth);
+	              var lineWidth = _HighwayUtils2.default.lineWidth(feature, 1.0);
+	              var outCoordss = _HighwayUtils2.default.multiLineStringToPolygon(self._getViziWorld(), feature.geometry.coordinates, lineWidth);
 	
 	              feature.geometry.type = 'MultiPolygon';
 	              feature.geometry.coordinates = outCoordss;
@@ -1295,7 +1483,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = HighwayLayer;
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1318,13 +1506,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
-	var _API = __webpack_require__(12);
+	var _API = __webpack_require__(14);
 	
 	var _API2 = _interopRequireDefault(_API);
-	
-	var _index = __webpack_require__(6);
-	
-	var _index2 = _interopRequireDefault(_index);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1497,7 +1681,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = VehicleLayer;
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1511,7 +1695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 	
 	
-	var _jquery = __webpack_require__(13);
+	var _jquery = __webpack_require__(15);
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
@@ -1567,7 +1751,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = API;
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*eslint-disable no-unused-vars*/

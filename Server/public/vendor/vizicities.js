@@ -18140,8 +18140,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _setBufferAttributes() {
 	      var _this2 = this;
 	
+	      var width = 0;
 	      var height = 0;
 	
+	      // Convert width into world units
+	      if (this._options.style.pointWidth) {
+	        width = this._world.metresToWorld(this._options.style.pointWidth, this._pointScale);
+	      }
 	      // Convert height into world units
 	      if (this._options.style.pointHeight) {
 	        height = this._world.metresToWorld(this._options.style.pointHeight, this._pointScale);
@@ -18158,8 +18163,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Debug geometry for points is a thin bar
 	        //
 	        // TODO: Allow point geometry to be customised / overridden
-	        var geometryWidth = this._world.metresToWorld(25, this._pointScale);
-	        var geometryHeight = this._world.metresToWorld(200, this._pointScale);
+	        var geometryWidth = this._world.metresToWorld(width, this._pointScale);
+	        var geometryHeight = this._world.metresToWorld(height, this._pointScale);
 	        var _geometry = new _three2['default'].BoxGeometry(geometryWidth, geometryHeight, geometryWidth);
 	
 	        // Shift geometry up so it sits on the ground
