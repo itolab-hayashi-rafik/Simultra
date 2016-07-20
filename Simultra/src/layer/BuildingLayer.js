@@ -22,6 +22,7 @@ class BuildingLayer extends Layer {
     // Buildings from Mapzen
     var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
       interactive: false,
+      maxLOD: 16,
       style: function(feature) {
         return BuildingUtils.style(feature, {
           height: 1,

@@ -22,6 +22,7 @@ class HighwayLayer extends Layer {
     // Roads from Mapzen
     var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
       interactive: false,
+      maxLOD: 18,
       style: function(feature) {
         if (feature.properties.lanes) {
           console.log(feature);
