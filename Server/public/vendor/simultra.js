@@ -86,7 +86,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _HighwayLayer2 = _interopRequireDefault(_HighwayLayer);
 	
-	var _VehicleLayer = __webpack_require__(13);
+	var _PedestrianLayer = __webpack_require__(13);
+	
+	var _PedestrianLayer2 = _interopRequireDefault(_PedestrianLayer);
+	
+	var _VehicleLayer = __webpack_require__(16);
 	
 	var _VehicleLayer2 = _interopRequireDefault(_VehicleLayer);
 	
@@ -157,6 +161,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._buildingLayer = new _BuildingLayer2.default().addTo(this);
 	      // Vehicle
 	      this._vehicleLayer = new _VehicleLayer2.default().addTo(this);
+	      // Pedestrian
+	      this._pedestrianLayer = new _PedestrianLayer2.default().addTo(this);
 	    }
 	
 	    /**
@@ -179,6 +185,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'start',
 	    value: function start() {
 	      this._vehicleLayer.start();
+	      this._pedestrianLayer.start();
 	      this._isRunning = true;
 	    }
 	
@@ -190,6 +197,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'stop',
 	    value: function stop() {
 	      this._vehicleLayer.stop();
+	      this._pedestrianLayer.stop();
 	      this._isRunning = false;
 	    }
 	
@@ -897,24 +905,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Highway Utilities
 	 */
-	var COLOR_MAP = {
+	var HIGHWAY_COLOR_MAP = {
+	  'motorway': '#9e250e', // express way
+	  'major': '#f7c616', // main road
+	  'primary': '#ffe104', // national highway
+	  'secondary': '#ffffff', // sub road
+	  'tertiary': '#ffffff', // sub road
+	  'residental': '#ffffff', // minor road
+	  'living_street': '#ffffff', // minor road
+	  'track': '#ffffff', // ?
+	  'trunk': '#ffffff', // ?
+	  'footway': '#ffffff', // footway
+	  'pedestrian': '#f0ebeb' };
+	var KIND_COLOR_MAP = {
 	  'major_road': '#f7c616',
 	  'minor_road': '#ffffff',
 	  'highway': '#888785',
 	  'path': '#888785',
 	  'rail': '#888785'
 	};
-	var WIDTH_MAP = {
-	  'major': 10,
-	  'primary': 10,
-	  'secondary': 7,
-	  'residental': 7,
-	  'tertiary': 5,
-	  'living_street': 5,
-	  'track': 3,
-	  'trunk': 3,
-	  'footway': 1
-	};
+	var HIGHWAY_WIDTH_MAP = {
+	  'motorway': 10, // express way
+	  'major': 10, // main road
+	  'primary': 10, // national highway
+	  'secondary': 7, // sub road
+	  'tertiary': 6, // sub road
+	  'residental': 5, // minor road
+	  'living_street': 4, // minor road
+	  'track': 3, // ?
+	  'trunk': 3, // ?
+	  'footway': 1, // footway
+	  'pedestrian': 1 };
 	// jscs:enable disallowSpaceAfterObjectKeys
 	// ---
 	
@@ -928,15 +949,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var style = function style(feature, defaultValue) {
 	    var color;
 	
-	    // color
-	    if (feature.properties.kind) {
-	      if (feature.properties.kind in COLOR_MAP) {
-	        color = COLOR_MAP[feature.properties.kind];
+	    // ---- color
+	    // based on 'highway' property
+	    if (feature.properties.highway) {
+	      if (feature.properties.highway in HIGHWAY_COLOR_MAP) {
+	        color = HIGHWAY_COLOR_MAP[feature.properties.highway];
 	      } else {
-	        // unknown highway kind
-	        console.info('Unknown highway kind: ' + feature.properties.kind);
+	        // unknown highway
+	        console.info('Unknown highway: ' + feature.properties.highway);
 	      }
 	    }
+	    // based on 'kind' property
+	    else if (feature.properties.kind) {
+	        if (feature.properties.kind in KIND_COLOR_MAP) {
+	          color = KIND_COLOR_MAP[feature.properties.kind];
+	        } else {
+	          // unknown highway kind
+	          console.info('Unknown highway kind: ' + feature.properties.kind);
+	        }
+	      }
+	    // ---
 	
 	    // construct the style
 	    var style = {
@@ -953,18 +985,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  var lineWidth = function lineWidth(feature, defaultValue) {
 	    var lineWidth;
-	    if (feature.properties.highway) {
-	      if (feature.properties.highway in WIDTH_MAP) {
-	        lineWidth = WIDTH_MAP[feature.properties.highway];
-	      } else {
-	        // unknown highway type
-	        console.info('Unknown highway: ' + feature.properties.highway);
-	        lineWidth = defaultValue;
-	      }
-	    } else {
-	      // no highway type mentioned
-	      lineWidth = defaultValue;
+	    // look for the line weight in the property
+	    if (feature.properties.width) {
+	      lineWidth = feature.properties.width;
 	    }
+	    // guess lineWidth from the highway type
+	    else if (feature.properties.highway) {
+	        if (feature.properties.highway in HIGHWAY_WIDTH_MAP) {
+	          lineWidth = HIGHWAY_WIDTH_MAP[feature.properties.highway];
+	        } else {
+	          // unknown highway type
+	          console.info('Unknown highway: ' + feature.properties.highway);
+	          lineWidth = defaultValue;
+	        }
+	      }
+	      // no way to find out the width
+	      else {
+	          // no highway type mentioned
+	          lineWidth = defaultValue;
+	        }
 	    return lineWidth;
 	  };
 	
@@ -1520,39 +1559,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var UPDATE_INTERVAL_MS = 1000;
 	
-	var VehicleLayer = function (_Layer) {
-	  _inherits(VehicleLayer, _Layer);
+	var PedestrianLayer = function (_Layer) {
+	  _inherits(PedestrianLayer, _Layer);
 	
-	  function VehicleLayer(options) {
-	    _classCallCheck(this, VehicleLayer);
+	  function PedestrianLayer(options) {
+	    _classCallCheck(this, PedestrianLayer);
 	
 	    var defaultOptions = {};
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(VehicleLayer).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PedestrianLayer).call(this, _options));
 	
-	    _this._vehicles = [];
+	    _this._pedestrians = [];
 	
 	    _this._setup();
 	    return _this;
 	  }
 	
-	  _createClass(VehicleLayer, [{
+	  _createClass(PedestrianLayer, [{
 	    key: '_setup',
 	    value: function _setup() {
 	
 	      // car layer
-	      var viziLayer = _vizi2.default.vehicleLayer({
-	        'veyron': {
+	      var viziLayer = _vizi2.default.pedestrianLayer({
+	        'monkey': {
 	          file: {
-	            body: '/javascripts/maps/objs/veyron/parts/veyron_body_bin.js',
-	            wheel: '/javascripts/maps/objs/veyron/parts/veyron_wheel_bin.js'
+	            body: '/javascripts/maps/json/monkey.js'
 	          },
-	          textureFile: '/javascripts/maps/objs/veyron/texture.png',
-	          scale: 0.1,
+	          scale: 1.0,
 	          translation: { x: 0, y: 0, z: 0 },
-	          rotation: { x: 0, y: 90 * Math.PI / 180, z: 0 }
+	          rotation: { x: 0, y: 0, z: 0 }
 	        }
 	      }, {
 	        simWidth: 32,
@@ -1598,12 +1635,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        this._lastUpdatedAt = Date.now();
 	
-	        this._api.getVehicles().then(function (data, textStatus, jqXHR) {
+	        this._api.getPedestrians().then(function (data, textStatus, jqXHR) {
 	
 	          self._performUpdate(data);
 	        }).fail(function (jqXHR, textStatus, errorThrown) {
 	
-	          console.error('Error updating the vehicle layer: ' + textStatus + ', ' + JSON.stringify(errorThrown));
+	          console.error('Error updating the pedestrian layer: ' + textStatus + ', ' + JSON.stringify(errorThrown));
 	        }).always(function () {
 	
 	          if (self._isRunning) {
@@ -1624,61 +1661,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_performUpdate',
 	    value: function _performUpdate(data) {
 	      var self = this;
+	      var viziLayer = this._getViziLayer();
 	
 	      // dictionaries to hold parameters
 	      var locations = {};
 	      var velocities = {};
 	      var accelerations = {};
 	
-	      // map vehicle parameters into dictionaries
-	      data.forEach(function (vehicle) {
-	        // if vehicle does not exist
-	        if (!(vehicle.id in self._vehicles)) {
-	          // add to vehicle layer
-	          var object = self._vehicleLayer.addVehicle(vehicle.type, new _vizi2.default.LatLon(vehicle.location.lat, vehicle.location.lon), vehicle.angle);
+	      // map pedestrian parameters into dictionaries
+	      data.forEach(function (pedestrian) {
+	        // if pedestrian does not exist
+	        if (!(pedestrian.id in self._pedestrians)) {
+	          // add to pedestrian layer
+	          var object = viziLayer.addPedestrian(pedestrian.type, new _vizi2.default.LatLon(pedestrian.location.lat, pedestrian.location.lon), pedestrian.angle);
 	          // add entry to dictionary
-	          self._vehicles[vehicle.id] = {
-	            data: vehicle,
+	          self._pedestrians[pedestrian.id] = {
+	            data: pedestrian,
 	            object: object
 	          };
 	
-	          console.log('added vehicle: ' + JSON.stringify(vehicle));
+	          console.log('added pedestrian: ' + JSON.stringify(pedestrian));
 	        }
 	        // if exists
 	        else {
 	            // update properties
-	            var vehicleData = self._vehicles[vehicle.id].data;
-	            Object.keys(vehicle).forEach(function (key) {
-	              vehicleData[key] = vehicle[key];
+	            var pedestrianData = self._pedestrians[pedestrian.id].data;
+	            Object.keys(pedestrian).forEach(function (key) {
+	              pedestrianData[key] = pedestrian[key];
 	            });
 	
-	            console.log('updated vehicle: ' + JSON.stringify(vehicle));
+	            console.log('updated pedestrian: ' + JSON.stringify(pedestrian));
 	          }
 	
 	        // for simulation
-	        locations[vehicle.id] = {
-	          lat: vehicle.location.lat, lon: vehicle.location.lon, angle: vehicle.angle
+	        locations[pedestrian.id] = {
+	          lat: pedestrian.location.lat, lon: pedestrian.location.lon, angle: pedestrian.angle
 	        };
-	        velocities[vehicle.id] = {
-	          vx: vehicle.velocity, vy: 0.0, vz: 0.0, wheel: vehicle.wheel
+	        velocities[pedestrian.id] = {
+	          vx: pedestrian.velocity, vy: 0.0, vz: 0.0, wheel: pedestrian.wheel
 	        };
-	        accelerations[vehicle.id] = {
-	          ax: vehicle.acceleration, ay: 0.0, az: 0.0
+	        accelerations[pedestrian.id] = {
+	          ax: pedestrian.acceleration, ay: 0.0, az: 0.0
 	        };
 	      });
 	
 	      // update simulation parameters
-	      var viziLayer = this._getViziLayer();
 	      viziLayer._setSimLocations(locations);
 	      viziLayer._setSimVelocities(velocities);
 	      viziLayer._setSimAccelerations(accelerations);
 	    }
 	  }]);
 	
-	  return VehicleLayer;
+	  return PedestrianLayer;
 	}(_Layer3.default);
 	
-	exports.default = VehicleLayer;
+	exports.default = PedestrianLayer;
 
 /***/ },
 /* 14 */
@@ -1709,6 +1746,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var GET_VEHICLE = function GET_VEHICLE(vid) {
 	  return '/api/v1/vehicles/' + vid;
 	};
+	
+	var GET_PEDESTRIANS = '/api/v1/pedestrians';
+	var UPDATE_PEDESTRIANS = '/api/v1/pedestrians';
+	var GET_PEDESTRIAN = function GET_PEDESTRIAN(pid) {
+	  return '/api/v1/pedestrians/' + pid;
+	};
 	// ---
 	
 	var API = function () {
@@ -1717,6 +1760,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    this.baseUrl = baseUrl;
 	  }
+	
+	  // --- Vehicles
+	
 	
 	  _createClass(API, [{
 	    key: 'getVehicles',
@@ -1743,6 +1789,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	        method: 'get'
 	      });
 	    }
+	    // ---
+	
+	    // --- Pedestrians
+	
+	  }, {
+	    key: 'getPedestrians',
+	    value: function getPedestrians() {
+	      return $.ajax({
+	        url: this.baseUrl + GET_PEDESTRIANS,
+	        method: 'get'
+	      });
+	    }
+	  }, {
+	    key: 'updatePedestrians',
+	    value: function updatePedestrians(data) {
+	      return $.ajax({
+	        url: this.baseUrl + UPDATE_PEDESTRIANS,
+	        method: 'put',
+	        data: data
+	      });
+	    }
+	  }, {
+	    key: 'getPedestrian',
+	    value: function getPedestrian(pid) {
+	      return $.ajax({
+	        url: this.baseUrl + GET_PEDESTRIAN(pid),
+	        method: 'get'
+	      });
+	    }
+	    // ---
+	
 	  }]);
 	
 	  return API;
@@ -11829,6 +11906,204 @@ return /******/ (function(modules) { // webpackBootstrap
 	return jQuery;
 	} );
 
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _vizi = __webpack_require__(1);
+	
+	var _vizi2 = _interopRequireDefault(_vizi);
+	
+	var _extend = __webpack_require__(4);
+	
+	var _extend2 = _interopRequireDefault(_extend);
+	
+	var _Layer2 = __webpack_require__(5);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _API = __webpack_require__(14);
+	
+	var _API2 = _interopRequireDefault(_API);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var UPDATE_INTERVAL_MS = 1000;
+	
+	var VehicleLayer = function (_Layer) {
+	  _inherits(VehicleLayer, _Layer);
+	
+	  function VehicleLayer(options) {
+	    _classCallCheck(this, VehicleLayer);
+	
+	    var defaultOptions = {};
+	
+	    var _options = (0, _extend2.default)({}, defaultOptions, options);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(VehicleLayer).call(this, _options));
+	
+	    _this._vehicles = [];
+	
+	    _this._setup();
+	    return _this;
+	  }
+	
+	  _createClass(VehicleLayer, [{
+	    key: '_setup',
+	    value: function _setup() {
+	
+	      // car layer
+	      var viziLayer = _vizi2.default.vehicleLayer({
+	        'veyron': {
+	          file: {
+	            body: '/javascripts/maps/objs/veyron/parts/veyron_body_bin.js',
+	            wheel: '/javascripts/maps/objs/veyron/parts/veyron_wheel_bin.js'
+	          },
+	          textureFile: '/javascripts/maps/objs/veyron/texture.png',
+	          scale: 0.1,
+	          translation: { x: 0, y: 0, z: 0 },
+	          rotation: { x: 0, y: 90 * Math.PI / 180, z: 0 }
+	        }
+	      }, {
+	        simWidth: 32,
+	        style: {
+	          height: 0
+	        }
+	      });
+	
+	      // set the instance property
+	      this._setViziLayer(viziLayer);
+	    }
+	
+	    /**
+	     * Starts updating the view
+	     */
+	
+	  }, {
+	    key: 'start',
+	    value: function start() {
+	      this._isRunning = true;
+	
+	      var self = this;
+	      setTimeout(function () {
+	        self._update();
+	      }, 0);
+	    }
+	
+	    /**
+	     * Stops updating the view
+	     */
+	
+	  }, {
+	    key: 'stop',
+	    value: function stop() {
+	      this._isRunning = false;
+	    }
+	  }, {
+	    key: '_update',
+	    value: function _update() {
+	      var self = this;
+	
+	      if (this._isRunning) {
+	
+	        this._lastUpdatedAt = Date.now();
+	
+	        this._api.getVehicles().then(function (data, textStatus, jqXHR) {
+	
+	          self._performUpdate(data);
+	        }).fail(function (jqXHR, textStatus, errorThrown) {
+	
+	          console.error('Error updating the vehicle layer: ' + textStatus + ', ' + JSON.stringify(errorThrown));
+	        }).always(function () {
+	
+	          if (self._isRunning) {
+	            // calculate the delay
+	            var lastUpdate = self._lastUpdatedAt;
+	            var now = Date.now();
+	            var delay = UPDATE_INTERVAL_MS - (now - lastUpdate);
+	
+	            // register the next update
+	            setTimeout(function () {
+	              self._update();
+	            }, delay > 0 ? delay : 0);
+	          }
+	        });
+	      }
+	    }
+	  }, {
+	    key: '_performUpdate',
+	    value: function _performUpdate(data) {
+	      var self = this;
+	      var viziLayer = this._getViziLayer();
+	
+	      // dictionaries to hold parameters
+	      var locations = {};
+	      var velocities = {};
+	      var accelerations = {};
+	
+	      // map vehicle parameters into dictionaries
+	      data.forEach(function (vehicle) {
+	        // if vehicle does not exist
+	        if (!(vehicle.id in self._vehicles)) {
+	          // add to vehicle layer
+	          var object = viziLayer.addVehicle(vehicle.type, new _vizi2.default.LatLon(vehicle.location.lat, vehicle.location.lon), vehicle.angle);
+	          // add entry to dictionary
+	          self._vehicles[vehicle.id] = {
+	            data: vehicle,
+	            object: object
+	          };
+	
+	          console.log('added vehicle: ' + JSON.stringify(vehicle));
+	        }
+	        // if exists
+	        else {
+	            // update properties
+	            var vehicleData = self._vehicles[vehicle.id].data;
+	            Object.keys(vehicle).forEach(function (key) {
+	              vehicleData[key] = vehicle[key];
+	            });
+	
+	            console.log('updated vehicle: ' + JSON.stringify(vehicle));
+	          }
+	
+	        // for simulation
+	        locations[vehicle.id] = {
+	          lat: vehicle.location.lat, lon: vehicle.location.lon, angle: vehicle.angle
+	        };
+	        velocities[vehicle.id] = {
+	          vx: vehicle.velocity, vy: 0.0, vz: 0.0, wheel: vehicle.wheel
+	        };
+	        accelerations[vehicle.id] = {
+	          ax: vehicle.acceleration, ay: 0.0, az: 0.0
+	        };
+	      });
+	
+	      // update simulation parameters
+	      viziLayer._setSimLocations(locations);
+	      viziLayer._setSimVelocities(velocities);
+	      viziLayer._setSimAccelerations(accelerations);
+	    }
+	  }]);
+	
+	  return VehicleLayer;
+	}(_Layer3.default);
+	
+	exports.default = VehicleLayer;
 
 /***/ }
 /******/ ])

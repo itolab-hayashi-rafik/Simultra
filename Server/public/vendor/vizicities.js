@@ -112,7 +112,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerGeometryPointLayer2 = _interopRequireDefault(_layerGeometryPointLayer);
 	
-	var _layerObjectVehicleLayer = __webpack_require__(77);
+	var _layerObjectPedestrianLayer = __webpack_require__(77);
+	
+	var _layerObjectPedestrianLayer2 = _interopRequireDefault(_layerObjectPedestrianLayer);
+	
+	var _layerObjectVehicleLayer = __webpack_require__(89);
 	
 	var _layerObjectVehicleLayer2 = _interopRequireDefault(_layerObjectVehicleLayer);
 	
@@ -128,7 +132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilIndex = __webpack_require__(87);
+	var _utilIndex = __webpack_require__(92);
 	
 	var _utilIndex2 = _interopRequireDefault(_utilIndex);
 	
@@ -160,6 +164,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  polylineLayer: _layerGeometryPolylineLayer.polylineLayer,
 	  PointLayer: _layerGeometryPointLayer2['default'],
 	  pointLayer: _layerGeometryPointLayer.pointLayer,
+	  PedestrianLayer: _layerObjectPedestrianLayer2['default'],
+	  pedestrianLayer: _layerObjectPedestrianLayer.pedestrianLayer,
 	  VehicleLayer: _layerObjectVehicleLayer2['default'],
 	  vehicleLayer: _layerObjectVehicleLayer.vehicleLayer,
 	  Point: _geoPoint2['default'],
@@ -18593,21 +18599,216 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	// TODO: Move duplicated logic between geometry layrs into GeometryLayer
+	/**
+	 * Created by masayuki on 20/07/2016.
+	 */
 	
-	// TODO: Look at ways to drop unneeded references to array buffers, etc to
-	// reduce memory footprint
+	var _SimObjectLayer2 = __webpack_require__(78);
 	
-	// TODO: Support dynamic updating / hiding / animation of geometry
-	//
-	// This could be pretty hard as it's all packed away within BufferGeometry and
-	// may even be merged by another layer (eg. GeoJSONLayer)
-	//
-	// How much control should this layer support? Perhaps a different or custom
-	// layer would be better suited for animation, for example.
+	var _SimObjectLayer3 = _interopRequireDefault(_SimObjectLayer2);
 	
-	// TODO: Allow _setBufferAttributes to use a custom function passed in to
-	// generate a custom mesh
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _ModelRepository = __webpack_require__(85);
+	
+	var _ModelRepository2 = _interopRequireDefault(_ModelRepository);
+	
+	var _PedestrianModel = __webpack_require__(86);
+	
+	var _PedestrianModel2 = _interopRequireDefault(_PedestrianModel);
+	
+	var _Pedestrian = __webpack_require__(88);
+	
+	var _Pedestrian2 = _interopRequireDefault(_Pedestrian);
+	
+	var MODEL_PREFIX = 'pedestrian:';
+	
+	var PedestrianLayer = (function (_SimObjectLayer) {
+	  _inherits(PedestrianLayer, _SimObjectLayer);
+	
+	  function PedestrianLayer(models, options) {
+	    _classCallCheck(this, PedestrianLayer);
+	
+	    var defaults = {
+	      output: true
+	    };
+	
+	    var _options = (0, _lodashAssign2['default'])({}, defaults, options);
+	
+	    _get(Object.getPrototypeOf(PedestrianLayer.prototype), 'constructor', this).call(this, _options);
+	
+	    var modelDefaults = {
+	      file: {
+	        body: null
+	      },
+	      scale: 1,
+	      translation: { x: 0, y: 0, z: 0 },
+	      rotation: { rx: 0, ry: 0, rz: 0 }
+	    };
+	    for (key in models) {
+	      models[key] = (0, _lodashAssign2['default'])({}, modelDefaults, models[key]);
+	    }
+	
+	    this._modelsLoaded = false;
+	    this._models = (0, _lodashAssign2['default'])({}, models);
+	    this._entries = [];
+	  }
+	
+	  _createClass(PedestrianLayer, [{
+	    key: '_onAdd',
+	    value: function _onAdd(world) {
+	      _get(Object.getPrototypeOf(PedestrianLayer.prototype), '_onAdd', this).call(this, world);
+	
+	      if (this.isOutput()) {
+	        // add callback
+	        this.on('loadCompleted', this._onLoadCompleted);
+	
+	        // load models
+	        this._loadModels();
+	      }
+	    }
+	  }, {
+	    key: '_loadModels',
+	    value: function _loadModels() {
+	      var self = this;
+	
+	      // load models iteratively
+	      var models = this._models;
+	      Object.keys(models).forEach(function (modelName) {
+	        var model = models[modelName];
+	
+	        var scale = 1.0;
+	        var translation = new _three2['default'].Vector3();
+	        var rotation = new _three2['default'].Vector3();
+	
+	        if (model.scale) {
+	          scale = model.scale;
+	        }
+	        if (model.translation) {
+	          translation.set(model.translation.x, model.translation.y, model.translation.z);
+	        }
+	        if (model.rotation) {
+	          rotation.set(model.rotation.x, model.rotation.y, model.rotation.z);
+	        }
+	
+	        // create a model
+	        var pedestrianModel = new _PedestrianModel2['default']({
+	          bodyURL: model.file.body,
+	          scale: scale,
+	          translation: translation,
+	          rotation: rotation
+	        }, callback);
+	
+	        // register to the repos
+	        _ModelRepository2['default'].add(MODEL_PREFIX + modelName, pedestrianModel);
+	      });
+	
+	      // callback
+	      var counter = 0;
+	      var len = Object.keys(models).length;
+	      function callback(scope) {
+	        if (++counter >= len) {
+	          // loaded all models
+	          self.emit('loadCompleted');
+	        }
+	      }
+	    }
+	  }, {
+	    key: '_onLoadCompleted',
+	    value: function _onLoadCompleted() {
+	      this._modelsLoaded = true;
+	
+	      // iterate over all the pedestrians already added and add meshes to the world
+	      for (var i = 0; i < this._entries.length; i++) {
+	        var entry = this._entries[i];
+	        if (entry.pedestrian === null) {
+	          this._addPedestrianInternal(entry);
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'addPedestrian',
+	    value: function addPedestrian(modelName, latlon, angle, options) {
+	      if (!_ModelRepository2['default'].contains(MODEL_PREFIX + modelName)) {
+	        throw new Error('Pedestrian model ' + modelName + ' does not exist.');
+	      }
+	
+	      var self = this;
+	
+	      var entry = {
+	        id: undefined,
+	        modelName: modelName,
+	        options: options,
+	        pedestrian: null,
+	        setLocation: function setLocation(lat, lon, angle) {
+	          self.setLocation(this.pedestrian.id, lat, lon, angle);
+	        },
+	        setPosition: function setPosition(x, y, z, angle) {
+	          self.setPosition(this.pedestrian.id, x, y, z, angle);
+	        }
+	      };
+	      var total = this._entries.push(entry);
+	      entry.id = total - 1;
+	
+	      // add pedestrian if the model is already loaded
+	      this._addPedestrianInternal(entry);
+	
+	      return entry;
+	    }
+	  }, {
+	    key: '_addPedestrianInternal',
+	    value: function _addPedestrianInternal(entry) {
+	      if (this._modelsLoaded) {
+	
+	        var pedestrianModel = _ModelRepository2['default'].get(MODEL_PREFIX + entry.modelName);
+	        var pedestrian = new _Pedestrian2['default'](pedestrianModel);
+	        this.add(pedestrian);
+	
+	        entry.pedestrian = pedestrian;
+	      }
+	    }
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      // Run common destruction logic from parent
+	      _get(Object.getPrototypeOf(PedestrianLayer.prototype), 'destroy', this).call(this);
+	    }
+	  }]);
+	
+	  return PedestrianLayer;
+	})(_SimObjectLayer3['default']);
+	
+	exports['default'] = PedestrianLayer;
+	
+	var noNew = function noNew(models, options) {
+	  return new PedestrianLayer(models, options);
+	};
+	
+	exports.pedestrianLayer = noNew;
+
+/***/ },
+/* 78 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var _Layer2 = __webpack_require__(32);
 	
@@ -18637,255 +18838,58 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
-	var _vendorGPUComputationRenderer = __webpack_require__(78);
+	var _vendorGPUComputationRenderer = __webpack_require__(79);
 	
 	var _vendorGPUComputationRenderer2 = _interopRequireDefault(_vendorGPUComputationRenderer);
 	
-	var _VehicleModel = __webpack_require__(79);
+	var _SimObject = __webpack_require__(80);
 	
-	var _VehicleModel2 = _interopRequireDefault(_VehicleModel);
+	var _SimObject2 = _interopRequireDefault(_SimObject);
 	
-	var _ModelRepository = __webpack_require__(81);
-	
-	var _ModelRepository2 = _interopRequireDefault(_ModelRepository);
-	
-	var _Vehicle = __webpack_require__(82);
-	
-	var _Vehicle2 = _interopRequireDefault(_Vehicle);
-	
-	var _vendorBinaryLoader = __webpack_require__(80);
-	
-	var _vendorBinaryLoader2 = _interopRequireDefault(_vendorBinaryLoader);
-	
-	var _VehicleVelocityShader = __webpack_require__(83);
+	var _VehicleVelocityShader = __webpack_require__(81);
 	
 	var _VehicleVelocityShader2 = _interopRequireDefault(_VehicleVelocityShader);
 	
-	var _VehiclePositionShader = __webpack_require__(84);
+	var _VehiclePositionShader = __webpack_require__(82);
 	
 	var _VehiclePositionShader2 = _interopRequireDefault(_VehiclePositionShader);
 	
-	var _VehicleShader = __webpack_require__(85);
+	var _VehicleShader = __webpack_require__(83);
 	
 	var _VehicleShader2 = _interopRequireDefault(_VehicleShader);
 	
-	var _utilObjectUtils = __webpack_require__(86);
+	var _utilObjectUtils = __webpack_require__(84);
 	
 	var _utilObjectUtils2 = _interopRequireDefault(_utilObjectUtils);
 	
-	var VehicleLayer = (function (_Layer) {
-	  _inherits(VehicleLayer, _Layer);
+	/**
+	 * Object Layer that supports GPGPU object extrapolations
+	 */
 	
-	  function VehicleLayer(models, options) {
-	    _classCallCheck(this, VehicleLayer);
+	var SimObjectLayer = (function (_Layer) {
+	  _inherits(SimObjectLayer, _Layer);
 	
-	    var modelDefaults = {
-	      file: null,
-	      scale: 1,
-	      translation: { x: 0, y: 0, z: 0 },
-	      rotation: { rx: 0, ry: 0, rz: 0 }
-	    };
-	    for (key in models) {
-	      models[key] = (0, _lodashAssign2['default'])({}, modelDefaults, models[key]);
-	    }
+	  function SimObjectLayer(options) {
+	    _classCallCheck(this, SimObjectLayer);
 	
 	    var defaults = {
 	      output: true,
 	      // simulation:
-	      simWidth: 2,
-	      // This default style is separate to Util.GeoJSON.defaultStyle
-	      style: {
-	        color: '#ffffff',
-	        transparent: false,
-	        opacity: 1,
-	        blending: _three2['default'].NormalBlending,
-	        height: 0
-	      }
+	      simWidth: 2
 	    };
 	
 	    var _options = (0, _lodashAssign2['default'])({}, defaults, options);
 	
-	    _get(Object.getPrototypeOf(VehicleLayer.prototype), 'constructor', this).call(this, _options);
+	    _get(Object.getPrototypeOf(SimObjectLayer.prototype), 'constructor', this).call(this, _options);
 	
-	    this._modelsLoaded = false;
-	    this._models = (0, _lodashAssign2['default'])({}, models);
-	    this._geometries = {};
-	    this._textures = {};
-	    this._vehicles = [];
+	    this._simObjects = [];
 	    this._gpuCompute = null;
 	  }
 	
-	  _createClass(VehicleLayer, [{
-	    key: '_onAdd',
-	    value: function _onAdd(world) {
-	      var self = this;
-	
-	      if (this.isOutput()) {
-	        // initialize GPUComputeRenderer
-	        this._initComputeRenderer();
-	
-	        // add callback
-	        this.on('loadCompleted', this._onLoadCompleted);
-	
-	        // add car
-	        this._loadModels();
-	
-	        // add listener
-	        world.on('preUpdate', function (delta) {
-	          self._onWorldUpdate(delta);
-	        });
-	      }
-	    }
-	  }, {
-	    key: '_loadModels',
-	    value: function _loadModels() {
-	      var self = this;
-	
-	      // load models iteratively
-	      var models = this._models;
-	      Object.keys(models).forEach(function (modelName) {
-	        var model = models[modelName];
-	
-	        var scale = 1.0;
-	        var translation = new _three2['default'].Vector3();
-	        var rotation = new _three2['default'].Vector3();
-	        var wheelOffset = null;
-	
-	        if (model.scale) {
-	          scale = model.scale;
-	        }
-	        if (model.translation) {
-	          translation.set(model.translation.x, model.translation.y, model.translation.z);
-	        }
-	        if (model.rotation) {
-	          rotation.set(model.rotation.x, model.rotation.y, model.rotation.z);
-	        }
-	        if (model.wheelOffset) {
-	          wheelOffset = new _three2['default'].Vector3(model.wheelOffset.x, model.wheelOffset.y, model.wheelOffset.z);
-	        }
-	
-	        // create a model
-	        var vehicleModel = new _VehicleModel2['default']({
-	          bodyURL: model.file.body,
-	          wheelURL: model.file.wheel,
-	          scale: scale,
-	          translation: translation,
-	          rotation: rotation,
-	          wheelOffset: wheelOffset
-	        }, callback);
-	
-	        // register to the repos
-	        _ModelRepository2['default'].add(modelName, vehicleModel);
-	      });
-	
-	      // callback
-	      var counter = 0;
-	      var len = Object.keys(models).length;
-	      function callback(scope) {
-	        if (++counter >= len) {
-	          // loaded all models
-	          self.emit('loadCompleted');
-	        }
-	      }
-	    }
-	  }, {
-	    key: '_onLoadCompleted',
-	    value: function _onLoadCompleted() {
-	      this._modelsLoaded = true;
-	
-	      // iterate over all the vehicles already added and add meshes to the world
-	      for (var i = 0; i < this._vehicles.length; i++) {
-	        var vehicle = this._vehicles[i];
-	        if (vehicle.vehicle === null) {
-	          this._addVehicleInternal(vehicle);
-	        }
-	      }
-	    }
-	  }, {
-	    key: '_onWorldUpdate',
-	    value: function _onWorldUpdate(delta) {
-	      if (this._gpuCompute) {
-	        this._performUpdate(delta);
-	      }
-	    }
-	  }, {
-	    key: 'addVehicle',
-	    value: function addVehicle(modelName, latlon, angle, options) {
-	      if (!_ModelRepository2['default'].contains(modelName)) {
-	        throw new Error('Vehicle model ' + modelName + ' does not exist.');
-	      }
-	
-	      var self = this;
-	
-	      var vehicle = {
-	        vid: undefined,
-	        modelName: modelName,
-	        model: null,
-	        latlon: latlon,
-	        angle: angle,
-	        options: options,
-	        vehicle: null,
-	        setLocation: function setLocation(lat, lon, angle) {
-	          self.setLocation(this.vid, lat, lon, angle);
-	        },
-	        setPosition: function setPosition(x, y, z, angle) {
-	          self.setPosition(this.vid, x, y, z, angle);
-	        }
-	      };
-	      var total = this._vehicles.push(vehicle);
-	      vehicle.vid = total - 1;
-	
-	      // add vehicle if the model is already loaded
-	      this._addVehicleInternal(vehicle);
-	
-	      return vehicle;
-	    }
-	  }, {
-	    key: '_addVehicleInternal',
-	    value: function _addVehicleInternal(vehicle) {
-	      if (this._modelsLoaded) {
-	
-	        var vehicleModel = _ModelRepository2['default'].get(vehicle.modelName);
-	        var v = new _Vehicle2['default'](vehicleModel);
-	        this.add(v.root);
-	
-	        vehicle.vehicle = v;
-	
-	        // var vid = vehicle.vid;
-	        //
-	        // var model = this._models[vehicle.modelName];
-	        // var geometry = this._geometries[vehicle.modelName];
-	        //
-	        // var material = new THREE.MeshLambertMaterial({ color: 0x995500, opacity: 1.0, transparent: false });
-	        // // var material = new THREE.ShaderMaterial({
-	        // //   uniforms: {
-	        // //     'reference':        { type: 'v2', value: null },
-	        // //     'texturePosition':  { type: 't',  value: null },
-	        // //     'texture':          { type: 't',  value: null },
-	        // //     'color':            { type: 'c',  value: new THREE.Color(0x995500) }
-	        // //   },
-	        // //   vertexShader: VehicleShader.vertexShader,
-	        // //   fragmentShader: VehicleShader.fragmentShader
-	        // // });
-	        // // material.uniforms.reference.value = new THREE.Vector2(x, y);
-	        //
-	        // var mesh = new THREE.Mesh(geometry, material);
-	        // mesh.scale.x = mesh.scale.y = mesh.scale.z = model.scale;
-	        // mesh.rotation.set(model.rotation.rx, model.rotation.ry, model.rotation.rz);
-	        // mesh.position.set(model.translation.x, model.translation.y, model.translation.z);
-	        //
-	        // this.add(mesh);
-	        // vehicle.model = model;
-	        // vehicle.mesh = mesh;
-	        // vehicle.setLocation(vehicle.latlon.lat, vehicle.latlon.lon, vehicle.angle);
-	      }
-	    }
-	
-	    // initialize GPUComputationRenderer
-	  }, {
+	  _createClass(SimObjectLayer, [{
 	    key: '_initComputeRenderer',
-	    value: function _initComputeRenderer() {
-	      var gpuCompute = new _vendorGPUComputationRenderer2['default'](this._options.simWidth, this._options.simWidth, this._world._engine._renderer);
+	    value: function _initComputeRenderer(world) {
+	      var gpuCompute = new _vendorGPUComputationRenderer2['default'](this._options.simWidth, this._options.simWidth, world._engine._renderer);
 	
 	      // create textures
 	      var textureAcceleration = gpuCompute.createTexture();
@@ -18923,193 +18927,216 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._velocityUniforms = velocityUniforms;
 	    }
 	
-	    // perform update
+	    // add SimObject
+	  }, {
+	    key: 'add',
+	    value: function add(simObject) {
+	      var total = this._simObjects.push(simObject);
+	      simObject.id = total - 1;
+	      _get(Object.getPrototypeOf(SimObjectLayer.prototype), 'add', this).call(this, simObject.root);
+	    }
+	
+	    // remove SimObject
+	  }, {
+	    key: 'remove',
+	    value: function remove(simObject) {
+	      this._simObjects.splice(this._simObjects.indexOf(simObject), 1);
+	      _get(Object.getPrototypeOf(SimObjectLayer.prototype), 'remove', this).call(this, simObject.root);
+	    }
+	  }, {
+	    key: '_onAdd',
+	    value: function _onAdd(world) {
+	      _get(Object.getPrototypeOf(SimObjectLayer.prototype), '_onAdd', this).call(this, world);
+	
+	      var self = this;
+	
+	      if (this.isOutput()) {
+	        // initialize GPUComputationRenderer
+	        this._initComputeRenderer(world);
+	
+	        // add listener
+	        world.on('preUpdate', function (delta) {
+	          self._onWorldUpdate(delta);
+	        });
+	      }
+	    }
+	  }, {
+	    key: '_onWorldUpdate',
+	    value: function _onWorldUpdate(delta) {
+	      this._performUpdate(delta);
+	      this._performSimUpdate(delta);
+	    }
 	  }, {
 	    key: '_performUpdate',
 	    value: function _performUpdate(delta) {
-	      var now = performance.now();
+	      for (var i = 0; i < this._simObjects.length; i++) {
+	        this._simObjects[i].update(delta);
+	      }
+	    }
+	  }, {
+	    key: '_performSimUpdate',
+	    value: function _performSimUpdate(delta) {
+	      if (this._gpuCompute) {
+	        var now = performance.now();
 	
-	      this._positionUniforms.time.value = now;
-	      this._positionUniforms.delta.value = delta;
-	      this._velocityUniforms.time.value = now;
-	      this._velocityUniforms.delta.value = delta;
+	        this._positionUniforms.time.value = now;
+	        this._positionUniforms.delta.value = delta;
+	        this._velocityUniforms.time.value = now;
+	        this._velocityUniforms.delta.value = delta;
 	
-	      this._gpuCompute.compute();
+	        this._gpuCompute.compute();
 	
-	      // transfer vehicles' parameters from gpu to cpu
-	      var texturePosition = this._gpuCompute.readVariable(this._positionVariable, this._texturePosition);
-	      for (var i = 0; i < this._vehicles.length; i++) {
-	        var vehicle = this._vehicles[i];
-	        if (vehicle.vehicle) {
+	        // transfer objects' velocity parameters from gpu to cpu
+	        var texturePosition = this._gpuCompute.readVariable(this._positionVariable, this._texturePosition);
+	        var textureVelocity = this._gpuCompute.readVariable(this._velocityVariable, this._textureVelocity);
+	        for (var i = 0; i < this._simObjects.length; i++) {
+	          var object = this._simObjects[i];
+	
 	          var x = texturePosition.image.data[i * 4 + 0];
 	          var y = texturePosition.image.data[i * 4 + 1];
 	          var z = texturePosition.image.data[i * 4 + 2];
 	          var angle = texturePosition.image.data[i * 4 + 3];
-	          vehicle.setPosition(x, y, z, angle);
+	          var velocity = textureVelocity.image.data[i * 4 + 0];
 	
-	          // TODO: transfer textureVelocity and update the rendering object
+	          object.setPosition(x, y, z);
+	          object.setAngle(-angle);
+	          object.setVelocity(velocity);
 	        }
-	      }
 	
-	      // (for gpgpu rendering (no transfer to cpu))
-	      // for (var i = 0; i < this._vehicles.length; i++) {
-	      //   var vehicle = this._vehicles[i];
-	      //   if (vehicle.mesh) {
-	      //     vehicle.mesh.material.uniforms.texturePosition.value = this._gpuCompute.getCurrentRenderTarget(this._positionVariable).texture;
-	      //     if (vehicle.mesh.material.uniforms.texture) {
-	      //       vehicle.mesh.material.uniforms.texture.value = this._textures[vehicle.modelName];
-	      //     }
-	      //   }
-	      // }
+	        // (for gpgpu rendering (no transfer to cpu))
+	        // for (var i = 0; i < this._vehicles.length; i++) {
+	        //   var vehicle = this._vehicles[i];
+	        //   if (vehicle.mesh) {
+	        //     vehicle.mesh.material.uniforms.texturePosition.value = this._gpuCompute.getCurrentRenderTarget(this._positionVariable).texture;
+	        //     if (vehicle.mesh.material.uniforms.texture) {
+	        //       vehicle.mesh.material.uniforms.texture.value = this._textures[vehicle.modelName];
+	        //     }
+	        //   }
+	        // }
+	      }
 	    }
 	
 	    /**
-	     * Set the location of a specific vehicle
+	     * Set the location of a specific object
 	     *
-	     * @param {number} vid vehicle id
+	     * @param {number} id SimObject id
 	     * @param {number} lat latitude
 	     * @param {number} lon longitude
 	     * @param {number} angle angle
 	     */
 	  }, {
 	    key: 'setLocation',
-	    value: function setLocation(vid, lat, lon, angle) {
-	      this._setLocation(vid, lat, lon, angle);
-	
-	      if (this._gpuCompute) {
-	        // console.log('this._setSimPosition(' + vid + ', ' + point.x + ', ' + 0 + ', ' + point.y + ', ' + angle + ')');
-	        this._setSimPosition(vid, point.x, 0, point.y, angle);
-	      }
+	    value: function setLocation(id, lat, lon, angle) {
+	      // calculate the position
+	      var point = this._world.latLonToPoint(latLon(lat, lon));
+	      this.setPosition(id, point.x, 0, point.y, angle);
 	    }
 	
-	    // internal helper for setLocation()
+	    /**
+	     * Set the position of a specific object
+	     *
+	     * @param {number} id SimObject id
+	     * @param {number} x x
+	     * @param {number} y y
+	     * @param {number} z z
+	     * @param {number} angle angle
+	     */
 	  }, {
-	    key: '_setLocation',
-	    value: function _setLocation(vid, lat, lon, angle) {
+	    key: 'setPosition',
+	    value: function setPosition(id, x, y, z, angle) {
+	      this._setPosition(id, x, y, z, angle);
+	      this._setSimPosition(id, x, y, z, angle);
+	    }
+	  }, {
+	    key: '_setPosition',
+	    value: function _setPosition(id, x, y, z, angle) {
 	      // if the vehicle exists
-	      if (vid in this._vehicles) {
-	        var vehicle = this._vehicles[vid];
+	      if (id in this._simObjects) {
+	        var simObject = this._simObjects[id];
 	
-	        // update latlon
-	        vehicle.latlon.lat = lat;
-	        vehicle.latlon.lon = lon;
+	        // update the vehicle
+	        simObject.setPosition(x, y, z);
+	        simObject.setAngle(angle);
+	      }
+	    }
+	  }, {
+	    key: '_setSimPosition',
+	    value: function _setSimPosition(id, x, y, z, angle) {
+	      console.log('_setSimPosition: ' + id + ', ' + x + ', ' + y + ', ' + z + ', ' + angle + ')');
 	
-	        if (vehicle.vehicle) {
-	          // calculate the position
-	          var point = this._world.latLonToPoint(vehicle.latlon);
+	      if (this._gpuCompute) {
+	        // transmit from gpu to cpu
+	        var texturePosition = this._gpuCompute.readVariable(this._positionVariable, this._texturePosition);
 	
-	          // update the vehicle
-	          vehicle.vehicle.setPosition(point.x, 0.0, point.y);
-	          vehicle.vehicle.setAngle(angle);
-	        }
+	        // (for extrapolation) update data
+	        texturePosition.image.data[id * 4 + 0] = x;
+	        texturePosition.image.data[id * 4 + 1] = y;
+	        texturePosition.image.data[id * 4 + 2] = z;
+	        texturePosition.image.data[id * 4 + 3] = angle;
+	        texturePosition.needsUpdate = true;
+	
+	        // transmit from cpu to gpu
+	        this._gpuCompute.updateVariable(this._positionVariable, texturePosition);
 	      }
 	    }
 	
 	    /**
-	     * Set the position of a specific vehicle
+	     * Set the velocity of a specific object
 	     *
-	     * @param {number} vid vehicle id
-	     * @param {number} x x coordinate
-	     * @param {number} y y coordinate
+	     * @param {number} id SimObject id
+	     * @param {number} vx x
+	     * @param {number} vy y
+	     * @param {number} vz z
+	     * @param {number} wheel wheel
 	     */
 	  }, {
-	    key: 'setPosition',
-	    value: function setPosition(vid, x, y, z, angle) {
-	      this._setPosition(vid, x, y, z, angle);
-	
-	      if (this._gpuCompute) {
-	        this._setPosition(vid, x, y, z, angle);
-	      }
+	    key: 'setVelocity',
+	    value: function setVelocity(id, vx, vy, vz, wheel) {
+	      this._setVelocity(id, vx, vy, vz, wheel);
+	      this._setSimVelocity(id, vx, vy, vz, wheel);
 	    }
-	
-	    // internal helper for setPosition()
 	  }, {
-	    key: '_setPosition',
-	    value: function _setPosition(vid, x, y, z, angle) {
+	    key: '_setVelocity',
+	    value: function _setVelocity(id, vx, vy, vz, wheel) {
 	      // if the vehicle exists
-	      if (vid in this._vehicles) {
-	        var vehicle = this._vehicles[vid];
+	      if (id in this._simObjects) {
+	        var simObject = this._simObjects[id];
 	
-	        if (vehicle.vehicle) {
-	          // update the vehicle
-	          vehicle.vehicle.setPosition(x, y, z);
-	          vehicle.vehicle.setAngle(-angle);
-	        }
-	
-	        // calculate and update the location
-	        vehicle.latlon = this._world.pointToLatLon(new _geoPoint.point(x, z));
+	        // update the vehicle
+	        simObject.setVelocity(vx); // FIXME: use vy, vz, wheel?
 	      }
-	    }
-	
-	    // Returns true if the polygon is flat (has no height)
-	  }, {
-	    key: 'isFlat',
-	    value: function isFlat() {
-	      return this._flat;
-	    }
-	
-	    // Returns true if coordinates refer to a single geometry
-	    //
-	    // For example, not coordinates for a MultiPolygon GeoJSON feature
-	  }, {
-	    key: 'destroy',
-	    value: function destroy() {
-	      // Run common destruction logic from parent
-	      _get(Object.getPrototypeOf(VehicleLayer.prototype), 'destroy', this).call(this);
-	    }
-	  }, {
-	    key: '_setSimLocation',
-	    value: function _setSimLocation(vid, lat, lon, angle) {
-	      var point = self._world.latLonToPoint(new _geoLatLon.latLon(lat, lon));
-	      var position = { x: position.x, y: 0.0, z: position.y, angle: angle };
-	
-	      this._setPosition(position);
-	    }
-	  }, {
-	    key: '_setSimPosition',
-	    value: function _setSimPosition(vid, x, y, z, angle) {
-	      // console.log('_setSimPosition: ' + vid + ', ' + x + ', ' + y + ', ' + z + ', ' + angle + ')');
-	
-	      // transmit from gpu to cpu
-	      var texturePosition = this._gpuCompute.readVariable(this._positionVariable, this._texturePosition);
-	
-	      // (for extrapolation) update data
-	      texturePosition.image.data[vid * 4 + 0] = x;
-	      texturePosition.image.data[vid * 4 + 1] = y;
-	      texturePosition.image.data[vid * 4 + 2] = z;
-	      texturePosition.image.data[vid * 4 + 3] = angle;
-	      texturePosition.needsUpdate = true;
-	
-	      // transmit from cpu to gpu
-	      this._gpuCompute.updateVariable(this._positionVariable, texturePosition);
 	    }
 	  }, {
 	    key: '_setSimVelocity',
-	    value: function _setSimVelocity(vid, vx, vy, vz, wheel) {
-	      // transmit from gpu to cpu
-	      var textureVelocity = this._gpuCompute.readVariable(this._velocityVariable, this._textureVelocity);
+	    value: function _setSimVelocity(id, vx, vy, vz, wheel) {
+	      console.log('_setSimVelocity: ' + id + ', ' + vx + ', ' + vy + ', ' + vz + ', ' + wheel + ')');
 	
-	      // update data
-	      textureVelocity.image.data[vid * 4 + 0] = vx;
-	      textureVelocity.image.data[vid * 4 + 1] = vy;
-	      textureVelocity.image.data[vid * 4 + 2] = vz;
-	      textureVelocity.image.data[vid * 4 + 3] = wheel;
-	      textureVelocity.needsUpdate = true;
+	      if (this._gpuCompute) {
+	        // transmit from gpu to cpu
+	        var textureVelocity = this._gpuCompute.readVariable(this._velocityVariable, this._textureVelocity);
 	
-	      console.log(textureVelocity.image.data);
+	        // update data
+	        textureVelocity.image.data[id * 4 + 0] = vx;
+	        textureVelocity.image.data[id * 4 + 1] = vy;
+	        textureVelocity.image.data[id * 4 + 2] = vz;
+	        textureVelocity.image.data[id * 4 + 3] = wheel;
+	        textureVelocity.needsUpdate = true;
 	
-	      // transmit from cpu to gpu
-	      this._gpuCompute.updateVariable(this._velocityVariable, textureVelocity);
+	        // transmit from cpu to gpu
+	        this._gpuCompute.updateVariable(this._velocityVariable, textureVelocity);
+	      }
 	    }
 	  }, {
 	    key: '_setSimAcceleration',
-	    value: function _setSimAcceleration(vid, ax, ay, az, aw) {
-	      // update data in cpu-memory
-	      this._velocityUniforms.textureAcceleration.value.image.data[vid * 4 + 0] = ax;
-	      this._velocityUniforms.textureAcceleration.value.image.data[vid * 4 + 1] = ay;
-	      this._velocityUniforms.textureAcceleration.value.image.data[vid * 4 + 2] = az;
-	      this._velocityUniforms.textureAcceleration.value.image.data[vid * 4 + 3] = aw;
-	      this._velocityUniforms.textureAcceleration.value.needsUpdate = true;
+	    value: function _setSimAcceleration(id, ax, ay, az, aw) {
+	      if (this._gpuCompute) {
+	        // update data in cpu-memory
+	        this._velocityUniforms.textureAcceleration.value.image.data[id * 4 + 0] = ax;
+	        this._velocityUniforms.textureAcceleration.value.image.data[id * 4 + 1] = ay;
+	        this._velocityUniforms.textureAcceleration.value.image.data[id * 4 + 2] = az;
+	        this._velocityUniforms.textureAcceleration.value.image.data[id * 4 + 3] = aw;
+	        this._velocityUniforms.textureAcceleration.value.needsUpdate = true;
+	      }
 	    }
 	
 	    //
@@ -19117,7 +19144,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    //   0: {lat: 0.0, lon: 0.0, angle: 0.0},
 	    //   1: {lat: 1.0, lon: 1.0, angle: 0.0},
 	    //   ...
-	    //   vid: {lat: lat, lon: lon, angle: angle}
+	    //   id: {lat: lat, lon: lon, angle: angle}
 	    // }
 	    //
 	  }, {
@@ -19126,9 +19153,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var self = this;
 	
 	      var positions = {};
-	      Object.keys(locations).forEach(function (vid) {
-	        var point = self._world.latLonToPoint(new _geoLatLon.latLon(locations[vid].lat, locations[vid].lon));
-	        positions[vid] = { x: point.x, y: 0.0, z: point.y, angle: locations[vid].angle };
+	      Object.keys(locations).forEach(function (id) {
+	        var point = self._world.latLonToPoint(latLon(locations[id].lat, locations[id].lon));
+	        positions[id] = { x: point.x, y: 0.0, z: point.y, angle: locations[id].angle };
 	      });
 	
 	      this._setSimPositions(positions);
@@ -19139,7 +19166,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    //   0: {x: 0.0, y: 0.0, z: 0.0, angle: 0.0},
 	    //   1: {x: 1.0, y: 1.0, z: 1.0, angle: 0.0},
 	    //   ...
-	    //   vid: {x: x, y: y, z: z, angle: angle}
+	    //   id: {x: x, y: y, z: z, angle: angle}
 	    // }
 	    //
 	  }, {
@@ -19150,12 +19177,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var texturePosition = this._gpuCompute.readVariable(this._positionVariable, this._texturePosition);
 	
 	        // update data
-	        Object.keys(positions).forEach(function (vid) {
+	        Object.keys(positions).forEach(function (id) {
 	          // (for extrapolation)
-	          texturePosition.image.data[vid * 4 + 0] = positions[vid].x;
-	          texturePosition.image.data[vid * 4 + 1] = positions[vid].y;
-	          texturePosition.image.data[vid * 4 + 2] = positions[vid].z;
-	          texturePosition.image.data[vid * 4 + 3] = positions[vid].angle;
+	          texturePosition.image.data[id * 4 + 0] = positions[id].x;
+	          texturePosition.image.data[id * 4 + 1] = positions[id].y;
+	          texturePosition.image.data[id * 4 + 2] = positions[id].z;
+	          texturePosition.image.data[id * 4 + 3] = positions[id].angle;
 	        });
 	        texturePosition.needsUpdate = true;
 	
@@ -19169,7 +19196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    //   0: {vx: 0.0, vy: 0.0, vz: 0.0, wheel: 0.0},
 	    //   1: {vx: 1.0, vy: 1.0, vz: 1.0, wheel: 0.0},
 	    //   ...
-	    //   vid: {vx: vx, vy: vy, vz: vz, wheel: wheel}
+	    //   id: {vx: vx, vy: vy, vz: vz, wheel: wheel}
 	    // }
 	    //
 	  }, {
@@ -19180,11 +19207,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var textureVelocity = this._gpuCompute.readVariable(this._velocityVariable, this._textureVelocity);
 	
 	        // update data
-	        Object.keys(velocities).forEach(function (vid) {
-	          textureVelocity.image.data[vid * 4 + 0] = velocities[vid].vx;
-	          textureVelocity.image.data[vid * 4 + 1] = velocities[vid].vy;
-	          textureVelocity.image.data[vid * 4 + 2] = velocities[vid].vz;
-	          textureVelocity.image.data[vid * 4 + 3] = velocities[vid].wheel;
+	        Object.keys(velocities).forEach(function (id) {
+	          textureVelocity.image.data[id * 4 + 0] = velocities[id].vx;
+	          textureVelocity.image.data[id * 4 + 1] = velocities[id].vy;
+	          textureVelocity.image.data[id * 4 + 2] = velocities[id].vz;
+	          textureVelocity.image.data[id * 4 + 3] = velocities[id].wheel;
 	        });
 	        textureVelocity.needsUpdate = true;
 	
@@ -19208,26 +19235,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      console.log('textureVelocity:');
 	      console.log(textureVelocity.image.data);
 	    }
-	  }], [{
-	    key: 'isSingle',
-	    value: function isSingle(coordinates) {
-	      return !Array.isArray(coordinates[0][0][0]);
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      // Run common destruction logic from parent
+	      _get(Object.getPrototypeOf(SimObjectLayer.prototype), 'destroy', this).call(this);
 	    }
 	  }]);
 	
-	  return VehicleLayer;
+	  return SimObjectLayer;
 	})(_Layer3['default']);
 	
-	exports['default'] = VehicleLayer;
-	
-	var noNew = function noNew(coordinates, options) {
-	  return new VehicleLayer(coordinates, options);
-	};
-	
-	exports.vehicleLayer = noNew;
+	exports['default'] = SimObjectLayer;
+	module.exports = exports['default'];
 
 /***/ },
-/* 78 */
+/* 79 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -19645,7 +19668,398 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 79 */
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	/**
+	 * Created by masayuki on 20/07/2016.
+	 */
+	
+	var _geoLatLon = __webpack_require__(7);
+	
+	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
+	
+	var SimObject = (function () {
+	  function SimObject() {
+	    _classCallCheck(this, SimObject);
+	
+	    // properties
+	    this.id = undefined;
+	    this.angle = 0.0;
+	    this.velocity = 0.0;
+	    this.updatePosition = false;
+	
+	    // 3D Object
+	    this.root = new THREE.Object3D();
+	
+	    // --- construct
+	    this._createSimObject();
+	  }
+	
+	  // --- API
+	  /**
+	   * Add THREE.Object3D object directly
+	   * @param {object} object
+	   */
+	
+	  _createClass(SimObject, [{
+	    key: 'add',
+	    value: function add(object) {
+	      this.root.add(object);
+	    }
+	
+	    /**
+	     * Remove THREE.Object3D object directly
+	     * @param {object} object
+	     */
+	  }, {
+	    key: 'remove',
+	    value: function remove(object) {
+	      this.root.remove(object);
+	    }
+	
+	    /**
+	     * sets the object position
+	     * @param {Number} x x
+	     * @param {Number} y y
+	     * @param {Number} z z
+	     * @param {Boolean} updateLatLon true if latLon property needs to be updated
+	     */
+	  }, {
+	    key: 'setPosition',
+	    value: function setPosition(x, y, z) {
+	      this.root.position.set(x, y, z);
+	    }
+	
+	    /**
+	     * sets the object angle
+	     * @param {Number} angle angle in [rad]
+	     */
+	  }, {
+	    key: 'setAngle',
+	    value: function setAngle(angle) {
+	      this.angle = angle;
+	      this.root.rotation.y = angle;
+	    }
+	
+	    /**
+	     * sets the vehicle's velocity
+	     * @param {Number} velocity velocity in [m/s]
+	     */
+	  }, {
+	    key: 'setVelocity',
+	    value: function setVelocity(velocity) {
+	      this.velocity = velocity;
+	    }
+	
+	    /**
+	     * update the object
+	     * @param {Number} delta
+	     */
+	  }, {
+	    key: 'update',
+	    value: function update(delta) {
+	
+	      var forwardDelta = delta * this.velocity;
+	
+	      // position
+	      if (this.updatePosition) {
+	        this.root.position.x += Math.sin(this.angle) * forwardDelta;
+	        this.root.position.z += Math.cos(this.angle) * forwardDelta;
+	
+	        this.root.rotation.y = this.angle;
+	      }
+	    }
+	
+	    // --- internal helper methods
+	  }, {
+	    key: '_createSimObject',
+	    value: function _createSimObject() {}
+	    // construct this object
+	
+	    // ---
+	
+	  }]);
+	
+	  return SimObject;
+	})();
+	
+	exports['default'] = SimObject;
+	module.exports = exports['default'];
+
+/***/ },
+/* 81 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	// jscs:disable
+	/* eslint-disable */
+	
+	/* To be used by GPUComputationRenderer */
+	var VehicleVelocityShader = {
+	
+	  uniforms: {
+	
+	    "time": { type: "f", value: 0.0 },
+	    "delta": { type: "f", value: 0.0 },
+	    "textureAcceleration": { type: "t", value: null }
+	
+	  },
+	
+	  vertexShader: [].join('\n'),
+	
+	  fragmentShader: ["uniform float time;", "uniform float delta; // about 0.016", "uniform sampler2D textureAcceleration;", "const float PI = 3.141592653589793;", "const float PI_05 = PI / 2.0;", "const float PI_2 = PI * 2.0;", "const float L = 2.0;", "const float SPEED_LIMIT = 10.0;", "void main() {", " vec2 uv = gl_FragCoord.xy / resolution.xy;", " vec4 selfVelocity = texture2D( textureVelocity, uv );", " vec4 selfAcceleration = texture2D( textureAcceleration, uv );", " float velocity = selfVelocity.x;", " float wheel = selfVelocity.w;", " float acceleration = selfAcceleration.x;", " // update velocity", " //velocity += acceleration;", " gl_FragColor = vec4(velocity, 0.0, 0.0, wheel);",
+	
+	  // " vec4 selfVelocity = texture2D( textureVelocity, uv );",
+	  // " vec3 velocity = selfVelocity.xyz;",
+	  // " float velocityScalar = length( velocity );",
+	  // " float wheel = selfVelocity.w;",
+	  //
+	  // " vec3 selfAcceleration = texture2D( textureAcceleration, uv ).xyz;",
+	  //
+	  // " // update the velocity in accordance with the centripetal force",
+	  // " float a = wheel / L * velocityScalar * velocityScalar;",
+	  // " vec3 centripetalAcceleration = vec3( - a / velocityScalar * velocity.z, 0.0, a / velocityScalar * velocity.x );",
+	  // " velocity += delta * centripetalAcceleration;",
+	  // " velocity *= velocityScalar / length( velocity );",
+	  //
+	  // " // update velocity",
+	  // " velocity += delta * selfAcceleration;",
+	  //
+	  // "	float limit = SPEED_LIMIT;",
+	  //
+	  // "	// Speed Limits",
+	  // "	//if ( length( velocity ) > limit ) {",
+	  // "	//	velocity = normalize( velocity ) * limit;",
+	  // "	//}",
+	  //
+	  // "	gl_FragColor = vec4( velocity, wheel );",
+	
+	  "}"].join('\n')
+	
+	};
+	
+	exports["default"] = VehicleVelocityShader;
+	module.exports = exports["default"];
+
+/***/ },
+/* 82 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	// jscs:disable
+	/* eslint-disable */
+	
+	var VehiclePositionShader = {
+	
+	  uniforms: {
+	
+	    "time": { type: "f", value: 0.0 },
+	    "delta": { type: "f", value: 0.0 }
+	  },
+	
+	  // "textureTargetPosition":  {type: "t", value: null}, // (for interpolation)
+	  // "t":                {type: "f", value: 0.0}, // (for interpolation)
+	
+	  vertexShader: [].join('\n'),
+	
+	  fragmentShader: ["uniform float time;", "uniform float delta;", "uniform sampler2D textureTargetPosition;", "uniform float t;", "const float PI = 3.141592653589793;", "const float L = 2.0;", "const float T = 1.0;", "void main() {", " vec2 uv = gl_FragCoord.xy / resolution.xy;",
+	
+	  // (for extrapolation)
+	  " vec4 selfPosition = texture2D( texturePosition, uv );", " vec4 selfVelocity = texture2D( textureVelocity, uv );", " vec3 position = selfPosition.xyz;", " float velocity = selfVelocity.x;", " float angle = selfPosition.w;", " float wheel = selfVelocity.w;", " float angular_velocity = wheel / L * velocity;", " angle += delta * angular_velocity;", " if( angle >  PI ) { angle -= 2.0 * PI; }", " if( angle < -PI ) { angle += 2.0 * PI; }", " position.x += delta * velocity * cos( angle );", " position.z += delta * velocity * sin( angle );", " gl_FragColor = vec4( position, angle );",
+	
+	  // (for interpolation)
+	  // " vec4 selfPosition = texture2D( texturePosition, uv );",
+	  // " vec4 selfTargetPosition = texture2D( textureTargetPosition, uv );",
+	  //
+	  // " selfPosition.x = mix( selfPosition.x, selfTargetPosition.x, t / T );",
+	  // " selfPosition.y = mix( selfPosition.y, selfTargetPosition.y, t / T );",
+	  // " selfPosition.z = mix( selfPosition.z, selfTargetPosition.z, t / T );",
+	  // " selfPosition.w = mix( selfPosition.w, selfTargetPosition.w, t / T );",
+	  //
+	  // " gl_FragColor = selfPosition;",
+	
+	  // " vec4 selfPosition = texture2D( texturePosition, uv );",
+	  // " vec4 selfVelocity = texture2D( textureVelocity, uv );",
+	  //
+	  // " vec3 position = selfPosition.xyz;",
+	  // " vec3 velocity = selfVelocity.xyz;",
+	  // " float angle = selfPosition.w;",
+	  // " float wheel = selfVelocity.w;",
+	  //
+	  // " // calculate the angular velocity",
+	  // " float angular_velocity = wheel / L * length( velocity );",
+	  //
+	  // " // update the position",
+	  // " position += delta * velocity;",
+	  // " angle += delta * angular_velocity;",
+	  // " if ( angle >  PI ) { angle -= 2.*PI; }",
+	  // " if ( angle < -PI ) { angle += 2.*PI; }",
+	  //
+	  // " gl_FragColor = vec4( position, angle );",
+	
+	  "}"].join('\n')
+	
+	};
+	
+	exports["default"] = VehiclePositionShader;
+	module.exports = exports["default"];
+
+/***/ },
+/* 83 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var VehicleShader = {
+	
+	  uniforms: {
+	
+	    "reference": { type: "v2", value: null },
+	    "texturePosition": { type: "t", value: null },
+	    "texture": { type: "t", value: null },
+	    "color": { type: "c", value: new _three2["default"].Color(0xff2200) }
+	
+	  },
+	
+	  vertexShader: ["uniform vec2 reference;", "uniform sampler2D texturePosition;", "varying vec2 vUv;", "mat4 rotationMatrix(vec3 axis, float angle)", "{", "    axis = normalize(axis);", "    float s = sin(angle);", "    float c = cos(angle);", "    float oc = 1.0 - c;", "    ", "    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,", "                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,", "                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,", "                0.0,                                0.0,                                0.0,                                1.0);", "}", "void main() {", " vUv = uv;", " // retrieve the simulated position of this vehicle", " vec4 selfPosition = texture2D( texturePosition, reference );", "	vec3 simPos = selfPosition.xyz;", " float angle = selfPosition.w;", " // tmp", " vec4 newPosition = vec4( position, 1.0 );", " // rotate", " mat4 rotYMatrix = rotationMatrix( vec3( 0., 1., 0. ), angle );", " newPosition = rotYMatrix * newPosition;", " // calcuate the actual position by adding the simulated position", "	newPosition = modelMatrix * newPosition;", " newPosition.xyz += simPos;", "	gl_Position = projectionMatrix * viewMatrix * newPosition;", "}"].join('\n'),
+	
+	  fragmentShader: ["uniform sampler2D texture;", "uniform vec3 color;", "varying vec2 vUv;", "void main() {", " gl_FragColor = texture2D( texture, vUv );", "// gl_FragColor = vec4( color, 1. );", "}"].join('\n')
+	
+	};
+	
+	exports["default"] = VehicleShader;
+	module.exports = exports["default"];
+
+/***/ },
+/* 84 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	/*
+	 * Object helpers
+	 */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var ObjectUtils = (function () {
+	
+	  // Create UV from geometry's faces
+	  var createUV = function createUV(geometry) {
+	    geometry.computeBoundingBox();
+	
+	    var max = geometry.boundingBox.max;
+	    var min = geometry.boundingBox.min;
+	    var offset = new _three2['default'].Vector2(0 - min.x, 0 - min.y);
+	    var range = new _three2['default'].Vector2(max.x - min.x, max.y - min.y);
+	    var faces = geometry.faces;
+	
+	    geometry.faceVertexUvs[0] = [];
+	
+	    for (var i = 0; i < faces.length; i++) {
+	      var v1 = geometry.vertices[faces[i].a];
+	      var v2 = geometry.vertices[faces[i].b];
+	      var v3 = geometry.vertices[faces[i].c];
+	
+	      geometry.faceVertexUvs[0].push([new _three2['default'].Vector2((v1.x + offset.x) / range.x, (v1.y + offset.y) / range.y), new _three2['default'].Vector2((v2.x + offset.x) / range.x, (v2.y + offset.y) / range.y), new _three2['default'].Vector2((v3.x + offset.x) / range.x, (v3.y + offset.y) / range.y)]);
+	    }
+	
+	    geometry.uvsNeedUpdate = true;
+	  };
+	
+	  return {
+	    createUV: createUV
+	  };
+	})();
+	
+	exports['default'] = ObjectUtils;
+	module.exports = exports['default'];
+
+/***/ },
+/* 85 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	/**
+	 * Created by masayuki on 17/07/2016.
+	 */
+	
+	var ModelRepository = (function () {
+	  function ModelRepository() {
+	    _classCallCheck(this, ModelRepository);
+	
+	    this._map = {};
+	  }
+	
+	  _createClass(ModelRepository, [{
+	    key: "add",
+	    value: function add(modelName, model) {
+	      this._map[modelName] = model;
+	    }
+	  }, {
+	    key: "get",
+	    value: function get(modelName) {
+	      return this._map[modelName];
+	    }
+	  }, {
+	    key: "contains",
+	    value: function contains(modelName) {
+	      return modelName in this._map;
+	    }
+	  }]);
+	
+	  return ModelRepository;
+	})();
+	
+	var modelRepository = new ModelRepository();
+	
+	exports["default"] = modelRepository;
+	module.exports = exports["default"];
+
+/***/ },
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -19655,35 +20069,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
 	/**
-	 * Created by masayuki on 17/07/2016.
+	 * Created by masayuki on 20/07/2016.
 	 */
 	
 	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorBinaryLoader = __webpack_require__(80);
+	var _vendorBinaryLoader = __webpack_require__(87);
 	
 	var _vendorBinaryLoader2 = _interopRequireDefault(_vendorBinaryLoader);
 	
-	var VehicleModel = function VehicleModel(parameters, callback) {
+	var PedestrianModel = function PedestrianModel(parameters, callback) {
 	
 	  var scope = this;
 	  var p = parameters;
 	
 	  // file paths
 	  this.bodyURL = p.bodyURL || null;
-	  this.wheelURL = p.wheelURL || null;
 	
 	  // parameters
 	  this.scale = p.scale || 1.0;
 	  this.translation = p.translation || new _three2['default'].Vector3();
 	  this.rotation = p.rotation || new _three2['default'].Vector3();
-	  this.wheelOffset = p.wheelOffset || new _three2['default'].Vector3();
-	  this.autoWheelOffset = p.autoWheelOffset || true;
-	
-	  // properties
-	  this.wheelDiameter = 1.0;
 	
 	  // callback
 	  this.callback = callback;
@@ -19695,18 +20103,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.bodyGeometry = null;
 	  this.bodyMaterials = null;
 	
-	  this.wheelGeometry = null;
-	  this.wheelMaterials = null;
-	
 	  // construct
-	  if (scope.bodyURL && scope.wheelURL) {
+	  if (scope.bodyURL) {
 	    // load binaries
-	    var bloader = new _three2['default'].BinaryLoader();
-	    bloader.load(scope.bodyURL, function (geometry, materials) {
+	    var jloader = new _three2['default'].JSONLoader();
+	    jloader.load(scope.bodyURL, function (geometry, materials) {
 	      createBody(geometry, materials);
-	    });
-	    bloader.load(scope.wheelURL, function (geometry, materials) {
-	      createWheel(geometry, materials);
 	    });
 	  }
 	
@@ -19715,32 +20117,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    scope.bodyGeometry = geometry;
 	    scope.bodyMaterials = materials;
 	
-	    onCreated();
-	  }
-	  function createWheel(geometry, materials) {
-	    scope.wheelGeometry = geometry;
-	    scope.wheelMaterials = materials;
+	    for (i = 0, max = materials.length; i < max; i = i + 1) {
+	      materials[i].morphTargets = true;
+	    }
 	
 	    onCreated();
 	  }
 	  function onCreated() {
-	    if (scope.bodyGeometry && scope.wheelGeometry) {
+	    if (scope.bodyGeometry) {
 	      scope.loaded = true;
-	
-	      // wheel
-	      scope.wheelGeometry.computeBoundingBox();
-	      var wbb = scope.wheelGeometry.boundingBox;
-	
-	      // compute wheel diameter
-	      scope.wheelDiameter = wbb.max.y - wbb.min.y;
-	
-	      // compute wheel offsets
-	      if (scope.autoWheelOffset) {
-	        scope.wheelOffset.addVectors(wbb.min, wbb.max);
-	        scope.wheelOffset.multiplyScalar(0.5);
-	
-	        scope.wheelGeometry.center();
-	      }
 	
 	      // callback
 	      if (scope.callback) {
@@ -19750,11 +20135,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 	
-	exports['default'] = VehicleModel;
+	exports['default'] = PedestrianModel;
 	module.exports = exports['default'];
 
 /***/ },
-/* 80 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -20400,411 +20785,427 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 81 */
-/***/ function(module, exports) {
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	/**
-	 * Created by masayuki on 17/07/2016.
-	 */
-	
-	var ModelRepository = (function () {
-	  function ModelRepository() {
-	    _classCallCheck(this, ModelRepository);
-	
-	    this._map = {};
-	  }
-	
-	  _createClass(ModelRepository, [{
-	    key: "add",
-	    value: function add(modelName, vehicleModel) {
-	      this._map[modelName] = vehicleModel;
-	    }
-	  }, {
-	    key: "get",
-	    value: function get(modelName) {
-	      return this._map[modelName];
-	    }
-	  }, {
-	    key: "contains",
-	    value: function contains(modelName) {
-	      return modelName in this._map;
-	    }
-	  }]);
-	
-	  return ModelRepository;
-	})();
-	
-	var modelRepository = new ModelRepository();
-	
-	exports["default"] = modelRepository;
-	module.exports = exports["default"];
-
-/***/ },
-/* 82 */
-/***/ function(module, exports) {
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	// jscs:disable
-	/* eslint-disable */
-	
-	/**
-	 * Created by masayuki on 17/07/2016.
-	 */
-	
-	var Vehicle = function Vehicle(vehicleModel) {
-	
-	  var scope = this;
-	
-	  // parameters
-	  this.model = vehicleModel;
-	  this.callback = function (scope) {};
-	
-	  // properties
-	  this.angle = 0.0;
-	  this.wheelAngle = 0.0;
-	  this.velocity = 0.0;
-	  this.wheelDiameter = 1.0;
-	  this.updatePosition = true;
-	  this.updateWheel = true;
-	
-	  // 3D Object
-	  this.root = new THREE.Object3D();
-	  this.frontLeftWheelRoot = new THREE.Object3D();
-	  this.frontRightWheelRoot = new THREE.Object3D();
-	
-	  // Meshes
-	  this.bodyMesh = null;
-	  this.frontLeftWheelMesh = null;
-	  this.frontRightWheelMesh = null;
-	  this.rearLeftWheelMesh = null;
-	  this.rearRightWheelMesh = null;
-	
-	  // --- constants
-	  this.STEERING_RADIUS_RATIO = 0.0023;
-	
-	  // --- construct
-	  createVehicle();
-	
-	  // --- API
-	  /**
-	   * sets the vehicle position
-	   * @param x x
-	   * @param y y
-	   * @param z z
-	   */
-	  this.setPosition = function (x, y, z) {
-	    var t = scope.model.translation;
-	    this.root.position.set(t.x + x, t.y + y, t.z + z);
-	  };
-	
-	  /**
-	   * sets the vehicle angle
-	   * @param angle angle in [rad]
-	   */
-	  this.setAngle = function (angle) {
-	    this.angle = angle;
-	
-	    var r = scope.model.rotation;
-	    this.root.rotation.y = r.y + angle;
-	  };
-	
-	  /**
-	   * sets the vehicle's wheel angle, relative to the vehicle
-	   * @param wheel angle in [rad]
-	   */
-	  this.setWheelAngle = function (wheel) {
-	    wheelAngle = wheel;
-	
-	    this.frontLeftWheelRoot.rotation.y = wheel;
-	    this.frontRightWheelRoot.rotation.y = wheel;
-	  };
-	
-	  /**
-	   * sets the vehicle's velocity
-	   * @param velocity velocity in [m/s]
-	   */
-	  this.setVelocity = function (velocity) {
-	    this.velocity = velocity;
-	  };
-	
-	  /**
-	   * update the vehicle
-	   * @param delta
-	   */
-	  this.update = function (delta) {
-	
-	    var forwardDelta = delta * this.velocity;
-	
-	    // position
-	    if (this.updatePosition) {
-	      this.angle += forwardDelta * this.STEERING_RADIUS_RATIO * this.wheelAngle;
-	
-	      this.root.position.x += Math.sin(this.angle) * forwardDelta;
-	      this.root.position.z += Math.cos(this.angle) * forwardDelta;
-	
-	      this.root.rotation.y = this.angle;
-	    }
-	
-	    // wheels rolling
-	    if (this.updateWheel) {
-	      var angularSpeedRatio = 1 / (this.modelScale * (this.wheelDiameter / 2));
-	      var wheelDelta = forwardDelta * angularSpeedRatio;
-	      if (this.loaded) {
-	        this.frontLeftWheelMesh.rotation.x += wheelDelta;
-	        this.frontRightWheelMesh.rotation.x += wheelDelta;
-	        this.backLeftWheelMesh.rotation.x += wheelDelta;
-	        this.backRightWheelMesh.rotation.x += wheelDelta;
-	      }
-	    }
-	  };
-	
-	  // --- internal helper methods
-	  function createVehicle() {
-	    if (scope.model.loaded) {
-	      // retrieve parameters from vehicleModel
-	      var modelScale = scope.model.scale;
-	      var modelTranslation = scope.model.translation;
-	      var modelRotation = scope.model.rotation;
-	      var wheelOffset = scope.model.wheelOffset;
-	      var wheelDiameter = scope.model.wheelDiameter;
-	      var bodyGeometry = scope.model.bodyGeometry;
-	      var bodyMaterials = scope.model.bodyMaterials;
-	      var wheelGeometry = scope.model.wheelGeometry;
-	      var wheelMaterials = scope.model.wheelMaterials;
-	
-	      // properties
-	      scope.wheelDiameter = wheelDiameter;
-	
-	      // temporary variables
-	      var s = modelScale,
-	          t = modelTranslation,
-	          r = modelRotation;
-	      var delta = new THREE.Vector3();
-	
-	      // setup combined materials
-	      var bodyFaceMaterial = new THREE.MultiMaterial(bodyMaterials);
-	      var wheelFaceMaterial = new THREE.MultiMaterial(wheelMaterials);
-	
-	      // create body mesh
-	      scope.bodyMesh = new THREE.Mesh(bodyGeometry, bodyFaceMaterial);
-	      scope.bodyMesh.scale.set(s, s, s);
-	      scope.root.add(scope.bodyMesh);
-	
-	      // create wheel meshes
-	      // front left
-	      delta.multiplyVectors(wheelOffset, new THREE.Vector3(s, s, s));
-	      scope.frontLeftWheelRoot.position.add(delta);
-	      scope.frontLeftWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
-	      scope.frontLeftWheelMesh.scale.set(s, s, s);
-	      scope.frontLeftWheelRoot.add(scope.frontLeftWheelMesh);
-	      scope.root.add(scope.frontLeftWheelRoot);
-	      // front right
-	      delta.multiplyVectors(wheelOffset, new THREE.Vector3(-s, s, s));
-	      scope.frontRightWheelRoot.position.add(delta);
-	      scope.frontRightWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
-	      scope.frontRightWheelMesh.scale.set(s, s, s);
-	      scope.frontRightWheelRoot.add(scope.frontRightWheelMesh);
-	      scope.root.add(scope.frontRightWheelRoot);
-	      // rear left
-	      delta.multiplyVectors(wheelOffset, new THREE.Vector3(s, s, -s));
-	      scope.rearLeftWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
-	      scope.rearLeftWheelMesh.scale.set(s, s, s);
-	      scope.rearLeftWheelMesh.position.add(delta);
-	      scope.root.add(scope.rearLeftWheelMesh);
-	      // rear right
-	      delta.multiplyVectors(wheelOffset, new THREE.Vector3(-s, s, -s));
-	      scope.rearRightWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
-	      scope.rearRightWheelMesh.scale.set(s, s, s);
-	      scope.rearRightWheelMesh.position.add(delta);
-	      scope.root.add(scope.rearRightWheelMesh);
-	
-	      // translation and rotation
-	      scope.root.position.set(t.x, t.y, t.z);
-	      scope.root.rotation.set(r.x, r.y, r.z);
-	
-	      // callback
-	      if (scope.callback) {
-	        scope.callback(scope);
-	      }
-	    }
-	  }
-	  // ---
-	};
-	
-	exports["default"] = Vehicle;
-	module.exports = exports["default"];
-
-/***/ },
-/* 83 */
-/***/ function(module, exports) {
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	// jscs:disable
-	/* eslint-disable */
-	
-	/* To be used by GPUComputationRenderer */
-	var VehicleVelocityShader = {
-	
-	  uniforms: {
-	
-	    "time": { type: "f", value: 0.0 },
-	    "delta": { type: "f", value: 0.0 },
-	    "textureAcceleration": { type: "t", value: null }
-	
-	  },
-	
-	  vertexShader: [].join('\n'),
-	
-	  fragmentShader: ["uniform float time;", "uniform float delta; // about 0.016", "uniform sampler2D textureAcceleration;", "const float PI = 3.141592653589793;", "const float PI_05 = PI / 2.0;", "const float PI_2 = PI * 2.0;", "const float L = 2.0;", "const float SPEED_LIMIT = 10.0;", "void main() {", " vec2 uv = gl_FragCoord.xy / resolution.xy;", " vec4 selfVelocity = texture2D( textureVelocity, uv );", " vec4 selfAcceleration = texture2D( textureAcceleration, uv );", " float velocity = selfVelocity.x;", " float wheel = selfVelocity.w;", " float acceleration = selfAcceleration.x;", " // update velocity", " //velocity += acceleration;", " gl_FragColor = vec4(velocity, 0.0, 0.0, wheel);",
-	
-	  // " vec4 selfVelocity = texture2D( textureVelocity, uv );",
-	  // " vec3 velocity = selfVelocity.xyz;",
-	  // " float velocityScalar = length( velocity );",
-	  // " float wheel = selfVelocity.w;",
-	  //
-	  // " vec3 selfAcceleration = texture2D( textureAcceleration, uv ).xyz;",
-	  //
-	  // " // update the velocity in accordance with the centripetal force",
-	  // " float a = wheel / L * velocityScalar * velocityScalar;",
-	  // " vec3 centripetalAcceleration = vec3( - a / velocityScalar * velocity.z, 0.0, a / velocityScalar * velocity.x );",
-	  // " velocity += delta * centripetalAcceleration;",
-	  // " velocity *= velocityScalar / length( velocity );",
-	  //
-	  // " // update velocity",
-	  // " velocity += delta * selfAcceleration;",
-	  //
-	  // "	float limit = SPEED_LIMIT;",
-	  //
-	  // "	// Speed Limits",
-	  // "	//if ( length( velocity ) > limit ) {",
-	  // "	//	velocity = normalize( velocity ) * limit;",
-	  // "	//}",
-	  //
-	  // "	gl_FragColor = vec4( velocity, wheel );",
-	
-	  "}"].join('\n')
-	
-	};
-	
-	exports["default"] = VehicleVelocityShader;
-	module.exports = exports["default"];
-
-/***/ },
-/* 84 */
-/***/ function(module, exports) {
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	// jscs:disable
-	/* eslint-disable */
-	
-	var VehiclePositionShader = {
-	
-	  uniforms: {
-	
-	    "time": { type: "f", value: 0.0 },
-	    "delta": { type: "f", value: 0.0 }
-	  },
-	
-	  // "textureTargetPosition":  {type: "t", value: null}, // (for interpolation)
-	  // "t":                {type: "f", value: 0.0}, // (for interpolation)
-	
-	  vertexShader: [].join('\n'),
-	
-	  fragmentShader: ["uniform float time;", "uniform float delta;", "uniform sampler2D textureTargetPosition;", "uniform float t;", "const float PI = 3.141592653589793;", "const float L = 2.0;", "const float T = 1.0;", "void main() {", " vec2 uv = gl_FragCoord.xy / resolution.xy;",
-	
-	  // (for extrapolation)
-	  " vec4 selfPosition = texture2D( texturePosition, uv );", " vec4 selfVelocity = texture2D( textureVelocity, uv );", " vec3 position = selfPosition.xyz;", " float velocity = selfVelocity.x;", " float angle = selfPosition.w;", " float wheel = selfVelocity.w;", " float angular_velocity = wheel / L * velocity;", " angle += delta * angular_velocity;", " if( angle >  PI ) { angle -= 2.0 * PI; }", " if( angle < -PI ) { angle += 2.0 * PI; }", " position.x += delta * velocity * cos( angle );", " position.z += delta * velocity * sin( angle );", " gl_FragColor = vec4( position, angle );",
-	
-	  // (for interpolation)
-	  // " vec4 selfPosition = texture2D( texturePosition, uv );",
-	  // " vec4 selfTargetPosition = texture2D( textureTargetPosition, uv );",
-	  //
-	  // " selfPosition.x = mix( selfPosition.x, selfTargetPosition.x, t / T );",
-	  // " selfPosition.y = mix( selfPosition.y, selfTargetPosition.y, t / T );",
-	  // " selfPosition.z = mix( selfPosition.z, selfTargetPosition.z, t / T );",
-	  // " selfPosition.w = mix( selfPosition.w, selfTargetPosition.w, t / T );",
-	  //
-	  // " gl_FragColor = selfPosition;",
-	
-	  // " vec4 selfPosition = texture2D( texturePosition, uv );",
-	  // " vec4 selfVelocity = texture2D( textureVelocity, uv );",
-	  //
-	  // " vec3 position = selfPosition.xyz;",
-	  // " vec3 velocity = selfVelocity.xyz;",
-	  // " float angle = selfPosition.w;",
-	  // " float wheel = selfVelocity.w;",
-	  //
-	  // " // calculate the angular velocity",
-	  // " float angular_velocity = wheel / L * length( velocity );",
-	  //
-	  // " // update the position",
-	  // " position += delta * velocity;",
-	  // " angle += delta * angular_velocity;",
-	  // " if ( angle >  PI ) { angle -= 2.*PI; }",
-	  // " if ( angle < -PI ) { angle += 2.*PI; }",
-	  //
-	  // " gl_FragColor = vec4( position, angle );",
-	
-	  "}"].join('\n')
-	
-	};
-	
-	exports["default"] = VehiclePositionShader;
-	module.exports = exports["default"];
-
-/***/ },
-/* 85 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	// jscs:disable
 	/* eslint-disable */
+	
+	/**
+	 * Created by masayuki on 20/07/2016.
+	 */
+	
+	var _SimObject2 = __webpack_require__(80);
+	
+	var _SimObject3 = _interopRequireDefault(_SimObject2);
 	
 	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var VehicleShader = {
+	var TOTAL_FRAMES = 60;
 	
-	  uniforms: {
+	var Pedestrian = (function (_SimObject) {
+	  _inherits(Pedestrian, _SimObject);
 	
-	    "reference": { type: "v2", value: null },
-	    "texturePosition": { type: "t", value: null },
-	    "texture": { type: "t", value: null },
-	    "color": { type: "c", value: new _three2["default"].Color(0xff2200) }
+	  function Pedestrian(pedestrianModel, callback) {
+	    _classCallCheck(this, Pedestrian);
 	
-	  },
+	    _get(Object.getPrototypeOf(Pedestrian.prototype), 'constructor', this).call(this);
 	
-	  vertexShader: ["uniform vec2 reference;", "uniform sampler2D texturePosition;", "varying vec2 vUv;", "mat4 rotationMatrix(vec3 axis, float angle)", "{", "    axis = normalize(axis);", "    float s = sin(angle);", "    float c = cos(angle);", "    float oc = 1.0 - c;", "    ", "    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,", "                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,", "                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,", "                0.0,                                0.0,                                0.0,                                1.0);", "}", "void main() {", " vUv = uv;", " // retrieve the simulated position of this vehicle", " vec4 selfPosition = texture2D( texturePosition, reference );", "	vec3 simPos = selfPosition.xyz;", " float angle = selfPosition.w;", " // tmp", " vec4 newPosition = vec4( position, 1.0 );", " // rotate", " mat4 rotYMatrix = rotationMatrix( vec3( 0., 1., 0. ), angle );", " newPosition = rotYMatrix * newPosition;", " // calcuate the actual position by adding the simulated position", "	newPosition = modelMatrix * newPosition;", " newPosition.xyz += simPos;", "	gl_Position = projectionMatrix * viewMatrix * newPosition;", "}"].join('\n'),
+	    // parameters
+	    this.model = pedestrianModel;
+	    this.callback = callback || function (self) {};
 	
-	  fragmentShader: ["uniform sampler2D texture;", "uniform vec3 color;", "varying vec2 vUv;", "void main() {", " gl_FragColor = texture2D( texture, vUv );", "// gl_FragColor = vec4( color, 1. );", "}"].join('\n')
+	    // properties
+	    this.lastKeyFrame = 0;
+	    this.currentKeyFrame = 0;
+	    this.updateMorph = true;
 	
-	};
+	    // Meshes
+	    this.bodyMesh = null;
 	
-	exports["default"] = VehicleShader;
-	module.exports = exports["default"];
+	    // --- make a pedestrian
+	    this._createPedestrian();
+	  }
+	
+	  _createClass(Pedestrian, [{
+	    key: 'update',
+	    value: function update(delta) {
+	      _get(Object.getPrototypeOf(Pedestrian.prototype), 'update', this).call(this, delta);
+	
+	      // morph animation
+	      if (this.updateMorph) {
+	        this.bodyMesh.update(delta);
+	      }
+	    }
+	  }, {
+	    key: '_createPedestrian',
+	    value: function _createPedestrian() {
+	      var self = this;
+	
+	      if (this.model.loaded) {
+	        var root = new _three2['default'].Object3D();
+	
+	        // retrieve parameters from vehicleModel
+	        var modelScale = this.model.scale;
+	        var modelTranslation = this.model.translation;
+	        var modelRotation = this.model.rotation;
+	        var bodyGeometry = this.model.bodyGeometry;
+	        var bodyMaterials = this.model.bodyMaterials;
+	
+	        // temporary variables
+	        var s = modelScale,
+	            t = modelTranslation,
+	            r = modelRotation;
+	        var delta = new _three2['default'].Vector3();
+	
+	        // materials
+	        var bodyFaceMaterial = new _three2['default'].MeshFaceMaterial(bodyMaterials);
+	
+	        // create body mesh
+	        this.bodyMesh = new _three2['default'].MorphBlendMesh(bodyGeometry, bodyFaceMaterial);
+	        this.bodyMesh.scale.set(s, s, s);
+	        this.bodyMesh.animationsList.forEach(function (animation) {
+	          animation.active = true; // activate all animations
+	        });
+	        root.add(this.bodyMesh);
+	
+	        // translation and rotation
+	        root.position.set(t.x, t.y, t.z);
+	        root.rotation.set(r.x, r.y, r.z);
+	
+	        // finish
+	        this.add(root);
+	
+	        // callback
+	        if (this.callback) {
+	          this.callback(self);
+	        }
+	      }
+	    }
+	  }]);
+	
+	  return Pedestrian;
+	})(_SimObject3['default']);
+	
+	exports['default'] = Pedestrian;
+	module.exports = exports['default'];
 
 /***/ },
-/* 86 */
+/* 89 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	// TODO: Move duplicated logic between geometry layrs into GeometryLayer
+	
+	// TODO: Look at ways to drop unneeded references to array buffers, etc to
+	// reduce memory footprint
+	
+	// TODO: Support dynamic updating / hiding / animation of geometry
+	//
+	// This could be pretty hard as it's all packed away within BufferGeometry and
+	// may even be merged by another layer (eg. GeoJSONLayer)
+	//
+	// How much control should this layer support? Perhaps a different or custom
+	// layer would be better suited for animation, for example.
+	
+	// TODO: Allow _setBufferAttributes to use a custom function passed in to
+	// generate a custom mesh
+	
+	var _SimObjectLayer2 = __webpack_require__(78);
+	
+	var _SimObjectLayer3 = _interopRequireDefault(_SimObjectLayer2);
+	
+	var _lodashAssign = __webpack_require__(3);
+	
+	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _geoLatLon = __webpack_require__(7);
+	
+	var _geoPoint = __webpack_require__(8);
+	
+	var _earcut = __webpack_require__(67);
+	
+	var _earcut2 = _interopRequireDefault(_earcut);
+	
+	var _utilExtrudePolygon = __webpack_require__(68);
+	
+	var _utilExtrudePolygon2 = _interopRequireDefault(_utilExtrudePolygon);
+	
+	var _utilBuffer = __webpack_require__(69);
+	
+	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
+	
+	var _vendorGPUComputationRenderer = __webpack_require__(79);
+	
+	var _vendorGPUComputationRenderer2 = _interopRequireDefault(_vendorGPUComputationRenderer);
+	
+	var _VehicleModel = __webpack_require__(90);
+	
+	var _VehicleModel2 = _interopRequireDefault(_VehicleModel);
+	
+	var _ModelRepository = __webpack_require__(85);
+	
+	var _ModelRepository2 = _interopRequireDefault(_ModelRepository);
+	
+	var _Vehicle = __webpack_require__(91);
+	
+	var _Vehicle2 = _interopRequireDefault(_Vehicle);
+	
+	var _vendorBinaryLoader = __webpack_require__(87);
+	
+	var _vendorBinaryLoader2 = _interopRequireDefault(_vendorBinaryLoader);
+	
+	var _VehicleVelocityShader = __webpack_require__(81);
+	
+	var _VehicleVelocityShader2 = _interopRequireDefault(_VehicleVelocityShader);
+	
+	var _VehiclePositionShader = __webpack_require__(82);
+	
+	var _VehiclePositionShader2 = _interopRequireDefault(_VehiclePositionShader);
+	
+	var _VehicleShader = __webpack_require__(83);
+	
+	var _VehicleShader2 = _interopRequireDefault(_VehicleShader);
+	
+	var _utilObjectUtils = __webpack_require__(84);
+	
+	var _utilObjectUtils2 = _interopRequireDefault(_utilObjectUtils);
+	
+	var MODEL_PREFIX = 'vehicle:';
+	
+	var VehicleLayer = (function (_SimObjectLayer) {
+	  _inherits(VehicleLayer, _SimObjectLayer);
+	
+	  function VehicleLayer(models, options) {
+	    _classCallCheck(this, VehicleLayer);
+	
+	    var defaults = {
+	      output: true
+	    };
+	
+	    var _options = (0, _lodashAssign2['default'])({}, defaults, options);
+	
+	    _get(Object.getPrototypeOf(VehicleLayer.prototype), 'constructor', this).call(this, _options);
+	
+	    var modelDefaults = {
+	      file: {
+	        body: null,
+	        wheel: null
+	      },
+	      scale: 1,
+	      translation: { x: 0, y: 0, z: 0 },
+	      rotation: { rx: 0, ry: 0, rz: 0 }
+	    };
+	    for (key in models) {
+	      models[key] = (0, _lodashAssign2['default'])({}, modelDefaults, models[key]);
+	    }
+	
+	    this._modelsLoaded = false;
+	    this._models = (0, _lodashAssign2['default'])({}, models);
+	    this._entries = [];
+	  }
+	
+	  _createClass(VehicleLayer, [{
+	    key: '_onAdd',
+	    value: function _onAdd(world) {
+	      _get(Object.getPrototypeOf(VehicleLayer.prototype), '_onAdd', this).call(this, world);
+	
+	      if (this.isOutput()) {
+	        // add callback
+	        this.on('loadCompleted', this._onLoadCompleted);
+	
+	        // load models
+	        this._loadModels();
+	      }
+	    }
+	  }, {
+	    key: '_loadModels',
+	    value: function _loadModels() {
+	      var self = this;
+	
+	      // load models iteratively
+	      var models = this._models;
+	      Object.keys(models).forEach(function (modelName) {
+	        var model = models[modelName];
+	
+	        var scale = 1.0;
+	        var translation = new _three2['default'].Vector3();
+	        var rotation = new _three2['default'].Vector3();
+	        var wheelOffset = null;
+	
+	        if (model.scale) {
+	          scale = model.scale;
+	        }
+	        if (model.translation) {
+	          translation.set(model.translation.x, model.translation.y, model.translation.z);
+	        }
+	        if (model.rotation) {
+	          rotation.set(model.rotation.x, model.rotation.y, model.rotation.z);
+	        }
+	        if (model.wheelOffset) {
+	          wheelOffset = new _three2['default'].Vector3(model.wheelOffset.x, model.wheelOffset.y, model.wheelOffset.z);
+	        }
+	
+	        // create a model
+	        var vehicleModel = new _VehicleModel2['default']({
+	          bodyURL: model.file.body,
+	          wheelURL: model.file.wheel,
+	          scale: scale,
+	          translation: translation,
+	          rotation: rotation,
+	          wheelOffset: wheelOffset
+	        }, callback);
+	
+	        // register to the repos
+	        _ModelRepository2['default'].add(MODEL_PREFIX + modelName, vehicleModel);
+	      });
+	
+	      // callback
+	      var counter = 0;
+	      var len = Object.keys(models).length;
+	      function callback(scope) {
+	        if (++counter >= len) {
+	          // loaded all models
+	          self.emit('loadCompleted');
+	        }
+	      }
+	    }
+	  }, {
+	    key: '_onLoadCompleted',
+	    value: function _onLoadCompleted() {
+	      this._modelsLoaded = true;
+	
+	      // iterate over all the vehicles already added and add meshes to the world
+	      for (var i = 0; i < this._entries.length; i++) {
+	        var entry = this._entries[i];
+	        if (entry.vehicle === null) {
+	          this._addVehicleInternal(entry);
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'addVehicle',
+	    value: function addVehicle(modelName, latlon, angle, options) {
+	      if (!_ModelRepository2['default'].contains(MODEL_PREFIX + modelName)) {
+	        throw new Error('Vehicle model ' + modelName + ' does not exist.');
+	      }
+	
+	      var self = this;
+	
+	      var entry = {
+	        id: undefined,
+	        modelName: modelName,
+	        options: options,
+	        vehicle: null,
+	        setLocation: function setLocation(lat, lon, angle) {
+	          self.setLocation(this.vehicle.id, lat, lon, angle);
+	        },
+	        setPosition: function setPosition(x, y, z, angle) {
+	          self.setPosition(this.vehicle.id, x, y, z, angle);
+	        }
+	      };
+	      var total = this._entries.push(entry);
+	      entry.id = total - 1;
+	
+	      // add vehicle if the model is already loaded
+	      this._addVehicleInternal(entry);
+	
+	      return entry;
+	    }
+	  }, {
+	    key: '_addVehicleInternal',
+	    value: function _addVehicleInternal(entry) {
+	      if (this._modelsLoaded) {
+	
+	        var vehicleModel = _ModelRepository2['default'].get(MODEL_PREFIX + entry.modelName);
+	        var vehicle = new _Vehicle2['default'](vehicleModel);
+	        this.add(vehicle);
+	
+	        entry.vehicle = vehicle;
+	
+	        // var id = vehicle.id;
+	        //
+	        // var model = this._models[vehicle.modelName];
+	        // var geometry = this._geometries[vehicle.modelName];
+	        //
+	        // var material = new THREE.MeshLambertMaterial({ color: 0x995500, opacity: 1.0, transparent: false });
+	        // // var material = new THREE.ShaderMaterial({
+	        // //   uniforms: {
+	        // //     'reference':        { type: 'v2', value: null },
+	        // //     'texturePosition':  { type: 't',  value: null },
+	        // //     'texture':          { type: 't',  value: null },
+	        // //     'color':            { type: 'c',  value: new THREE.Color(0x995500) }
+	        // //   },
+	        // //   vertexShader: VehicleShader.vertexShader,
+	        // //   fragmentShader: VehicleShader.fragmentShader
+	        // // });
+	        // // material.uniforms.reference.value = new THREE.Vector2(x, y);
+	        //
+	        // var mesh = new THREE.Mesh(geometry, material);
+	        // mesh.scale.x = mesh.scale.y = mesh.scale.z = model.scale;
+	        // mesh.rotation.set(model.rotation.rx, model.rotation.ry, model.rotation.rz);
+	        // mesh.position.set(model.translation.x, model.translation.y, model.translation.z);
+	        //
+	        // this.add(mesh);
+	        // vehicle.model = model;
+	        // vehicle.mesh = mesh;
+	        // vehicle.setLocation(vehicle.latlon.lat, vehicle.latlon.lon, vehicle.angle);
+	      }
+	    }
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	      // Run common destruction logic from parent
+	      _get(Object.getPrototypeOf(VehicleLayer.prototype), 'destroy', this).call(this);
+	    }
+	  }]);
+	
+	  return VehicleLayer;
+	})(_SimObjectLayer3['default']);
+	
+	exports['default'] = VehicleLayer;
+	
+	var noNew = function noNew(models, options) {
+	  return new VehicleLayer(models, options);
+	};
+	
+	exports.vehicleLayer = noNew;
+
+/***/ },
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -20813,49 +21214,316 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	/*
-	 * Object helpers
+	/**
+	 * Created by masayuki on 17/07/2016.
 	 */
 	
 	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var ObjectUtils = (function () {
+	var _vendorBinaryLoader = __webpack_require__(87);
 	
-	  // Create UV from geometry's faces
-	  var createUV = function createUV(geometry) {
-	    geometry.computeBoundingBox();
+	var _vendorBinaryLoader2 = _interopRequireDefault(_vendorBinaryLoader);
 	
-	    var max = geometry.boundingBox.max;
-	    var min = geometry.boundingBox.min;
-	    var offset = new _three2['default'].Vector2(0 - min.x, 0 - min.y);
-	    var range = new _three2['default'].Vector2(max.x - min.x, max.y - min.y);
-	    var faces = geometry.faces;
+	var VehicleModel = function VehicleModel(parameters, callback) {
 	
-	    geometry.faceVertexUvs[0] = [];
+	  var scope = this;
+	  var p = parameters;
 	
-	    for (var i = 0; i < faces.length; i++) {
-	      var v1 = geometry.vertices[faces[i].a];
-	      var v2 = geometry.vertices[faces[i].b];
-	      var v3 = geometry.vertices[faces[i].c];
+	  // file paths
+	  this.bodyURL = p.bodyURL || null;
+	  this.wheelURL = p.wheelURL || null;
 	
-	      geometry.faceVertexUvs[0].push([new _three2['default'].Vector2((v1.x + offset.x) / range.x, (v1.y + offset.y) / range.y), new _three2['default'].Vector2((v2.x + offset.x) / range.x, (v2.y + offset.y) / range.y), new _three2['default'].Vector2((v3.x + offset.x) / range.x, (v3.y + offset.y) / range.y)]);
+	  // parameters
+	  this.scale = p.scale || 1.0;
+	  this.translation = p.translation || new _three2['default'].Vector3();
+	  this.rotation = p.rotation || new _three2['default'].Vector3();
+	  this.wheelOffset = p.wheelOffset || new _three2['default'].Vector3();
+	  this.autoWheelOffset = p.autoWheelOffset || true;
+	
+	  // properties
+	  this.wheelDiameter = 1.0;
+	
+	  // callback
+	  this.callback = callback;
+	
+	  // status
+	  this.loaded = false;
+	
+	  // internal use
+	  this.bodyGeometry = null;
+	  this.bodyMaterials = null;
+	
+	  this.wheelGeometry = null;
+	  this.wheelMaterials = null;
+	
+	  // construct
+	  if (scope.bodyURL && scope.wheelURL) {
+	    // load binaries
+	    var bloader = new _three2['default'].BinaryLoader();
+	    bloader.load(scope.bodyURL, function (geometry, materials) {
+	      createBody(geometry, materials);
+	    });
+	    bloader.load(scope.wheelURL, function (geometry, materials) {
+	      createWheel(geometry, materials);
+	    });
+	  }
+	
+	  // internal helper methods
+	  function createBody(geometry, materials) {
+	    scope.bodyGeometry = geometry;
+	    scope.bodyMaterials = materials;
+	
+	    onCreated();
+	  }
+	  function createWheel(geometry, materials) {
+	    scope.wheelGeometry = geometry;
+	    scope.wheelMaterials = materials;
+	
+	    onCreated();
+	  }
+	  function onCreated() {
+	    if (scope.bodyGeometry && scope.wheelGeometry) {
+	      scope.loaded = true;
+	
+	      // wheel
+	      scope.wheelGeometry.computeBoundingBox();
+	      var wbb = scope.wheelGeometry.boundingBox;
+	
+	      // compute wheel diameter
+	      scope.wheelDiameter = wbb.max.y - wbb.min.y;
+	
+	      // compute wheel offsets
+	      if (scope.autoWheelOffset) {
+	        scope.wheelOffset.addVectors(wbb.min, wbb.max);
+	        scope.wheelOffset.multiplyScalar(0.5);
+	
+	        scope.wheelGeometry.center();
+	      }
+	
+	      // callback
+	      if (scope.callback) {
+	        scope.callback(scope);
+	      }
 	    }
+	  }
+	};
 	
-	    geometry.uvsNeedUpdate = true;
-	  };
-	
-	  return {
-	    createUV: createUV
-	  };
-	})();
-	
-	exports['default'] = ObjectUtils;
+	exports['default'] = VehicleModel;
 	module.exports = exports['default'];
 
 /***/ },
-/* 87 */
+/* 91 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	/**
+	 * Created by masayuki on 17/07/2016.
+	 */
+	
+	var _SimObject2 = __webpack_require__(80);
+	
+	var _SimObject3 = _interopRequireDefault(_SimObject2);
+	
+	var Vehicle = (function (_SimObject) {
+	  _inherits(Vehicle, _SimObject);
+	
+	  function Vehicle(vehicleModel, callback) {
+	    _classCallCheck(this, Vehicle);
+	
+	    _get(Object.getPrototypeOf(Vehicle.prototype), 'constructor', this).call(this);
+	
+	    // parameters
+	    this.model = vehicleModel;
+	    this.callback = callback || function (self) {};
+	
+	    // properties
+	    this.wheelAngle = 0.0;
+	    this.wheelDiameter = 1.0;
+	    this.updateWheel = true;
+	
+	    // 3D Object
+	    this.frontLeftWheelRoot = new THREE.Object3D();
+	    this.frontRightWheelRoot = new THREE.Object3D();
+	
+	    // Meshes
+	    this.bodyMesh = null;
+	    this.frontLeftWheelMesh = null;
+	    this.frontRightWheelMesh = null;
+	    this.rearLeftWheelMesh = null;
+	    this.rearRightWheelMesh = null;
+	
+	    // --- constants
+	    this.STEERING_RADIUS_RATIO = 0.0023;
+	
+	    // --- make a vehicle
+	    this._createVehicle();
+	  }
+	
+	  // --- API
+	  /**
+	   * sets the vehicle's wheel angle, relative to the vehicle
+	   * @param wheelAngle angle in [rad]
+	   */
+	
+	  _createClass(Vehicle, [{
+	    key: 'setWheelAngle',
+	    value: function setWheelAngle(wheelAngle) {
+	      wheelAngle = wheelAngle;
+	
+	      this.frontLeftWheelRoot.rotation.y = wheelAngle;
+	      this.frontRightWheelRoot.rotation.y = wheelAngle;
+	    }
+	  }, {
+	    key: 'setVelocity',
+	
+	    /**
+	     * sets the vehicle's velocity
+	     * @param velocity velocity in [m/s]
+	     */
+	    value: function setVelocity(velocity) {
+	      _get(Object.getPrototypeOf(Vehicle.prototype), 'setVelocity', this).call(this, velocity);
+	    }
+	
+	    /**
+	     * update the vehicle
+	     * @param delta
+	     */
+	  }, {
+	    key: 'update',
+	    value: function update(delta) {
+	
+	      var forwardDelta = delta * this.velocity;
+	
+	      // position
+	      if (this.updatePosition) {
+	        this.angle += forwardDelta * this.STEERING_RADIUS_RATIO * this.wheelAngle;
+	      }
+	
+	      _get(Object.getPrototypeOf(Vehicle.prototype), 'update', this).call(this, delta);
+	
+	      // wheels rolling
+	      if (this.updateWheel) {
+	        var angularSpeedRatio = 1 / (this.modelScale * (this.wheelDiameter / 2));
+	        var wheelDelta = forwardDelta * angularSpeedRatio;
+	        if (this.loaded) {
+	          this.frontLeftWheelMesh.rotation.x += wheelDelta;
+	          this.frontRightWheelMesh.rotation.x += wheelDelta;
+	          this.backLeftWheelMesh.rotation.x += wheelDelta;
+	          this.backRightWheelMesh.rotation.x += wheelDelta;
+	        }
+	      }
+	    }
+	
+	    // --- internal helper methods
+	  }, {
+	    key: '_createVehicle',
+	    value: function _createVehicle() {
+	      var self = this;
+	
+	      if (this.model.loaded) {
+	        var root = new THREE.Object3D();
+	
+	        // retrieve parameters from vehicleModel
+	        var modelScale = this.model.scale;
+	        var modelTranslation = this.model.translation;
+	        var modelRotation = this.model.rotation;
+	        var wheelOffset = this.model.wheelOffset;
+	        var wheelDiameter = this.model.wheelDiameter;
+	        var bodyGeometry = this.model.bodyGeometry;
+	        var bodyMaterials = this.model.bodyMaterials;
+	        var wheelGeometry = this.model.wheelGeometry;
+	        var wheelMaterials = this.model.wheelMaterials;
+	
+	        // properties
+	        this.wheelDiameter = wheelDiameter;
+	
+	        // temporary variables
+	        var s = modelScale,
+	            t = modelTranslation,
+	            r = modelRotation;
+	        var delta = new THREE.Vector3();
+	
+	        // setup combined materials
+	        var bodyFaceMaterial = new THREE.MultiMaterial(bodyMaterials);
+	        var wheelFaceMaterial = new THREE.MultiMaterial(wheelMaterials);
+	
+	        // create body mesh
+	        this.bodyMesh = new THREE.Mesh(bodyGeometry, bodyFaceMaterial);
+	        this.bodyMesh.scale.set(s, s, s);
+	        root.add(this.bodyMesh);
+	
+	        // create wheel meshes
+	        // front left
+	        delta.multiplyVectors(wheelOffset, new THREE.Vector3(s, s, s));
+	        this.frontLeftWheelRoot.position.add(delta);
+	        this.frontLeftWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
+	        this.frontLeftWheelMesh.scale.set(s, s, s);
+	        this.frontLeftWheelRoot.add(this.frontLeftWheelMesh);
+	        root.add(this.frontLeftWheelRoot);
+	        // front right
+	        delta.multiplyVectors(wheelOffset, new THREE.Vector3(-s, s, s));
+	        this.frontRightWheelRoot.position.add(delta);
+	        this.frontRightWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
+	        this.frontRightWheelMesh.scale.set(s, s, s);
+	        this.frontRightWheelRoot.add(this.frontRightWheelMesh);
+	        root.add(this.frontRightWheelRoot);
+	        // rear left
+	        delta.multiplyVectors(wheelOffset, new THREE.Vector3(s, s, -s));
+	        this.rearLeftWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
+	        this.rearLeftWheelMesh.scale.set(s, s, s);
+	        this.rearLeftWheelMesh.position.add(delta);
+	        root.add(this.rearLeftWheelMesh);
+	        // rear right
+	        delta.multiplyVectors(wheelOffset, new THREE.Vector3(-s, s, -s));
+	        this.rearRightWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
+	        this.rearRightWheelMesh.scale.set(s, s, s);
+	        this.rearRightWheelMesh.position.add(delta);
+	        root.add(this.rearRightWheelMesh);
+	
+	        // translation and rotation
+	        root.position.set(t.x, t.y, t.z);
+	        root.rotation.set(r.x, r.y, r.z);
+	
+	        // finish
+	        this.add(root);
+	
+	        // callback
+	        if (this.callback) {
+	          this.callback(self);
+	        }
+	      }
+	    }
+	
+	    // ---
+	
+	  }]);
+	
+	  return Vehicle;
+	})(_SimObject3['default']);
+	
+	exports['default'] = Vehicle;
+	module.exports = exports['default'];
+
+/***/ },
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -20866,7 +21534,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// TODO: A lot of these utils don't need to be in separate, tiny files
 	
-	var _wrapNum = __webpack_require__(88);
+	var _wrapNum = __webpack_require__(93);
 	
 	var _wrapNum2 = _interopRequireDefault(_wrapNum);
 	
@@ -20893,7 +21561,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 88 */
+/* 93 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
