@@ -1581,11 +1581,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_setup',
 	    value: function _setup() {
 	
-	      // car layer
+	      // pedestrian layer
 	      var viziLayer = _vizi2.default.pedestrianLayer({
 	        'monkey': {
 	          file: {
-	            body: '/javascripts/maps/json/monkey.js'
+	            body: '/javascripts/maps/json/monkey/monkey.json'
 	          },
 	          scale: 1.0,
 	          translation: { x: 0, y: 0, z: 0 },

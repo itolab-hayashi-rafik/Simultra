@@ -19028,7 +19028,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'setLocation',
 	    value: function setLocation(id, lat, lon, angle) {
 	      // calculate the position
-	      var point = this._world.latLonToPoint(latLon(lat, lon));
+	      var point = this._world.latLonToPoint((0, _geoLatLon.latLon)(lat, lon));
 	      this.setPosition(id, point.x, 0, point.y, angle);
 	    }
 	
@@ -19154,7 +19154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var positions = {};
 	      Object.keys(locations).forEach(function (id) {
-	        var point = self._world.latLonToPoint(latLon(locations[id].lat, locations[id].lon));
+	        var point = self._world.latLonToPoint((0, _geoLatLon.latLon)(locations[id].lat, locations[id].lon));
 	        positions[id] = { x: point.x, y: 0.0, z: point.y, angle: locations[id].angle };
 	      });
 	
@@ -19669,17 +19669,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 80 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	// jscs:disable
 	/* eslint-disable */
@@ -19687,10 +19685,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Created by masayuki on 20/07/2016.
 	 */
-	
-	var _geoLatLon = __webpack_require__(7);
-	
-	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
 	
 	var SimObject = (function () {
 	  function SimObject() {
@@ -19716,7 +19710,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	
 	  _createClass(SimObject, [{
-	    key: 'add',
+	    key: "add",
 	    value: function add(object) {
 	      this.root.add(object);
 	    }
@@ -19726,7 +19720,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {object} object
 	     */
 	  }, {
-	    key: 'remove',
+	    key: "remove",
 	    value: function remove(object) {
 	      this.root.remove(object);
 	    }
@@ -19736,10 +19730,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Number} x x
 	     * @param {Number} y y
 	     * @param {Number} z z
-	     * @param {Boolean} updateLatLon true if latLon property needs to be updated
 	     */
 	  }, {
-	    key: 'setPosition',
+	    key: "setPosition",
 	    value: function setPosition(x, y, z) {
 	      this.root.position.set(x, y, z);
 	    }
@@ -19749,7 +19742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Number} angle angle in [rad]
 	     */
 	  }, {
-	    key: 'setAngle',
+	    key: "setAngle",
 	    value: function setAngle(angle) {
 	      this.angle = angle;
 	      this.root.rotation.y = angle;
@@ -19760,7 +19753,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Number} velocity velocity in [m/s]
 	     */
 	  }, {
-	    key: 'setVelocity',
+	    key: "setVelocity",
 	    value: function setVelocity(velocity) {
 	      this.velocity = velocity;
 	    }
@@ -19770,7 +19763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Number} delta
 	     */
 	  }, {
-	    key: 'update',
+	    key: "update",
 	    value: function update(delta) {
 	
 	      var forwardDelta = delta * this.velocity;
@@ -19786,7 +19779,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // --- internal helper methods
 	  }, {
-	    key: '_createSimObject',
+	    key: "_createSimObject",
 	    value: function _createSimObject() {}
 	    // construct this object
 	
@@ -19797,8 +19790,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return SimObject;
 	})();
 	
-	exports['default'] = SimObject;
-	module.exports = exports['default'];
+	exports["default"] = SimObject;
+	module.exports = exports["default"];
 
 /***/ },
 /* 81 */
