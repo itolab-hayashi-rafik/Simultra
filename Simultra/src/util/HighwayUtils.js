@@ -6,23 +6,38 @@ import extend from 'extend';
 
 // --- constants
 // jscs:disable disallowSpaceAfterObjectKeys
-const COLOR_MAP = {
+const HIGHWAY_COLOR_MAP = {
+  'motorway'      : '#9e250e', // express way
+  'major'         : '#f7c616', // main road
+  'primary'       : '#ffe104', // national highway
+  'secondary'     : '#ffffff', // sub road
+  'tertiary'      : '#ffffff', // sub road
+  'residental'    : '#ffffff', // minor road
+  'living_street' : '#ffffff', // minor road
+  'track'         : '#ffffff', // ?
+  'trunk'         : '#ffffff', // ?
+  'footway'       : '#ffffff', // footway
+  'pedestrian'    : '#f0ebeb', // pedestrian
+};
+const KIND_COLOR_MAP = {
   'major_road': '#f7c616',
   'minor_road': '#ffffff',
   'highway'   : '#888785',
   'path'      : '#888785',
   'rail'      : '#888785',
 };
-const WIDTH_MAP = {
-  'major'         : 10,
-  'primary'       : 10,
-  'secondary'     : 7,
-  'residental'    : 7,
-  'tertiary'      : 5,
-  'living_street' : 5,
-  'track'         : 3,
-  'trunk'         : 3,
-  'footway'       : 1,
+const HIGHWAY_WIDTH_MAP = {
+  'motorway'      : 10, // express way
+  'major'         : 10, // main road
+  'primary'       : 10, // national highway
+  'secondary'     : 7,  // sub road
+  'tertiary'      : 6,  // sub road
+  'residental'    : 5,  // minor road
+  'living_street' : 4,  // minor road
+  'track'         : 3,  // ?
+  'trunk'         : 3,  // ?
+  'footway'       : 1,  // footway
+  'pedestrian'    : 1,  // pedestrian
 };
 // jscs:enable disallowSpaceAfterObjectKeys
 // ---
@@ -37,15 +52,26 @@ var HighwayUtils = (function() {
   var style = function(feature, defaultValue) {
     var color;
 
-    // color
-    if (feature.properties.kind) {
-      if (feature.properties.kind in COLOR_MAP) {
-        color = COLOR_MAP[feature.properties.kind];
+    // ---- color
+    // based on 'highway' property
+    if (feature.properties.highway) {
+      if (feature.properties.highway in HIGHWAY_COLOR_MAP) {
+        color = HIGHWAY_COLOR_MAP[feature.properties.highway];
+      } else {
+        // unknown highway
+        console.info('Unknown highway: ' + feature.properties.highway);
+      }
+    }
+    // based on 'kind' property
+    else if (feature.properties.kind) {
+      if (feature.properties.kind in KIND_COLOR_MAP) {
+        color = KIND_COLOR_MAP[feature.properties.kind];
       } else {
         // unknown highway kind
         console.info('Unknown highway kind: ' + feature.properties.kind);
       }
     }
+    // ---
 
     // construct the style
     var style = {
@@ -62,15 +88,22 @@ var HighwayUtils = (function() {
    */
   var lineWidth = function(feature, defaultValue) {
     var lineWidth;
-    if (feature.properties.highway) {
-      if (feature.properties.highway in WIDTH_MAP) {
-        lineWidth = WIDTH_MAP[feature.properties.highway];
+    // look for the line weight in the property
+    if (feature.properties.width) {
+      lineWidth = feature.properties.width;
+    }
+    // guess lineWidth from the highway type
+    else if (feature.properties.highway) {
+      if (feature.properties.highway in HIGHWAY_WIDTH_MAP) {
+        lineWidth = HIGHWAY_WIDTH_MAP[feature.properties.highway];
       } else {
         // unknown highway type
         console.info('Unknown highway: ' + feature.properties.highway);
         lineWidth = defaultValue;
       }
-    } else {
+    }
+    // no way to find out the width
+    else {
       // no highway type mentioned
       lineWidth = defaultValue;
     }
