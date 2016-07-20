@@ -5,6 +5,7 @@ import BasemapLayer from './layer/BasemapLayer';
 import BuildingLayer from './layer/BuildingLayer';
 import FootwayLayer from './layer/FootwayLayer';
 import HighwayLayer from './layer/HighwayLayer';
+import PedestrianLayer from './layer/PedestrianLayer';
 import VehicleLayer from './layer/VehicleLayer';
 
 import API from './io/API';
@@ -53,6 +54,8 @@ class Simultra extends EventEmitter {
     this._buildingLayer = new BuildingLayer().addTo(this);
     // Vehicle
     this._vehicleLayer = new VehicleLayer().addTo(this);
+    // Pedestrian
+    this._pedestrianLayer = new PedestrianLayer().addTo(this);
   }
 
   /**
@@ -69,6 +72,7 @@ class Simultra extends EventEmitter {
    */
   start() {
     this._vehicleLayer.start();
+    this._pedestrianLayer.start();
     this._isRunning = true;
   }
 
@@ -77,6 +81,7 @@ class Simultra extends EventEmitter {
    */
   stop() {
     this._vehicleLayer.stop();
+    this._pedestrianLayer.stop();
     this._isRunning = false;
   }
 

@@ -7,6 +7,10 @@ import jQuery from 'jquery';
 const GET_VEHICLES = '/api/v1/vehicles';
 const UPDATE_VEHICLES = '/api/v1/vehicles';
 const GET_VEHICLE = function(vid) { return '/api/v1/vehicles/' + vid; };
+
+const GET_PEDESTRIANS = '/api/v1/pedestrians';
+const UPDATE_PEDESTRIANS = '/api/v1/pedestrians';
+const GET_PEDESTRIAN = function(pid) { return '/api/v1/pedestrians/' + pid; };
 // ---
 
 class API {
@@ -14,6 +18,7 @@ class API {
     this.baseUrl = baseUrl;
   }
 
+  // --- Vehicles
   getVehicles() {
     return $.ajax({
       url: this.baseUrl + GET_VEHICLES,
@@ -35,6 +40,31 @@ class API {
       method: 'get'
     });
   }
+  // ---
+
+  // --- Pedestrians
+  getPedestrians() {
+    return $.ajax({
+      url: this.baseUrl + GET_PEDESTRIANS,
+      method: 'get'
+    });
+  }
+
+  updatePedestrians(data) {
+    return $.ajax({
+      url: this.baseUrl + UPDATE_PEDESTRIANS,
+      method: 'put',
+      data: data
+    });
+  }
+
+  getPedestrian(pid) {
+    return $.ajax({
+      url: this.baseUrl + GET_PEDESTRIAN(pid),
+      method: 'get'
+    });
+  }
+  // ---
 
 }
 
