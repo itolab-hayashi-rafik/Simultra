@@ -3,6 +3,7 @@ import EventEmitter from 'eventemitter3';
 
 import BasemapLayer from './layer/BasemapLayer';
 import BuildingLayer from './layer/BuildingLayer';
+import FootwayLayer from './layer/FootwayLayer';
 import HighwayLayer from './layer/HighwayLayer';
 import VehicleLayer from './layer/VehicleLayer';
 
@@ -46,6 +47,8 @@ class Simultra extends EventEmitter {
     this._basemapLayer = new BasemapLayer().addTo(this);
     // Highway
     this._highwayLayer = new HighwayLayer().addTo(this);
+    // Footway
+    this._footwayLayer = new FootwayLayer().addTo(this);
     // Building
     this._buildingLayer = new BuildingLayer().addTo(this);
     // Vehicle
