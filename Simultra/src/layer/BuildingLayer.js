@@ -3,7 +3,7 @@ import extend from 'extend';
 
 import Layer from './Layer';
 
-import Util from '../util/index';
+import BuildingUtils from '../util/BuildingUtils';
 
 class BuildingLayer extends Layer {
   constructor(options) {
@@ -23,7 +23,7 @@ class BuildingLayer extends Layer {
     var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
       interactive: false,
       style: function(feature) {
-        return Util.BuildingUtils.style(feature, {
+        return BuildingUtils.style(feature, {
           height: 1,
           lineColor: '#f7c616',
           lineWidth: 1,

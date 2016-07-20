@@ -3,7 +3,7 @@ import extend from 'extend';
 
 import Layer from './Layer';
 
-import Util from '../util/index';
+import HighwayUtils from '../util/HighwayUtils';
 
 class HighwayLayer extends Layer {
   constructor(options) {
@@ -30,7 +30,7 @@ class HighwayLayer extends Layer {
           console.log(feature);
         }
 
-        return Util.HighwayUtils.style(feature, {
+        return HighwayUtils.style(feature, {
           height: 0,
           opacity: 0.2
         });
@@ -43,16 +43,16 @@ class HighwayLayer extends Layer {
 
         // Convert LineString to polygon
         if (feature.geometry.type === 'LineString') {
-          var lineWidth = Util.HighwayUtils.lineWidth(feature, 1.0);
-          var outCoordss = Util.HighwayUtils.lineStringToPolygon(self._getViziWorld(), feature.geometry.coordinates, lineWidth);
+          var lineWidth = HighwayUtils.lineWidth(feature, 1.0);
+          var outCoordss = HighwayUtils.lineStringToPolygon(self._getViziWorld(), feature.geometry.coordinates, lineWidth);
 
           feature.geometry.type = 'MultiPolygon';
           feature.geometry.coordinates = outCoordss;
         }
         // Convert MultiLineString to Polygon
         else if (feature.geometry.type === 'MultiLineString') {
-          var lineWidth = Util.HighwayUtils.lineWidth(feature, 1.0);
-          var outCoordss = Util.HighwayUtils.multiLineStringToPolygon(self._getViziWorld(), feature.geometry.coordinates, lineWidth);
+          var lineWidth = HighwayUtils.lineWidth(feature, 1.0);
+          var outCoordss = HighwayUtils.multiLineStringToPolygon(self._getViziWorld(), feature.geometry.coordinates, lineWidth);
 
           feature.geometry.type = 'MultiPolygon';
           feature.geometry.coordinates = outCoordss;

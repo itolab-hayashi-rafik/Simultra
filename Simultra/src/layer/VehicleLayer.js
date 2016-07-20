@@ -4,7 +4,6 @@ import extend from 'extend';
 import Layer from './Layer';
 
 import API from '../io/API';
-import Util from '../util/index';
 
 const UPDATE_INTERVAL_MS = 1000;
 
