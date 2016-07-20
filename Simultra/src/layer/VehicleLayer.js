@@ -97,6 +97,7 @@ class VehicleLayer extends Layer {
 
   _performUpdate(data) {
     var self = this;
+    var viziLayer = this._getViziLayer();
 
     // dictionaries to hold parameters
     var locations = {};
@@ -108,7 +109,7 @@ class VehicleLayer extends Layer {
       // if vehicle does not exist
       if (!(vehicle.id in self._vehicles)) {
         // add to vehicle layer
-        var object = self._vehicleLayer.addVehicle(
+        var object = viziLayer.addVehicle(
           vehicle.type,
           new VIZI.LatLon(vehicle.location.lat, vehicle.location.lon),
           vehicle.angle
@@ -145,7 +146,6 @@ class VehicleLayer extends Layer {
     });
 
     // update simulation parameters
-    var viziLayer = this._getViziLayer();
     viziLayer._setSimLocations(locations);
     viziLayer._setSimVelocities(velocities);
     viziLayer._setSimAccelerations(accelerations);
