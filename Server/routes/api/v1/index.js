@@ -3,6 +3,7 @@ var router = express.Router();
 
 // vehicleManager
 var vehicleManager = require('../../../models/vehicle-manager');
+var pedestrianManager = require('../../../models/pedestrian-manager');
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -50,6 +51,50 @@ router.put('/vehicles/:id(\\d+)', function(req, res, next) {
   // return
   if (vehicle) {
     res.json(vehicle);
+  } else {
+    res.status(400).json({message: 'vehicle not found with id='+req.params.id});
+  }
+});
+
+/* GET pedestrians */
+router.get('/pedestrians', function(req, res, next) {
+  var pedestrian = pedestrianManager.getAll();
+  res.json(pedestrian);
+});
+
+/* GET a pedestrian */
+router.get('/pedestrians/:id(\\d+)', function(req, res, next) {
+  var pedestrian = pedestrianManager.get(req.params.id);
+  if (pedestrian) {
+    res.json(pedestrian);
+  } else {
+    res.status(400).json({message: 'vehicle not found with id='+req.params.id});
+  }
+});
+
+/* ADD a new pedestrian */
+router.post('/pedestrians/new', function(req, res, next) {
+  console.log('create');
+  console.log(req.body);
+
+  // add
+  var pedestrian = pedestrianManager.createNew(req.body);
+
+  // return
+  res.json(pedestrian);
+});
+
+/* UPDATE a pedestrian */
+router.put('/pedestrians/:id(\\d+)', function(req, res, next) {
+  console.log('update: '+req.params.id);
+  console.log(req.body);
+
+  // update
+  var pedestrian = pedestrianManager.update(req.params.id, req.body);
+
+  // return
+  if (pedestrian) {
+    res.json(pedestrian);
   } else {
     res.status(400).json({message: 'vehicle not found with id='+req.params.id});
   }
