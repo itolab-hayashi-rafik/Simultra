@@ -81,11 +81,22 @@ var HighwayUtils = (function() {
    * Convert LineString to Polygon
    *
    * @param {Object} world VIZI.World object
+   * @param {Array} coords LineString, e.g. [[lon, lat], [lon, lat], ...]
+   * @param {Number} lineWidth the width of the lines
+   */
+  var lineStringToPolygon = function(world, coords, lineWidth) {
+    return multiLineStringToPolygon(world, [coords], lineWidth);
+  };
+
+  /**
+   * Convert MultiLineString to Polygon
+   *
+   * @param {Object} world VIZI.World object
    * @param {Array} coordss Array of LineStrings, e.g. [[[lon, lat], [lon, lat], ...], ...]
    * @param {Number} lineWidth the width of the lines
    * @returns {Array}
    */
-  var lineStringsToPolygon = function(world, coordss, lineWidth) {
+  var multiLineStringToPolygon = function(world, coordss, lineWidth) {
     if (lineWidth === undefined) {
       lineWidth = 1.0;
     }
@@ -188,7 +199,8 @@ var HighwayUtils = (function() {
   return {
     style: style,
     lineWidth: lineWidth,
-    lineStringsToPolygon: lineStringsToPolygon
+    lineStringToPolygon: lineStringToPolygon,
+    multiLineStringToPolygon: multiLineStringToPolygon
   };
 })();
 

@@ -24,6 +24,10 @@ class Layer extends EventEmitter {
     return this._viziLayer;
   }
 
+  _getViziWorld() {
+    return this._simultra._world;
+  }
+
   addTo(simultra) {
     if (this._viziLayer === undefined) {
       throw new Error('Layer not initialized');

@@ -730,6 +730,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this._viziLayer;
 	    }
 	  }, {
+	    key: '_getViziWorld',
+	    value: function _getViziWorld() {
+	      return this._simultra._world;
+	    }
+	  }, {
 	    key: 'addTo',
 	    value: function addTo(simultra) {
 	      if (this._viziLayer === undefined) {
@@ -961,11 +966,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * Convert LineString to Polygon
 	   *
 	   * @param {Object} world VIZI.World object
+	   * @param {Array} coords LineString, e.g. [[lon, lat], [lon, lat], ...]
+	   * @param {Number} lineWidth the width of the lines
+	   */
+	  var lineStringToPolygon = function lineStringToPolygon(world, coords, lineWidth) {
+	    return multiLineStringToPolygon(world, [coords], lineWidth);
+	  };
+	
+	  /**
+	   * Convert MultiLineString to Polygon
+	   *
+	   * @param {Object} world VIZI.World object
 	   * @param {Array} coordss Array of LineStrings, e.g. [[[lon, lat], [lon, lat], ...], ...]
 	   * @param {Number} lineWidth the width of the lines
 	   * @returns {Array}
 	   */
-	  var lineStringsToPolygon = function lineStringsToPolygon(world, coordss, lineWidth) {
+	  var multiLineStringToPolygon = function multiLineStringToPolygon(world, coordss, lineWidth) {
 	    if (lineWidth === undefined) {
 	      lineWidth = 1.0;
 	    }
@@ -1072,7 +1088,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return {
 	    style: style,
 	    lineWidth: lineWidth,
-	    lineStringsToPolygon: lineStringsToPolygon
+	    lineStringToPolygon: lineStringToPolygon,
+	    multiLineStringToPolygon: multiLineStringToPolygon
 	  };
 	}();
 	
@@ -1245,15 +1262,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return false;
 	          }
 	
-	          // Convert line to polygon
-	          if (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString') {
+	          // Convert LineString to polygon
+	          if (feature.geometry.type === 'LineString') {
 	            var lineWidth = _index2.default.HighwayUtils.lineWidth(feature, 1.0);
-	            var coordss = feature.geometry.type === 'LineString' ? [feature.geometry.coordinates] : feature.geometry.coordinates;
-	            var outCoordss = _index2.default.HighwayUtils.lineStringsToPolygon(self._viziLayer._world, coordss, lineWidth);
+	            var outCoordss = _index2.default.HighwayUtils.lineStringToPolygon(self._getViziWorld(), feature.geometry.coordinates, lineWidth);
 	
 	            feature.geometry.type = 'MultiPolygon';
 	            feature.geometry.coordinates = outCoordss;
 	          }
+	          // Convert MultiLineString to Polygon
+	          else if (feature.geometry.type === 'MultiLineString') {
+	              var lineWidth = _index2.default.HighwayUtils.lineWidth(feature, 1.0);
+	              var outCoordss = _index2.default.HighwayUtils.multiLineStringToPolygon(self._getViziWorld(), feature.geometry.coordinates, lineWidth);
+	
+	              feature.geometry.type = 'MultiPolygon';
+	              feature.geometry.coordinates = outCoordss;
+	            }
 	
 	          return true;
 	        },

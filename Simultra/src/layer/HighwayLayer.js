@@ -41,11 +41,18 @@ class HighwayLayer extends Layer {
           return false;
         }
 
-        // Convert line to polygon
-        if (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString') {
+        // Convert LineString to polygon
+        if (feature.geometry.type === 'LineString') {
           var lineWidth = Util.HighwayUtils.lineWidth(feature, 1.0);
-          var coordss = (feature.geometry.type === 'LineString') ? [feature.geometry.coordinates] : feature.geometry.coordinates;
-          var outCoordss = Util.HighwayUtils.lineStringsToPolygon(self._viziLayer._world, coordss, lineWidth);
+          var outCoordss = Util.HighwayUtils.lineStringToPolygon(self._getViziWorld(), feature.geometry.coordinates, lineWidth);
+
+          feature.geometry.type = 'MultiPolygon';
+          feature.geometry.coordinates = outCoordss;
+        }
+        // Convert MultiLineString to Polygon
+        else if (feature.geometry.type === 'MultiLineString') {
+          var lineWidth = Util.HighwayUtils.lineWidth(feature, 1.0);
+          var outCoordss = Util.HighwayUtils.multiLineStringToPolygon(self._getViziWorld(), feature.geometry.coordinates, lineWidth);
 
           feature.geometry.type = 'MultiPolygon';
           feature.geometry.coordinates = outCoordss;
