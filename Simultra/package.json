@@ -59,6 +59,7 @@
     "mochaGlobals": []
   },
   "dependencies": {
+    "eventemitter3": "^1.2.0",
     "extend": "^3.0.0",
     "jquery": "^3.1.0",
     "vizicities": "file:../../vizicities"

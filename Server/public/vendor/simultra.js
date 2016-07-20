@@ -66,11 +66,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vizi2 = _interopRequireDefault(_vizi);
 	
-	var _API = __webpack_require__(2);
+	var _eventemitter = __webpack_require__(2);
+	
+	var _eventemitter2 = _interopRequireDefault(_eventemitter);
+	
+	var _BasemapLayer = __webpack_require__(3);
+	
+	var _BasemapLayer2 = _interopRequireDefault(_BasemapLayer);
+	
+	var _BuildingLayer = __webpack_require__(9);
+	
+	var _BuildingLayer2 = _interopRequireDefault(_BuildingLayer);
+	
+	var _HighwayLayer = __webpack_require__(10);
+	
+	var _HighwayLayer2 = _interopRequireDefault(_HighwayLayer);
+	
+	var _VehicleLayer = __webpack_require__(11);
+	
+	var _VehicleLayer2 = _interopRequireDefault(_VehicleLayer);
+	
+	var _API = __webpack_require__(12);
 	
 	var _API2 = _interopRequireDefault(_API);
 	
-	var _index = __webpack_require__(4);
+	var _index = __webpack_require__(6);
 	
 	var _index2 = _interopRequireDefault(_index);
 	
@@ -78,24 +98,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var UPDATE_INTERVAL_MS = 1000;
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	var Simultra = function () {
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Simultra = function (_EventEmitter) {
+	  _inherits(Simultra, _EventEmitter);
+	
 	  function Simultra(baseUrl, defaultCoords) {
 	    _classCallCheck(this, Simultra);
 	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Simultra).call(this));
+	
+	    _this._api = new _API2.default(baseUrl);
+	    _this._isRunning = false;
+	
 	    var coords = defaultCoords || [35.156324, 136.923108];
 	
-	    this._setupWorld(coords);
-	    this._setupBasemap();
-	    this._setupRoads();
-	    this._setupBuildings();
-	    this._setupVehicles();
-	
-	    this._vehicles = [];
-	
-	    this._api = new _API2.default(baseUrl);
-	    this._isRunning = false;
+	    _this._setupWorld(coords);
+	    _this._setupLayers();
+	    return _this;
 	  }
 	
 	  _createClass(Simultra, [{
@@ -119,23 +141,1090 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._world = world;
 	    }
 	  }, {
-	    key: '_setupBasemap',
-	    value: function _setupBasemap() {
-	      // CartoDB basemap
-	      var basemapLayer = _vizi2.default.imageTileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
-	        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
-	      }).addTo(this._world);
+	    key: '_setupLayers',
+	    value: function _setupLayers() {
+	      // Basemap
+	      this._basemapLayer = new _BasemapLayer2.default().addTo(this);
+	      // Highway
+	      this._highwayLayer = new _HighwayLayer2.default().addTo(this);
+	      // Building
+	      this._buildingLayer = new _BuildingLayer2.default().addTo(this);
+	      // Vehicle
+	      this._vehicleLayer = new _VehicleLayer2.default().addTo(this);
+	    }
 	
-	      // set the instance properties
-	      this._basemapLayer = basemapLayer;
+	    /**
+	     * Sets the center coordinate of the view
+	     * @param lat latitude
+	     * @param lon longitude
+	     */
+	
+	  }, {
+	    key: 'setView',
+	    value: function setView(lat, lon) {
+	      this._world.setView([lat, lon]);
+	    }
+	
+	    /**
+	     * Starts updating the view
+	     */
+	
+	  }, {
+	    key: 'start',
+	    value: function start() {
+	      this._vehicleLayer.start();
+	      this._isRunning = true;
+	    }
+	
+	    /**
+	     * Stops updating the view
+	     */
+	
+	  }, {
+	    key: 'stop',
+	    value: function stop() {
+	      this._vehicleLayer.stop();
+	      this._isRunning = false;
+	    }
+	
+	    /**
+	     * Returns if the view updating loop is running
+	     *
+	     * @returns {boolean}
+	     */
+	
+	  }, {
+	    key: 'isRunning',
+	    value: function isRunning() {
+	      return this._isRunning;
+	    }
+	  }]);
+	
+	  return Simultra;
+	}(_eventemitter2.default);
+	
+	exports.default = Simultra;
+	
+	window.Simultra = Simultra;
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var has = Object.prototype.hasOwnProperty;
+	
+	//
+	// We store our EE objects in a plain object whose properties are event names.
+	// If `Object.create(null)` is not supported we prefix the event names with a
+	// `~` to make sure that the built-in object properties are not overridden or
+	// used as an attack vector.
+	// We also assume that `Object.create(null)` is available when the event name
+	// is an ES6 Symbol.
+	//
+	var prefix = typeof Object.create !== 'function' ? '~' : false;
+	
+	/**
+	 * Representation of a single EventEmitter function.
+	 *
+	 * @param {Function} fn Event handler to be called.
+	 * @param {Mixed} context Context for function execution.
+	 * @param {Boolean} [once=false] Only emit once
+	 * @api private
+	 */
+	function EE(fn, context, once) {
+	  this.fn = fn;
+	  this.context = context;
+	  this.once = once || false;
+	}
+	
+	/**
+	 * Minimal EventEmitter interface that is molded against the Node.js
+	 * EventEmitter interface.
+	 *
+	 * @constructor
+	 * @api public
+	 */
+	function EventEmitter() { /* Nothing to set */ }
+	
+	/**
+	 * Hold the assigned EventEmitters by name.
+	 *
+	 * @type {Object}
+	 * @private
+	 */
+	EventEmitter.prototype._events = undefined;
+	
+	/**
+	 * Return an array listing the events for which the emitter has registered
+	 * listeners.
+	 *
+	 * @returns {Array}
+	 * @api public
+	 */
+	EventEmitter.prototype.eventNames = function eventNames() {
+	  var events = this._events
+	    , names = []
+	    , name;
+	
+	  if (!events) return names;
+	
+	  for (name in events) {
+	    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+	  }
+	
+	  if (Object.getOwnPropertySymbols) {
+	    return names.concat(Object.getOwnPropertySymbols(events));
+	  }
+	
+	  return names;
+	};
+	
+	/**
+	 * Return a list of assigned event listeners.
+	 *
+	 * @param {String} event The events that should be listed.
+	 * @param {Boolean} exists We only need to know if there are listeners.
+	 * @returns {Array|Boolean}
+	 * @api public
+	 */
+	EventEmitter.prototype.listeners = function listeners(event, exists) {
+	  var evt = prefix ? prefix + event : event
+	    , available = this._events && this._events[evt];
+	
+	  if (exists) return !!available;
+	  if (!available) return [];
+	  if (available.fn) return [available.fn];
+	
+	  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+	    ee[i] = available[i].fn;
+	  }
+	
+	  return ee;
+	};
+	
+	/**
+	 * Emit an event to all registered event listeners.
+	 *
+	 * @param {String} event The name of the event.
+	 * @returns {Boolean} Indication if we've emitted an event.
+	 * @api public
+	 */
+	EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+	  var evt = prefix ? prefix + event : event;
+	
+	  if (!this._events || !this._events[evt]) return false;
+	
+	  var listeners = this._events[evt]
+	    , len = arguments.length
+	    , args
+	    , i;
+	
+	  if ('function' === typeof listeners.fn) {
+	    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+	
+	    switch (len) {
+	      case 1: return listeners.fn.call(listeners.context), true;
+	      case 2: return listeners.fn.call(listeners.context, a1), true;
+	      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+	      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+	      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+	      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+	    }
+	
+	    for (i = 1, args = new Array(len -1); i < len; i++) {
+	      args[i - 1] = arguments[i];
+	    }
+	
+	    listeners.fn.apply(listeners.context, args);
+	  } else {
+	    var length = listeners.length
+	      , j;
+	
+	    for (i = 0; i < length; i++) {
+	      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+	
+	      switch (len) {
+	        case 1: listeners[i].fn.call(listeners[i].context); break;
+	        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+	        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+	        default:
+	          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+	            args[j - 1] = arguments[j];
+	          }
+	
+	          listeners[i].fn.apply(listeners[i].context, args);
+	      }
+	    }
+	  }
+	
+	  return true;
+	};
+	
+	/**
+	 * Register a new EventListener for the given event.
+	 *
+	 * @param {String} event Name of the event.
+	 * @param {Function} fn Callback function.
+	 * @param {Mixed} [context=this] The context of the function.
+	 * @api public
+	 */
+	EventEmitter.prototype.on = function on(event, fn, context) {
+	  var listener = new EE(fn, context || this)
+	    , evt = prefix ? prefix + event : event;
+	
+	  if (!this._events) this._events = prefix ? {} : Object.create(null);
+	  if (!this._events[evt]) this._events[evt] = listener;
+	  else {
+	    if (!this._events[evt].fn) this._events[evt].push(listener);
+	    else this._events[evt] = [
+	      this._events[evt], listener
+	    ];
+	  }
+	
+	  return this;
+	};
+	
+	/**
+	 * Add an EventListener that's only called once.
+	 *
+	 * @param {String} event Name of the event.
+	 * @param {Function} fn Callback function.
+	 * @param {Mixed} [context=this] The context of the function.
+	 * @api public
+	 */
+	EventEmitter.prototype.once = function once(event, fn, context) {
+	  var listener = new EE(fn, context || this, true)
+	    , evt = prefix ? prefix + event : event;
+	
+	  if (!this._events) this._events = prefix ? {} : Object.create(null);
+	  if (!this._events[evt]) this._events[evt] = listener;
+	  else {
+	    if (!this._events[evt].fn) this._events[evt].push(listener);
+	    else this._events[evt] = [
+	      this._events[evt], listener
+	    ];
+	  }
+	
+	  return this;
+	};
+	
+	/**
+	 * Remove event listeners.
+	 *
+	 * @param {String} event The event we want to remove.
+	 * @param {Function} fn The listener that we need to find.
+	 * @param {Mixed} context Only remove listeners matching this context.
+	 * @param {Boolean} once Only remove once listeners.
+	 * @api public
+	 */
+	EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+	  var evt = prefix ? prefix + event : event;
+	
+	  if (!this._events || !this._events[evt]) return this;
+	
+	  var listeners = this._events[evt]
+	    , events = [];
+	
+	  if (fn) {
+	    if (listeners.fn) {
+	      if (
+	           listeners.fn !== fn
+	        || (once && !listeners.once)
+	        || (context && listeners.context !== context)
+	      ) {
+	        events.push(listeners);
+	      }
+	    } else {
+	      for (var i = 0, length = listeners.length; i < length; i++) {
+	        if (
+	             listeners[i].fn !== fn
+	          || (once && !listeners[i].once)
+	          || (context && listeners[i].context !== context)
+	        ) {
+	          events.push(listeners[i]);
+	        }
+	      }
+	    }
+	  }
+	
+	  //
+	  // Reset the array, or remove it completely if we have no more listeners.
+	  //
+	  if (events.length) {
+	    this._events[evt] = events.length === 1 ? events[0] : events;
+	  } else {
+	    delete this._events[evt];
+	  }
+	
+	  return this;
+	};
+	
+	/**
+	 * Remove all listeners or only the listeners for the specified event.
+	 *
+	 * @param {String} event The event want to remove all listeners for.
+	 * @api public
+	 */
+	EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+	  if (!this._events) return this;
+	
+	  if (event) delete this._events[prefix ? prefix + event : event];
+	  else this._events = prefix ? {} : Object.create(null);
+	
+	  return this;
+	};
+	
+	//
+	// Alias methods names because people roll like that.
+	//
+	EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+	EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+	
+	//
+	// This function doesn't apply anymore.
+	//
+	EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+	  return this;
+	};
+	
+	//
+	// Expose the prefix.
+	//
+	EventEmitter.prefixed = prefix;
+	
+	//
+	// Expose the module.
+	//
+	if (true) {
+	  module.exports = EventEmitter;
+	}
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _vizi = __webpack_require__(1);
+	
+	var _vizi2 = _interopRequireDefault(_vizi);
+	
+	var _extend = __webpack_require__(4);
+	
+	var _extend2 = _interopRequireDefault(_extend);
+	
+	var _Layer2 = __webpack_require__(5);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _index = __webpack_require__(6);
+	
+	var _index2 = _interopRequireDefault(_index);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var BasemapLayer = function (_Layer) {
+	  _inherits(BasemapLayer, _Layer);
+	
+	  function BasemapLayer(options) {
+	    _classCallCheck(this, BasemapLayer);
+	
+	    var defaultOptions = {};
+	
+	    var _options = (0, _extend2.default)({}, defaultOptions, options);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BasemapLayer).call(this, _options));
+	
+	    _this._setup();
+	    return _this;
+	  }
+	
+	  _createClass(BasemapLayer, [{
+	    key: '_setup',
+	    value: function _setup() {
+	      // CartoDB basemap
+	      var viziLayer = _vizi2.default.imageTileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+	        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+	      });
+	
+	      this._setViziLayer(viziLayer);
+	    }
+	  }]);
+	
+	  return BasemapLayer;
+	}(_Layer3.default);
+	
+	exports.default = BasemapLayer;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var hasOwn = Object.prototype.hasOwnProperty;
+	var toStr = Object.prototype.toString;
+	
+	var isArray = function isArray(arr) {
+		if (typeof Array.isArray === 'function') {
+			return Array.isArray(arr);
+		}
+	
+		return toStr.call(arr) === '[object Array]';
+	};
+	
+	var isPlainObject = function isPlainObject(obj) {
+		if (!obj || toStr.call(obj) !== '[object Object]') {
+			return false;
+		}
+	
+		var hasOwnConstructor = hasOwn.call(obj, 'constructor');
+		var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+		// Not own constructor property must be Object
+		if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
+			return false;
+		}
+	
+		// Own properties are enumerated firstly, so to speed up,
+		// if last one is own, then all properties are own.
+		var key;
+		for (key in obj) {/**/}
+	
+		return typeof key === 'undefined' || hasOwn.call(obj, key);
+	};
+	
+	module.exports = function extend() {
+		var options, name, src, copy, copyIsArray, clone,
+			target = arguments[0],
+			i = 1,
+			length = arguments.length,
+			deep = false;
+	
+		// Handle a deep copy situation
+		if (typeof target === 'boolean') {
+			deep = target;
+			target = arguments[1] || {};
+			// skip the boolean and the target
+			i = 2;
+		} else if ((typeof target !== 'object' && typeof target !== 'function') || target == null) {
+			target = {};
+		}
+	
+		for (; i < length; ++i) {
+			options = arguments[i];
+			// Only deal with non-null/undefined values
+			if (options != null) {
+				// Extend the base object
+				for (name in options) {
+					src = target[name];
+					copy = options[name];
+	
+					// Prevent never-ending loop
+					if (target !== copy) {
+						// Recurse if we're merging plain objects or arrays
+						if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+							if (copyIsArray) {
+								copyIsArray = false;
+								clone = src && isArray(src) ? src : [];
+							} else {
+								clone = src && isPlainObject(src) ? src : {};
+							}
+	
+							// Never move original objects, clone them
+							target[name] = extend(deep, clone, copy);
+	
+						// Don't bring in undefined values
+						} else if (typeof copy !== 'undefined') {
+							target[name] = copy;
+						}
+					}
+				}
+			}
+		}
+	
+		// Return the modified object
+		return target;
+	};
+	
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _vizi = __webpack_require__(1);
+	
+	var _vizi2 = _interopRequireDefault(_vizi);
+	
+	var _eventemitter = __webpack_require__(2);
+	
+	var _eventemitter2 = _interopRequireDefault(_eventemitter);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	/**
+	 * Base Layer class
+	 */
+	
+	var Layer = function (_EventEmitter) {
+	  _inherits(Layer, _EventEmitter);
+	
+	  function Layer(options) {
+	    _classCallCheck(this, Layer);
+	
+	    // delegate layer
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Layer).call(this));
+	
+	    _this._viziLayer = null;
+	    _this._options = options;
+	
+	    _this._simultra = null;
+	    _this._api = null;
+	    return _this;
+	  }
+	
+	  _createClass(Layer, [{
+	    key: '_setViziLayer',
+	    value: function _setViziLayer(viziLayer) {
+	      this._viziLayer = viziLayer;
 	    }
 	  }, {
-	    key: '_setupRoads',
-	    value: function _setupRoads() {
+	    key: '_getViziLayer',
+	    value: function _getViziLayer() {
+	      return this._viziLayer;
+	    }
+	  }, {
+	    key: 'addTo',
+	    value: function addTo(simultra) {
+	      if (this._viziLayer === undefined) {
+	        throw new Error('Layer not initialized');
+	      }
+	      if (simultra._world === undefined) {
+	        throw new Error('Simultra not initialized');
+	      }
+	
+	      this._simultra = simultra;
+	      this._onAdd(simultra);
+	
+	      this._viziLayer.addTo(simultra._world);
+	
+	      return this;
+	    }
+	  }, {
+	    key: '_onAdd',
+	    value: function _onAdd(simultra) {
+	      this._api = simultra._api;
+	    }
+	  }, {
+	    key: 'remove',
+	    value: function remove() {
+	      this._simultra = null;
+	      this._onRemove();
+	
+	      return this;
+	    }
+	  }, {
+	    key: '_onRemove',
+	    value: function _onRemove() {
+	      // do something when this layer is removed from simultra
+	    }
+	  }]);
+	
+	  return Layer;
+	}(_eventemitter2.default);
+	
+	exports.default = Layer;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _BuildingUtils = __webpack_require__(7);
+	
+	var _BuildingUtils2 = _interopRequireDefault(_BuildingUtils);
+	
+	var _HighwayUtils = __webpack_require__(8);
+	
+	var _HighwayUtils2 = _interopRequireDefault(_HighwayUtils);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	/**
+	 * Utility
+	 */
+	
+	
+	var Util = {};
+	
+	Util.BuildingUtils = _BuildingUtils2.default;
+	Util.HighwayUtils = _HighwayUtils2.default;
+	
+	exports.default = Util;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _vizi = __webpack_require__(1);
+	
+	var _vizi2 = _interopRequireDefault(_vizi);
+	
+	var _extend = __webpack_require__(4);
+	
+	var _extend2 = _interopRequireDefault(_extend);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	/**
+	 * Building Utilities
+	 */
+	
+	
+	var BuildingUtils = function () {
+	
+	  /**
+	   * Return the style for a specific building
+	   *
+	   * @param {Object} feature
+	   * @param {Object} defaultValue
+	   */
+	  var style = function style(feature, defaultValue) {
+	    var height;
+	
+	    if (feature.properties.height) {
+	      height = feature.properties.height;
+	    } else {
+	      height = 10 + Math.random() * 10;
+	    }
+	
+	    // construct the style
+	    var style = {
+	      height: height || defaultValue.height
+	    };
+	
+	    return (0, _extend2.default)({}, defaultValue, style);
+	  };
+	
+	  // return the utility object
+	  return {
+	    style: style
+	  };
+	}();
+	
+	exports.default = BuildingUtils;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _vizi = __webpack_require__(1);
+	
+	var _vizi2 = _interopRequireDefault(_vizi);
+	
+	var _extend = __webpack_require__(4);
+	
+	var _extend2 = _interopRequireDefault(_extend);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	// --- constants
+	// jscs:disable disallowSpaceAfterObjectKeys
+	/**
+	 * Highway Utilities
+	 */
+	var COLOR_MAP = {
+	  'major_road': '#f7c616',
+	  'minor_road': '#ffffff',
+	  'highway': '#888785',
+	  'path': '#888785',
+	  'rail': '#888785'
+	};
+	var WIDTH_MAP = {
+	  'major': 10,
+	  'primary': 10,
+	  'secondary': 7,
+	  'residental': 7,
+	  'tertiary': 5,
+	  'living_street': 5,
+	  'track': 3,
+	  'trunk': 3,
+	  'footway': 1
+	};
+	// jscs:enable disallowSpaceAfterObjectKeys
+	// ---
+	
+	var HighwayUtils = function () {
+	
+	  /**
+	   * Return the style for a specific highway
+	   *
+	   * @param {Object} feature
+	   */
+	  var style = function style(feature, defaultValue) {
+	    var color;
+	
+	    // color
+	    if (feature.properties.kind) {
+	      if (feature.properties.kind in COLOR_MAP) {
+	        color = COLOR_MAP[feature.properties.kind];
+	      } else {
+	        // unknown highway kind
+	        console.info('Unknown highway kind: ' + feature.properties.kind);
+	      }
+	    }
+	
+	    // construct the style
+	    var style = {
+	      color: color || defaultValue.color
+	    };
+	
+	    return (0, _extend2.default)({}, defaultValue, style);
+	  };
+	
+	  /**
+	   * Return the line width for a specific highway
+	   *
+	   * @param {Object} feature
+	   */
+	  var lineWidth = function lineWidth(feature, defaultValue) {
+	    var lineWidth;
+	    if (feature.properties.highway) {
+	      if (feature.properties.highway in WIDTH_MAP) {
+	        lineWidth = WIDTH_MAP[feature.properties.highway];
+	      } else {
+	        // unknown highway type
+	        console.info('Unknown highway: ' + feature.properties.highway);
+	        lineWidth = defaultValue;
+	      }
+	    } else {
+	      // no highway type mentioned
+	      lineWidth = defaultValue;
+	    }
+	    return lineWidth;
+	  };
+	
+	  /**
+	   * Convert LineString to Polygon
+	   *
+	   * @param {Object} world VIZI.World object
+	   * @param {Array} coordss Array of LineStrings, e.g. [[[lon, lat], [lon, lat], ...], ...]
+	   * @param {Number} lineWidth the width of the lines
+	   * @returns {Array}
+	   */
+	  var lineStringsToPolygon = function lineStringsToPolygon(world, coordss, lineWidth) {
+	    if (lineWidth === undefined) {
+	      lineWidth = 1.0;
+	    }
+	
+	    // jscs:disable disallowMultipleVarDecl
+	    var cLatLon, pLatLon, nLatLon;
+	    var cGeoCoord, pGeoCoord, nGeoCoord;
+	    var vVert = new _vizi2.default.Point(),
+	        _vVert = new _vizi2.default.Point();
+	    var vMean = new _vizi2.default.Point(),
+	        vPadding = new _vizi2.default.Point(),
+	        _vPadding = new _vizi2.default.Point();
+	    var p = new _vizi2.default.Point(),
+	        _p;
+	    // jscs:enable disallowMultipleVarDecl
+	
+	    var outCoordss = [];
+	
+	    coordss.forEach(function (coords) {
+	      var outCoords = [];
+	
+	      cLatLon = pLatLon = nLatLon = null;
+	      cGeoCoord = pGeoCoord = nGeoCoord = null;
+	
+	      for (var i = 0; i < coords.length; i++) {
+	        cLatLon = nLatLon || new _vizi2.default.LatLon(coords[i][1], coords[i][0]);
+	        cGeoCoord = nGeoCoord || world.latLonToPoint(cLatLon);
+	
+	        // project the next coordinate
+	        if (i < coords.length - 1) {
+	          nLatLon = new _vizi2.default.LatLon(coords[i + 1][1], coords[i + 1][0]);
+	          nGeoCoord = world.latLonToPoint(nLatLon);
+	
+	          // calculate the vertical vector
+	          vVert.x = -(nGeoCoord.y - cGeoCoord.y);
+	          vVert.y = nGeoCoord.x - cGeoCoord.x;
+	          normalize(vVert);
+	
+	          // incorpolate the vertical vector with the previous one
+	          if (i == 0) {
+	            _vVert.x = vVert.x;_vVert.y = vVert.y;
+	          }
+	          vMean.x = (vVert.x + _vVert.x) / 2.0;vMean.y = (vVert.y + _vVert.y) / 2.0;
+	          normalize(vMean);
+	          vPadding.x = vMean.x * lineWidth;vPadding.y = vMean.y * lineWidth;
+	        } else {
+	          vPadding.x = _vVert.x * lineWidth;vPadding.y = _vVert.y * lineWidth;
+	        }
+	
+	        // construct polygons
+	        if (0 < i) {
+	          if (i == 1) {
+	            // left top
+	            p.x = pGeoCoord.x - _vPadding.x;p.y = pGeoCoord.y - _vPadding.y;
+	            _p = world.pointToLatLon(p);
+	            outCoords.splice(0, 0, [_p.lon, _p.lat]);
+	
+	            // left bottom
+	            p.x = pGeoCoord.x + _vPadding.x;p.y = pGeoCoord.y + _vPadding.y;
+	            _p = world.pointToLatLon(p);
+	            outCoords.splice(0, 0, [_p.lon, _p.lat]);
+	          }
+	
+	          var idx = outCoords.length / 2;
+	          // right bottom
+	          p.x = cGeoCoord.x + vPadding.x;p.y = cGeoCoord.y + vPadding.y;
+	          _p = world.pointToLatLon(p);
+	          outCoords.splice(idx, 0, [_p.lon, _p.lat]);
+	
+	          // right top
+	          p.x = cGeoCoord.x - vPadding.x;p.y = cGeoCoord.y - vPadding.y;
+	          _p = world.pointToLatLon(p);
+	          outCoords.splice(idx + 1, 0, [_p.lon, _p.lat]);
+	        }
+	
+	        // keep the vectors as the previous one
+	        pLatLon = cLatLon;
+	        pGeoCoord = cGeoCoord;
+	        _vVert.x = vVert.x;_vVert.y = vVert.y;
+	        _vPadding.x = vPadding.x;_vPadding.y = vPadding.y;
+	      }
+	
+	      // add the first vertice at the end to make the polygon closed
+	      outCoords.push(outCoords[0]);
+	
+	      // add this polygon to the array of polygons
+	      outCoordss.push([outCoords]);
+	    });
+	
+	    return outCoordss;
+	  };
+	
+	  // --- internal helper methods
+	  /** Normalize VIZI.Point */
+	  function normalize(p) {
+	    var l = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
+	    l = l === 0.0 ? 1.0 : l;
+	    p.x /= l;
+	    p.y /= l;
+	  }
+	  // ---
+	
+	  // return the utility object
+	  return {
+	    style: style,
+	    lineWidth: lineWidth,
+	    lineStringsToPolygon: lineStringsToPolygon
+	  };
+	}();
+	
+	exports.default = HighwayUtils;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _vizi = __webpack_require__(1);
+	
+	var _vizi2 = _interopRequireDefault(_vizi);
+	
+	var _extend = __webpack_require__(4);
+	
+	var _extend2 = _interopRequireDefault(_extend);
+	
+	var _Layer2 = __webpack_require__(5);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _index = __webpack_require__(6);
+	
+	var _index2 = _interopRequireDefault(_index);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var BuildingLayer = function (_Layer) {
+	  _inherits(BuildingLayer, _Layer);
+	
+	  function BuildingLayer(options) {
+	    _classCallCheck(this, BuildingLayer);
+	
+	    var defaultOptions = {};
+	
+	    var _options = (0, _extend2.default)({}, defaultOptions, options);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BuildingLayer).call(this, _options));
+	
+	    _this._setup();
+	    return _this;
+	  }
+	
+	  _createClass(BuildingLayer, [{
+	    key: '_setup',
+	    value: function _setup() {
+	
+	      // Buildings from Mapzen
+	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+	        interactive: false,
+	        style: function style(feature) {
+	          return _index2.default.BuildingUtils.style(feature, {
+	            height: 1,
+	            lineColor: '#f7c616',
+	            lineWidth: 1,
+	            lineTransparent: true,
+	            lineOpacity: 0.2,
+	            lineBlending: THREE.AdditiveBlending,
+	            lineRenderOrder: 2
+	          });
+	        },
+	        filter: function filter(feature) {
+	          // Don't show points
+	          return feature.geometry.type !== 'Point';
+	        },
+	        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
+	      });
+	
+	      // set the instance properties
+	      this._setViziLayer(viziLayer);
+	    }
+	  }]);
+	
+	  return BuildingLayer;
+	}(_Layer3.default);
+	
+	exports.default = BuildingLayer;
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _vizi = __webpack_require__(1);
+	
+	var _vizi2 = _interopRequireDefault(_vizi);
+	
+	var _extend = __webpack_require__(4);
+	
+	var _extend2 = _interopRequireDefault(_extend);
+	
+	var _Layer2 = __webpack_require__(5);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _index = __webpack_require__(6);
+	
+	var _index2 = _interopRequireDefault(_index);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var HighwayLayer = function (_Layer) {
+	  _inherits(HighwayLayer, _Layer);
+	
+	  function HighwayLayer(options) {
+	    _classCallCheck(this, HighwayLayer);
+	
+	    var defaultOptions = {};
+	
+	    var _options = (0, _extend2.default)({}, defaultOptions, options);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HighwayLayer).call(this, _options));
+	
+	    _this._setup();
+	    return _this;
+	  }
+	
+	  _createClass(HighwayLayer, [{
+	    key: '_setup',
+	    value: function _setup() {
+	
 	      var self = this;
 	
 	      // Roads from Mapzen
-	      var topoJSONRoadLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
 	        interactive: false,
 	        style: function style(feature) {
 	          if (feature.properties.lanes) {
@@ -160,7 +1249,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString') {
 	            var lineWidth = _index2.default.HighwayUtils.lineWidth(feature, 1.0);
 	            var coordss = feature.geometry.type === 'LineString' ? [feature.geometry.coordinates] : feature.geometry.coordinates;
-	            var outCoordss = _index2.default.HighwayUtils.lineStringsToPolygon(self._world, coordss, lineWidth);
+	            var outCoordss = _index2.default.HighwayUtils.lineStringsToPolygon(self._viziLayer._world, coordss, lineWidth);
 	
 	            feature.geometry.type = 'MultiPolygon';
 	            feature.geometry.coordinates = outCoordss;
@@ -169,43 +1258,84 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return true;
 	        },
 	        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
-	      }).addTo(this._world);
+	      });
 	
 	      // set the instance properties
-	      this._roadLayer = topoJSONRoadLayer;
+	      this._setViziLayer(viziLayer);
 	    }
-	  }, {
-	    key: '_setupBuildings',
-	    value: function _setupBuildings() {
-	      // Buildings from Mapzen
-	      var topoJSONBuildingLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
-	        interactive: false,
-	        style: function style(feature) {
-	          return _index2.default.BuildingUtils.style(feature, {
-	            height: 1,
-	            lineColor: '#f7c616',
-	            lineWidth: 1,
-	            lineTransparent: true,
-	            lineOpacity: 0.2,
-	            lineBlending: THREE.AdditiveBlending,
-	            lineRenderOrder: 2
-	          });
-	        },
-	        filter: function filter(feature) {
-	          // Don't show points
-	          return feature.geometry.type !== 'Point';
-	        },
-	        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://whosonfirst.mapzen.com#License">Who\'s On First</a>.'
-	      }).addTo(this._world);
+	  }]);
 	
-	      // set the instance properties
-	      this._buildingLayer = topoJSONBuildingLayer;
-	    }
-	  }, {
-	    key: '_setupVehicles',
-	    value: function _setupVehicles() {
+	  return HighwayLayer;
+	}(_Layer3.default);
+	
+	exports.default = HighwayLayer;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _vizi = __webpack_require__(1);
+	
+	var _vizi2 = _interopRequireDefault(_vizi);
+	
+	var _extend = __webpack_require__(4);
+	
+	var _extend2 = _interopRequireDefault(_extend);
+	
+	var _Layer2 = __webpack_require__(5);
+	
+	var _Layer3 = _interopRequireDefault(_Layer2);
+	
+	var _API = __webpack_require__(12);
+	
+	var _API2 = _interopRequireDefault(_API);
+	
+	var _index = __webpack_require__(6);
+	
+	var _index2 = _interopRequireDefault(_index);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var UPDATE_INTERVAL_MS = 1000;
+	
+	var VehicleLayer = function (_Layer) {
+	  _inherits(VehicleLayer, _Layer);
+	
+	  function VehicleLayer(options) {
+	    _classCallCheck(this, VehicleLayer);
+	
+	    var defaultOptions = {};
+	
+	    var _options = (0, _extend2.default)({}, defaultOptions, options);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(VehicleLayer).call(this, _options));
+	
+	    _this._vehicles = [];
+	
+	    _this._setup();
+	    return _this;
+	  }
+	
+	  _createClass(VehicleLayer, [{
+	    key: '_setup',
+	    value: function _setup() {
+	
 	      // car layer
-	      var vehicleLayer = _vizi2.default.vehicleLayer({
+	      var viziLayer = _vizi2.default.vehicleLayer({
 	        'veyron': {
 	          file: {
 	            body: '/javascripts/maps/objs/veyron/parts/veyron_body_bin.js',
@@ -221,22 +1351,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        style: {
 	          height: 0
 	        }
-	      }).addTo(this._world);
+	      });
 	
-	      // set the instance properties
-	      this._vehicleLayer = vehicleLayer;
-	    }
-	
-	    /**
-	     * Sets the center coordinate of the view
-	     * @param lat latitude
-	     * @param lon longitude
-	     */
-	
-	  }, {
-	    key: 'setView',
-	    value: function setView(lat, lon) {
-	      this._world.setView([lat, lon]);
+	      // set the instance property
+	      this._setViziLayer(viziLayer);
 	    }
 	
 	    /**
@@ -253,6 +1371,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        self._update();
 	      }, 0);
 	    }
+	
+	    /**
+	     * Stops updating the view
+	     */
+	
+	  }, {
+	    key: 'stop',
+	    value: function stop() {
+	      this._isRunning = false;
+	    }
 	  }, {
 	    key: '_update',
 	    value: function _update() {
@@ -267,7 +1395,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          self._performUpdate(data);
 	        }).fail(function (jqXHR, textStatus, errorThrown) {
 	
-	          console.error('Error updating the simulation: ' + textStatus + ', ' + JSON.stringify(errorThrown));
+	          console.error('Error updating the vehicle layer: ' + textStatus + ', ' + JSON.stringify(errorThrown));
 	        }).always(function () {
 	
 	          if (self._isRunning) {
@@ -289,10 +1417,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _performUpdate(data) {
 	      var self = this;
 	
+	      // dictionaries to hold parameters
 	      var locations = {};
 	      var velocities = {};
 	      var accelerations = {};
 	
+	      // map vehicle parameters into dictionaries
 	      data.forEach(function (vehicle) {
 	        // if vehicle does not exist
 	        if (!(vehicle.id in self._vehicles)) {
@@ -330,49 +1460,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	
 	      // update simulation parameters
-	      this._vehicleLayer._setSimLocations(locations);
-	      this._vehicleLayer._setSimVelocities(velocities);
-	      this._vehicleLayer._setSimAccelerations(accelerations);
-	    }
-	
-	    /**
-	     * Stops updating the view
-	     */
-	
-	  }, {
-	    key: 'stop',
-	    value: function stop() {
-	      this._isRunning = false;
-	    }
-	
-	    /**
-	     * Returns if the view updating loop is running
-	     *
-	     * @returns {boolean}
-	     */
-	
-	  }, {
-	    key: 'isRunning',
-	    value: function isRunning() {
-	      return this._isRunning;
+	      var viziLayer = this._getViziLayer();
+	      viziLayer._setSimLocations(locations);
+	      viziLayer._setSimVelocities(velocities);
+	      viziLayer._setSimAccelerations(accelerations);
 	    }
 	  }]);
 	
-	  return Simultra;
-	}();
+	  return VehicleLayer;
+	}(_Layer3.default);
 	
-	exports.default = Simultra;
-	
-	window.Simultra = Simultra;
+	exports.default = VehicleLayer;
 
 /***/ },
-/* 1 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
-
-/***/ },
-/* 2 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -386,7 +1487,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 	
 	
-	var _jquery = __webpack_require__(3);
+	var _jquery = __webpack_require__(13);
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
@@ -442,7 +1543,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = API;
 
 /***/ },
-/* 3 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*eslint-disable no-unused-vars*/
@@ -10520,405 +11621,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	return jQuery;
 	} );
 
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _BuildingUtils = __webpack_require__(5);
-	
-	var _BuildingUtils2 = _interopRequireDefault(_BuildingUtils);
-	
-	var _HighwayUtils = __webpack_require__(7);
-	
-	var _HighwayUtils2 = _interopRequireDefault(_HighwayUtils);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	/**
-	 * Utility
-	 */
-	
-	
-	var Util = {};
-	
-	Util.BuildingUtils = _BuildingUtils2.default;
-	Util.HighwayUtils = _HighwayUtils2.default;
-	
-	exports.default = Util;
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _vizi = __webpack_require__(1);
-	
-	var _vizi2 = _interopRequireDefault(_vizi);
-	
-	var _extend = __webpack_require__(6);
-	
-	var _extend2 = _interopRequireDefault(_extend);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	/**
-	 * Building Utilities
-	 */
-	
-	
-	var BuildingUtils = function () {
-	
-	  /**
-	   * Return the style for a specific building
-	   *
-	   * @param {Object} feature
-	   * @param {Object} defaultValue
-	   */
-	  var style = function style(feature, defaultValue) {
-	    var height;
-	
-	    if (feature.properties.height) {
-	      height = feature.properties.height;
-	    } else {
-	      height = 10 + Math.random() * 10;
-	    }
-	
-	    // construct the style
-	    var style = {
-	      height: height || defaultValue.height
-	    };
-	
-	    return (0, _extend2.default)({}, defaultValue, style);
-	  };
-	
-	  // return the utility object
-	  return {
-	    style: style
-	  };
-	}();
-	
-	exports.default = BuildingUtils;
-
-/***/ },
-/* 6 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	var hasOwn = Object.prototype.hasOwnProperty;
-	var toStr = Object.prototype.toString;
-	
-	var isArray = function isArray(arr) {
-		if (typeof Array.isArray === 'function') {
-			return Array.isArray(arr);
-		}
-	
-		return toStr.call(arr) === '[object Array]';
-	};
-	
-	var isPlainObject = function isPlainObject(obj) {
-		if (!obj || toStr.call(obj) !== '[object Object]') {
-			return false;
-		}
-	
-		var hasOwnConstructor = hasOwn.call(obj, 'constructor');
-		var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
-		// Not own constructor property must be Object
-		if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
-			return false;
-		}
-	
-		// Own properties are enumerated firstly, so to speed up,
-		// if last one is own, then all properties are own.
-		var key;
-		for (key in obj) {/**/}
-	
-		return typeof key === 'undefined' || hasOwn.call(obj, key);
-	};
-	
-	module.exports = function extend() {
-		var options, name, src, copy, copyIsArray, clone,
-			target = arguments[0],
-			i = 1,
-			length = arguments.length,
-			deep = false;
-	
-		// Handle a deep copy situation
-		if (typeof target === 'boolean') {
-			deep = target;
-			target = arguments[1] || {};
-			// skip the boolean and the target
-			i = 2;
-		} else if ((typeof target !== 'object' && typeof target !== 'function') || target == null) {
-			target = {};
-		}
-	
-		for (; i < length; ++i) {
-			options = arguments[i];
-			// Only deal with non-null/undefined values
-			if (options != null) {
-				// Extend the base object
-				for (name in options) {
-					src = target[name];
-					copy = options[name];
-	
-					// Prevent never-ending loop
-					if (target !== copy) {
-						// Recurse if we're merging plain objects or arrays
-						if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
-							if (copyIsArray) {
-								copyIsArray = false;
-								clone = src && isArray(src) ? src : [];
-							} else {
-								clone = src && isPlainObject(src) ? src : {};
-							}
-	
-							// Never move original objects, clone them
-							target[name] = extend(deep, clone, copy);
-	
-						// Don't bring in undefined values
-						} else if (typeof copy !== 'undefined') {
-							target[name] = copy;
-						}
-					}
-				}
-			}
-		}
-	
-		// Return the modified object
-		return target;
-	};
-	
-
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _vizi = __webpack_require__(1);
-	
-	var _vizi2 = _interopRequireDefault(_vizi);
-	
-	var _extend = __webpack_require__(6);
-	
-	var _extend2 = _interopRequireDefault(_extend);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	// --- constants
-	// jscs:disable disallowSpaceAfterObjectKeys
-	/**
-	 * Highway Utilities
-	 */
-	var COLOR_MAP = {
-	  'major_road': '#f7c616',
-	  'minor_road': '#ffffff',
-	  'highway': '#888785',
-	  'path': '#888785',
-	  'rail': '#888785'
-	};
-	var WIDTH_MAP = {
-	  'major': 10,
-	  'primary': 10,
-	  'secondary': 7,
-	  'residental': 7,
-	  'tertiary': 5,
-	  'living_street': 5,
-	  'track': 3,
-	  'trunk': 3,
-	  'footway': 1
-	};
-	// jscs:enable disallowSpaceAfterObjectKeys
-	// ---
-	
-	var HighwayUtils = function () {
-	
-	  /**
-	   * Return the style for a specific highway
-	   *
-	   * @param {Object} feature
-	   */
-	  var style = function style(feature, defaultValue) {
-	    var color;
-	
-	    // color
-	    if (feature.properties.kind) {
-	      if (feature.properties.kind in COLOR_MAP) {
-	        color = COLOR_MAP[feature.properties.kind];
-	      } else {
-	        // unknown highway kind
-	        console.info('Unknown highway kind: ' + feature.properties.kind);
-	      }
-	    }
-	
-	    // construct the style
-	    var style = {
-	      color: color || defaultValue.color
-	    };
-	
-	    return (0, _extend2.default)({}, defaultValue, style);
-	  };
-	
-	  /**
-	   * Return the line width for a specific highway
-	   *
-	   * @param {Object} feature
-	   */
-	  var lineWidth = function lineWidth(feature, defaultValue) {
-	    var lineWidth;
-	    if (feature.properties.highway) {
-	      if (feature.properties.highway in WIDTH_MAP) {
-	        lineWidth = WIDTH_MAP[feature.properties.highway];
-	      } else {
-	        // unknown highway type
-	        console.info('Unknown highway: ' + feature.properties.highway);
-	        lineWidth = defaultValue;
-	      }
-	    } else {
-	      // no highway type mentioned
-	      lineWidth = defaultValue;
-	    }
-	    return lineWidth;
-	  };
-	
-	  /**
-	   * Convert LineString to Polygon
-	   *
-	   * @param {Object} world VIZI.World object
-	   * @param {Array} coordss Array of LineStrings, e.g. [[[lon, lat], [lon, lat], ...], ...]
-	   * @param {Number} lineWidth the width of the lines
-	   * @returns {Array}
-	   */
-	  var lineStringsToPolygon = function lineStringsToPolygon(world, coordss, lineWidth) {
-	    if (lineWidth === undefined) {
-	      lineWidth = 1.0;
-	    }
-	
-	    // jscs:disable disallowMultipleVarDecl
-	    var cLatLon, pLatLon, nLatLon;
-	    var cGeoCoord, pGeoCoord, nGeoCoord;
-	    var vVert = new _vizi2.default.Point(),
-	        _vVert = new _vizi2.default.Point();
-	    var vMean = new _vizi2.default.Point(),
-	        vPadding = new _vizi2.default.Point(),
-	        _vPadding = new _vizi2.default.Point();
-	    var p = new _vizi2.default.Point(),
-	        _p;
-	    // jscs:enable disallowMultipleVarDecl
-	
-	    var outCoordss = [];
-	
-	    coordss.forEach(function (coords) {
-	      var outCoords = [];
-	
-	      cLatLon = pLatLon = nLatLon = null;
-	      cGeoCoord = pGeoCoord = nGeoCoord = null;
-	
-	      for (var i = 0; i < coords.length; i++) {
-	        cLatLon = nLatLon || new _vizi2.default.LatLon(coords[i][1], coords[i][0]);
-	        cGeoCoord = nGeoCoord || world.latLonToPoint(cLatLon);
-	
-	        // project the next coordinate
-	        if (i < coords.length - 1) {
-	          nLatLon = new _vizi2.default.LatLon(coords[i + 1][1], coords[i + 1][0]);
-	          nGeoCoord = world.latLonToPoint(nLatLon);
-	
-	          // calculate the vertical vector
-	          vVert.x = -(nGeoCoord.y - cGeoCoord.y);
-	          vVert.y = nGeoCoord.x - cGeoCoord.x;
-	          normalize(vVert);
-	
-	          // incorpolate the vertical vector with the previous one
-	          if (i == 0) {
-	            _vVert.x = vVert.x;_vVert.y = vVert.y;
-	          }
-	          vMean.x = (vVert.x + _vVert.x) / 2.0;vMean.y = (vVert.y + _vVert.y) / 2.0;
-	          normalize(vMean);
-	          vPadding.x = vMean.x * lineWidth;vPadding.y = vMean.y * lineWidth;
-	        } else {
-	          vPadding.x = _vVert.x * lineWidth;vPadding.y = _vVert.y * lineWidth;
-	        }
-	
-	        // construct polygons
-	        if (0 < i) {
-	          if (i == 1) {
-	            // left top
-	            p.x = pGeoCoord.x - _vPadding.x;p.y = pGeoCoord.y - _vPadding.y;
-	            _p = world.pointToLatLon(p);
-	            outCoords.splice(0, 0, [_p.lon, _p.lat]);
-	
-	            // left bottom
-	            p.x = pGeoCoord.x + _vPadding.x;p.y = pGeoCoord.y + _vPadding.y;
-	            _p = world.pointToLatLon(p);
-	            outCoords.splice(0, 0, [_p.lon, _p.lat]);
-	          }
-	
-	          var idx = outCoords.length / 2;
-	          // right bottom
-	          p.x = cGeoCoord.x + vPadding.x;p.y = cGeoCoord.y + vPadding.y;
-	          _p = world.pointToLatLon(p);
-	          outCoords.splice(idx, 0, [_p.lon, _p.lat]);
-	
-	          // right top
-	          p.x = cGeoCoord.x - vPadding.x;p.y = cGeoCoord.y - vPadding.y;
-	          _p = world.pointToLatLon(p);
-	          outCoords.splice(idx + 1, 0, [_p.lon, _p.lat]);
-	        }
-	
-	        // keep the vectors as the previous one
-	        pLatLon = cLatLon;
-	        pGeoCoord = cGeoCoord;
-	        _vVert.x = vVert.x;_vVert.y = vVert.y;
-	        _vPadding.x = vPadding.x;_vPadding.y = vPadding.y;
-	      }
-	
-	      // add the first vertice at the end to make the polygon closed
-	      outCoords.push(outCoords[0]);
-	
-	      // add this polygon to the array of polygons
-	      outCoordss.push([outCoords]);
-	    });
-	
-	    return outCoordss;
-	  };
-	
-	  // --- internal helper methods
-	  /** Normalize VIZI.Point */
-	  function normalize(p) {
-	    var l = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
-	    l = l === 0.0 ? 1.0 : l;
-	    p.x /= l;
-	    p.y /= l;
-	  }
-	  // ---
-	
-	  // return the utility object
-	  return {
-	    style: style,
-	    lineWidth: lineWidth,
-	    lineStringsToPolygon: lineStringsToPolygon
-	  };
-	}();
-	
-	exports.default = HighwayUtils;
 
 /***/ }
 /******/ ])
