@@ -11,3 +11,5 @@ $ cd Simultra/Server
 $ npm install
 $ ./bin/www
 ```
+
+Open `http://localhost:3000/maps` on your browser.
