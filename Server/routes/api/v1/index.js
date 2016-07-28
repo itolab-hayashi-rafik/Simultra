@@ -30,8 +30,8 @@ router.get('/vehicles/:id(\\d+)', function(req, res, next) {
 
 /* ADD a new vehicle */
 router.post('/vehicles/new', function(req, res, next) {
-  console.log('create');
-  console.log(req.body);
+  // console.log('create');
+  // console.log(req.body);
 
   // add
   var vehicle = vehicleManager.createNew(req.body);
@@ -42,8 +42,8 @@ router.post('/vehicles/new', function(req, res, next) {
 
 /* UPDATE a vehicle */
 router.put('/vehicles/:id(\\d+)', function(req, res, next) {
-  console.log('update: '+req.params.id);
-  console.log(req.body);
+  // console.log('update: '+req.params.id);
+  // console.log(req.body);
 
   // update
   var vehicle = vehicleManager.update(req.params.id, req.body);

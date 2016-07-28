@@ -1,11 +1,14 @@
 import VIZI from 'vizi';
 import extend from 'extend';
+import operative from 'operative';
 
 import Layer from './Layer';
 
 import API from '../io/API';
 
-const UPDATE_INTERVAL_MS = 1000;
+import WorkerUtils from '../util/WorkerUtils';
+
+const UPDATE_INTERVAL_MS = 10000;
 
 class VehicleLayer extends Layer {
   constructor(options) {
@@ -52,6 +55,14 @@ class VehicleLayer extends Layer {
     this._isRunning = true;
 
     var self = this;
+
+    // start all of the workers
+    this._vehicles.forEach((vehicle,id) => {
+      if (vehicle.worker) {
+        vehicle.worker.start(id, self._createWorkerCallback());
+      }
+    });
+
     setTimeout(function() { self._update(); }, 0);
   }
 
@@ -60,6 +71,13 @@ class VehicleLayer extends Layer {
    */
   stop() {
     this._isRunning = false;
+
+    // terminate all of the workers
+    this._vehicles.forEach(vehicle => {
+      if (vehicle.worker) {
+        vehicle.worker.stop();
+      }
+    });
   }
 
   _update() {
@@ -70,15 +88,15 @@ class VehicleLayer extends Layer {
       this._lastUpdatedAt = Date.now();
 
       this._api.getVehicles()
-        .then(function(data, textStatus, jqXHR) {
+        .then(function(data) {
 
           self._performUpdate(data);
 
-        }).fail(function(jqXHR, textStatus, errorThrown) {
+        }).catch(function(err) {
 
-        console.error('Error updating the vehicle layer: ' + textStatus + ', ' + JSON.stringify(errorThrown));
+        console.error('Error updating the vehicle layer: ' + err);
 
-      }).always(function() {
+      }).then(function() {
 
         if (self._isRunning) {
           // calculate the delay
@@ -97,58 +115,102 @@ class VehicleLayer extends Layer {
 
   _performUpdate(data) {
     var self = this;
-    var viziLayer = this._getViziLayer();
-
-    // dictionaries to hold parameters
-    var locations = {};
-    var velocities = {};
-    var accelerations = {};
 
     // map vehicle parameters into dictionaries
-    data.forEach(function(vehicle) {
+    data.forEach(vehicle => {
       // if vehicle does not exist
-      if (!(vehicle.id in self._vehicles)) {
+      if (!self._hasVehicle(vehicle)) {
         // add to vehicle layer
-        var object = viziLayer.addVehicle(
-          vehicle.type,
-          new VIZI.LatLon(vehicle.location.lat, vehicle.location.lon),
-          vehicle.angle
-        );
-        // add entry to dictionary
-        self._vehicles[vehicle.id] = {
-          data: vehicle,
-          object: object
-        };
-
-        console.log('added vehicle: ' + JSON.stringify(vehicle));
+        self._addVehicle(vehicle);
       }
-      // if exists
-      else {
-        // update properties
-        var vehicleData = self._vehicles[vehicle.id].data;
-        Object.keys(vehicle).forEach(function(key) {
-          vehicleData[key] = vehicle[key];
-        });
-
-        console.log('updated vehicle: ' + JSON.stringify(vehicle));
-      }
-
-      // for simulation
-      locations[vehicle.id] = {
-        lat: vehicle.location.lat, lon: vehicle.location.lon, angle: vehicle.angle
-      };
-      velocities[vehicle.id] = {
-        vx: vehicle.velocity, vy: 0.0, vz: 0.0, wheel: vehicle.wheel
-      };
-      accelerations[vehicle.id] = {
-        ax: vehicle.acceleration, ay: 0.0, az: 0.0
-      };
     });
+  }
 
-    // update simulation parameters
-    viziLayer._setSimLocations(locations);
-    viziLayer._setSimVelocities(velocities);
-    viziLayer._setSimAccelerations(accelerations);
+  _hasVehicle(vehicle) {
+    return (vehicle.id in this._vehicles);
+  }
+
+  _addVehicle(vehicle) {
+    var viziLayer = this._getViziLayer();
+
+    // add vehicle to the vizi layer
+    var object = viziLayer.addVehicle(
+      vehicle.type,
+      new VIZI.LatLon(vehicle.location.lat, vehicle.location.lon),
+      vehicle.angle
+    );
+
+    // create a new updating thread
+    var worker = operative(this._createWorker(), WorkerUtils.getDependencies());
+
+    // add entry to dictionary
+    this._vehicles[vehicle.id] = {
+      data: vehicle,
+      object: object,
+      worker: worker
+    };
+
+    // start the worker
+    worker.start(vehicle.id, this._createWorkerCallback());
+
+    console.log('added vehicle: ' + JSON.stringify(vehicle));
+  }
+
+  _createWorker() {
+    var baseUrl = this._api.baseUrl;
+    return {
+      _interval: 10,
+      _baseUrl: baseUrl,
+      _api: null,
+      _id: null,
+      _callback: null,
+      _isRunning: false,
+
+      /** start updating the vehicle */
+      start: function(id, callback) {
+        this._api = new SimWorker.API(this._baseUrl);
+        this._id = id;
+        this._callback = callback;
+        this._isRunning = true;
+
+        var self = this;
+        setTimeout(function() { self._update(); }, self._interval);
+      },
+
+      _update: function() {
+        var id = this._id;
+        var self = this;
+        this._api.getVehicle(id)
+          .then(function(data) {
+            self._callback(data);
+          })
+          .catch(function(err) {
+            console.error(err);
+          })
+          .then(function() {
+            if (self._isRunning) {
+              setTimeout(function() { self._update(); }, self._interval);
+            }
+          });
+      },
+
+      /** stop updating */
+      stop: function() {
+        this._isRunning = false;
+      }
+    };
+  }
+
+  _createWorkerCallback() {
+    return (function(that) {
+      return function(vehicle) {
+        var viziLayer = that._getViziLayer();
+
+        // update the object in vizi layer
+        viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, -vehicle.angle);
+        viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
+      };
+    })(this);
   }
 
 }

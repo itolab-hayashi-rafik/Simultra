@@ -68,15 +68,15 @@ class PedestrianLayer extends Layer {
       this._lastUpdatedAt = Date.now();
 
       this._api.getPedestrians()
-        .then(function(data, textStatus, jqXHR) {
+        .then(function(data) {
 
           self._performUpdate(data);
 
-        }).fail(function(jqXHR, textStatus, errorThrown) {
+        }).catch(function(err) {
 
-        console.error('Error updating the pedestrian layer: ' + textStatus + ', ' + JSON.stringify(errorThrown));
+        console.error('Error updating the pedestrian layer:' + err);
 
-      }).always(function() {
+      }).then(function() {
 
         if (self._isRunning) {
           // calculate the delay

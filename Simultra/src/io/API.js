@@ -1,7 +1,7 @@
 /**
  * API Helper
  */
-import jQuery from 'jquery';
+import WebClient from './WebClient';
 
 // --- API endpoint definitions
 const GET_VEHICLES = '/api/v1/vehicles';
@@ -13,21 +13,22 @@ const UPDATE_PEDESTRIANS = '/api/v1/pedestrians';
 const GET_PEDESTRIAN = function(pid) { return '/api/v1/pedestrians/' + pid; };
 // ---
 
-class API {
+class API extends WebClient {
   constructor(baseUrl) {
+    super();
     this.baseUrl = baseUrl;
   }
 
   // --- Vehicles
   getVehicles() {
-    return $.ajax({
+    return this._ajax({
       url: this.baseUrl + GET_VEHICLES,
       method: 'get'
     });
   }
 
   updateVehicles(data) {
-    return $.ajax({
+    return this._ajax({
       url: this.baseUrl + UPDATE_VEHICLES,
       method: 'put',
       data: data
@@ -35,7 +36,7 @@ class API {
   }
 
   getVehicle(vid) {
-    return $.ajax({
+    return this._ajax({
       url: this.baseUrl + GET_VEHICLE(vid),
       method: 'get'
     });
@@ -44,14 +45,14 @@ class API {
 
   // --- Pedestrians
   getPedestrians() {
-    return $.ajax({
+    return this._ajax({
       url: this.baseUrl + GET_PEDESTRIANS,
       method: 'get'
     });
   }
 
   updatePedestrians(data) {
-    return $.ajax({
+    return this._ajax({
       url: this.baseUrl + UPDATE_PEDESTRIANS,
       method: 'put',
       data: data
@@ -59,7 +60,7 @@ class API {
   }
 
   getPedestrian(pid) {
-    return $.ajax({
+    return this._ajax({
       url: this.baseUrl + GET_PEDESTRIAN(pid),
       method: 'get'
     });

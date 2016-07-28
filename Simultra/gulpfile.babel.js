@@ -78,7 +78,9 @@ function build() {
       },
       externals: {
         // Proxy the global VIZI variable to require('vizi')
-        'vizi': 'VIZI'
+        'vizi': 'VIZI',
+        // Proxy the global operative variable to require('operative')
+        'operative': 'operative'
       },
       module: {
         loaders: [
@@ -105,6 +107,29 @@ function build() {
     .pipe(gulp.dest(destinationFolder))
     .pipe(gulp.dest(destinationFolder2))
     .pipe($.livereload());
+}
+
+function buildWorker() {
+  return gulp.src(path.join('src', config.entryFileName + '-worker.js'))
+    .pipe($.plumber())
+    .pipe(webpackStream({
+      output: {
+        filename: exportFileName + '-worker.js',
+        libraryTarget: 'umd',
+        library: config.mainVarName
+      },
+      externals: {
+        // add external libraries
+      },
+      module: {
+        loaders: [
+          { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }
+        ]
+      },
+      devtool: 'source-map'
+    }))
+    .pipe(gulp.dest(destinationFolder))
+    .pipe(gulp.dest(destinationFolder2));
 }
 
 function moveCSS() {
@@ -175,6 +200,9 @@ gulp.task('move-css', ['clean'], moveCSS);
 
 // Build two versions of the library
 gulp.task('build', ['lint', 'move-css'], build);
+
+// Build worker library
+gulp.task('build-worker', ['lint'], buildWorker);
 
 // Lint and run our tests
 gulp.task('test', ['lint'], test);
