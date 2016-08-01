@@ -25,6 +25,7 @@ const exportFileName = path.basename(mainFile, path.extname(mainFile));
 
 // additional configurations by Masayuki (2016-07-19)
 const destinationFolder2 = '../Server/public/vendor';
+const destinationFolder3 = '../GoServer/public/vendor';
 
 // Remove a directory
 function _clean(dir) {
@@ -91,6 +92,7 @@ function build() {
     }))
     .pipe(gulp.dest(destinationFolder))
     .pipe(gulp.dest(destinationFolder2))
+    .pipe(gulp.dest(destinationFolder3))
     .pipe($.filter(['*', '!**/*.js.map']))
     .pipe($.rename(exportFileName + '.min.js'))
     .pipe($.sourcemaps.init({ loadMaps: true }))
@@ -106,6 +108,7 @@ function build() {
     .pipe($.sourcemaps.write('./'))
     .pipe(gulp.dest(destinationFolder))
     .pipe(gulp.dest(destinationFolder2))
+    .pipe(gulp.dest(destinationFolder3))
     .pipe($.livereload());
 }
 
@@ -129,13 +132,15 @@ function buildWorker() {
       devtool: 'source-map'
     }))
     .pipe(gulp.dest(destinationFolder))
-    .pipe(gulp.dest(destinationFolder2));
+    .pipe(gulp.dest(destinationFolder2))
+    .pipe(gulp.dest(destinationFolder3));
 }
 
 function moveCSS() {
   return gulp.src(path.join('src', config.entryFileName + '.css'))
     .pipe(gulp.dest(destinationFolder))
-    .pipe(gulp.dest(destinationFolder2));
+    .pipe(gulp.dest(destinationFolder2))
+    .pipe(gulp.dest(destinationFolder3));
 }
 
 function _mocha() {
