@@ -5,6 +5,8 @@ import Layer from './Layer';
 
 import API from '../io/API';
 
+import WorkerUtils from '../util/WorkerUtils';
+
 const UPDATE_INTERVAL_MS = 1000;
 
 class PedestrianLayer extends Layer {
@@ -50,6 +52,27 @@ class PedestrianLayer extends Layer {
     this._isRunning = true;
 
     var self = this;
+
+    // start all of the workers
+    this._pedestrians.forEach((pedestrian,id) => {
+      if (pedestrian.worker) {
+        pedestrian.worker.start(id, self._createWorkerCallback());
+      }
+    });
+
+    // start pedestrian manager
+    var ws = this._api.wsPedestrians();
+    ws.onclose = function(event) {
+      console.log('closed pedestrian manager');
+    };
+    ws.onmessage = function(event) {
+      self._onMessage(event.data);
+    };
+    ws.onopen = function() {
+      console.log('opened pedestrian manager');
+    };
+    this._ws = ws;
+
     setTimeout(function() { self._update(); }, 0);
   }
 
@@ -58,8 +81,66 @@ class PedestrianLayer extends Layer {
    */
   stop() {
     this._isRunning = false;
+
+    // terminate pedestrian manager
+    if (this._ws) {
+      this._ws.close();
+    }
+
+    // terminate all of the workers
+    this._pedestrians.forEach(pedestrian => {
+      if (pedestrian.worker) {
+        pedestrian.worker.stop();
+      }
+    });
   }
 
+  _onMessage(data) {
+    var self = this;
+    if (data === 'creation') {
+      setTimeout(function() { self._update(); }, 0);
+    } else if (data === 'deletion') {
+      setTImeout(function() { self._update(); }, 0);
+    } else {
+      console.error('unknown message ' + data);
+    }
+  }
+
+  // (rest)
+  // _update() {
+  //   var self = this;
+  //
+  //   if (this._isRunning) {
+  //
+  //     this._lastUpdatedAt = Date.now();
+  //
+  //     this._api.getPedestrians()
+  //       .then(function(data) {
+  //
+  //         self._performUpdate(data);
+  //
+  //       }).catch(function(err) {
+  //
+  //       console.error('Error updating the pedestrian layer:' + err);
+  //
+  //     }).then(function() {
+  //
+  //       if (self._isRunning) {
+  //         // calculate the delay
+  //         var lastUpdate = self._lastUpdatedAt;
+  //         var now = Date.now();
+  //         var delay = UPDATE_INTERVAL_MS - (now - lastUpdate);
+  //
+  //         // register the next update
+  //         setTimeout(function() { self._update(); }, (delay > 0) ? delay : 0);
+  //       }
+  //
+  //     });
+  //
+  //   }
+  // }
+
+  // (websocket)
   _update() {
     var self = this;
 
@@ -76,20 +157,7 @@ class PedestrianLayer extends Layer {
 
         console.error('Error updating the pedestrian layer:' + err);
 
-      }).then(function() {
-
-        if (self._isRunning) {
-          // calculate the delay
-          var lastUpdate = self._lastUpdatedAt;
-          var now = Date.now();
-          var delay = UPDATE_INTERVAL_MS - (now - lastUpdate);
-
-          // register the next update
-          setTimeout(function() { self._update(); }, (delay > 0) ? delay : 0);
-        }
-
       });
-
     }
   }
 
@@ -97,56 +165,106 @@ class PedestrianLayer extends Layer {
     var self = this;
     var viziLayer = this._getViziLayer();
 
-    // dictionaries to hold parameters
-    var locations = {};
-    var velocities = {};
-    var accelerations = {};
-
     // map pedestrian parameters into dictionaries
-    data.forEach(function(pedestrian) {
+    data.forEach(pedestrian => {
       // if pedestrian does not exist
-      if (!(pedestrian.id in self._pedestrians)) {
+      if (!self._hasPedestrian(pedestrian)) {
         // add to pedestrian layer
-        var object = viziLayer.addPedestrian(
-          pedestrian.type,
-          new VIZI.LatLon(pedestrian.location.lat, pedestrian.location.lon),
-          pedestrian.angle
-        );
-        // add entry to dictionary
-        self._pedestrians[pedestrian.id] = {
-          data: pedestrian,
-          object: object
-        };
-
-        console.log('added pedestrian: ' + JSON.stringify(pedestrian));
+        self._addPedestrian(pedestrian);
       }
-      // if exists
-      else {
-        // update properties
-        var pedestrianData = self._pedestrians[pedestrian.id].data;
-        Object.keys(pedestrian).forEach(function(key) {
-          pedestrianData[key] = pedestrian[key];
-        });
-
-        console.log('updated pedestrian: ' + JSON.stringify(pedestrian));
-      }
-
-      // for simulation
-      locations[pedestrian.id] = {
-        lat: pedestrian.location.lat, lon: pedestrian.location.lon, angle: pedestrian.angle
-      };
-      velocities[pedestrian.id] = {
-        vx: pedestrian.velocity, vy: 0.0, vz: 0.0, wheel: pedestrian.wheel
-      };
-      accelerations[pedestrian.id] = {
-        ax: pedestrian.acceleration, ay: 0.0, az: 0.0
-      };
     });
 
-    // update simulation parameters
-    viziLayer._setSimLocations(locations);
-    viziLayer._setSimVelocities(velocities);
-    viziLayer._setSimAccelerations(accelerations);
+  }
+
+  _hasPedestrian(pedestrian) {
+    return (pedestrian.id in this._pedestrians);
+  }
+
+  _addPedestrian(pedestrian) {
+    var viziLayer = this._getViziLayer();
+
+    // add pedestrian to the vizi layer
+    var object = viziLayer.addPedestrian(
+      pedestrian.type,
+      new VIZI.LatLon(pedestrian.location.lat, pedestrian.location.lon),
+      pedestrian.angle
+    );
+
+    // create a new updating thread
+    var worker = operative(this._createWorker(), WorkerUtils.getDependencies());
+
+    // add entry to dictionary
+    this._pedestrians[pedestrian.id] = {
+      data: pedestrian,
+      object: object,
+      worker: worker
+    };
+
+    // start the worker
+    worker.start(pedestrian.id, this._createWorkerCallback());
+
+    console.log('added pedestrian: ' + JSON.stringify(pedestrian));
+  }
+
+  // (websocket)
+  _createWorker() {
+    var baseUrl = this._api.baseUrl;
+    return {
+      _baseUrl: baseUrl,
+      _api: null,
+      _id: null,
+      _callback: null,
+      _isRunning: false,
+
+      /** start updating the pedestrian */
+      start: function(id, callback) {
+        this._api = new SimWorker.API(this._baseUrl);
+        this._id = id;
+        this._callback = callback;
+        this._isRunning = true;
+
+        var self = this;
+        setTimeout(function() { self._update(); }, self._interval);
+      },
+
+      _update: function() {
+        var self = this;
+
+        var socket = this._api.wsPedestrian(this._id);
+        socket.onclose = function(event) {
+          self._isRunning = false;
+          console.log('closed pedestrian ' + self._id);
+        };
+        socket.onmessage = function(event) {
+          // here, "event" is an instance of MessageEvent, which cannot be serialized to send to the UI thread,
+          // hence, we just extract the data object (sent by another peer) and transfer it to the UI thread.
+          // console.log(event.data);
+          if (event.data) {
+            self._callback(JSON.parse(event.data));
+          }
+        };
+        socket.onopen = function() {
+          console.log('opened pedestrian ' + self._id);
+        };
+      },
+
+      /** stop updating */
+      stop: function() {
+        this._isRunning = false;
+      }
+    };
+  }
+
+  _createWorkerCallback() {
+    return (function(that) {
+      return function(pedestrian) {
+        var viziLayer = that._getViziLayer();
+
+        // update the object in vizi layer
+        viziLayer.setLocation(pedestrian.id, pedestrian.location.lat, pedestrian.location.lon, -pedestrian.angle);
+        viziLayer.setVelocity(pedestrian.id, pedestrian.velocity, 0, 0, 0);
+      };
+    })(this);
   }
 
 }

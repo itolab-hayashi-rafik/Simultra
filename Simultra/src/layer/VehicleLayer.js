@@ -63,6 +63,19 @@ class VehicleLayer extends Layer {
       }
     });
 
+    // start vehicle manager
+    var ws = this._api.wsVehicles();
+    ws.onclose = function(event) {
+      console.log('closed vehicle manager');
+    };
+    ws.onmessage = function(event) {
+      self._onMessage(event.data);
+    };
+    ws.onopen = function() {
+      console.log('opened vehicle manager');
+    };
+    this._ws = ws;
+
     setTimeout(function() { self._update(); }, 0);
   }
 
@@ -72,6 +85,11 @@ class VehicleLayer extends Layer {
   stop() {
     this._isRunning = false;
 
+    // terminate vehicle manager
+    if (this._ws) {
+      this._ws.close();
+    }
+
     // terminate all of the workers
     this._vehicles.forEach(vehicle => {
       if (vehicle.worker) {
@@ -80,6 +98,52 @@ class VehicleLayer extends Layer {
     });
   }
 
+  _onMessage(data) {
+    var self = this;
+    if (data === 'creation') {
+      setTimeout(function() { self._update(); }, 0);
+    } else if (data === 'deletion') {
+      setTImeout(function() { self._update(); }, 0);
+    } else {
+      console.error('unknown message ' + data);
+    }
+  }
+
+  // (rest)
+  // _update() {
+  //   var self = this;
+  //
+  //   if (this._isRunning) {
+  //
+  //     this._lastUpdatedAt = Date.now();
+  //
+  //     this._api.getVehicles()
+  //       .then(function(data) {
+  //
+  //         self._performUpdate(data);
+  //
+  //       }).catch(function(err) {
+  //
+  //       console.error('Error updating the vehicle layer: ' + err);
+  //
+  //     }).then(function() {
+  //
+  //       if (self._isRunning) {
+  //         // calculate the delay
+  //         var lastUpdate = self._lastUpdatedAt;
+  //         var now = Date.now();
+  //         var delay = UPDATE_INTERVAL_MS - (now - lastUpdate);
+  //
+  //         // register the next update
+  //         setTimeout(function() { self._update(); }, (delay > 0) ? delay : 0);
+  //       }
+  //
+  //     });
+  //
+  //   }
+  // }
+
+  // (websocket)
   _update() {
     var self = this;
 
@@ -94,21 +158,9 @@ class VehicleLayer extends Layer {
 
         }).catch(function(err) {
 
-        console.error('Error updating the vehicle layer: ' + err);
+          console.error('Error updating the vehicle layer: ' + err);
 
-      }).then(function() {
-
-        if (self._isRunning) {
-          // calculate the delay
-          var lastUpdate = self._lastUpdatedAt;
-          var now = Date.now();
-          var delay = UPDATE_INTERVAL_MS - (now - lastUpdate);
-
-          // register the next update
-          setTimeout(function() { self._update(); }, (delay > 0) ? delay : 0);
-        }
-
-      });
+        });
 
     }
   }
@@ -156,10 +208,56 @@ class VehicleLayer extends Layer {
     console.log('added vehicle: ' + JSON.stringify(vehicle));
   }
 
+  // (rest)
+  // _createWorker() {
+  //   var baseUrl = this._api.baseUrl;
+  //   return {
+  //     _interval: 10,
+  //     _baseUrl: baseUrl,
+  //     _api: null,
+  //     _id: null,
+  //     _callback: null,
+  //     _isRunning: false,
+  //
+  //     /** start updating the vehicle */
+  //     start: function(id, callback) {
+  //       this._api = new SimWorker.API(this._baseUrl);
+  //       this._id = id;
+  //       this._callback = callback;
+  //       this._isRunning = true;
+  //
+  //       var self = this;
+  //       setTimeout(function() { self._update(); }, self._interval);
+  //     },
+  //
+  //     _update: function() {
+  //       var id = this._id;
+  //       var self = this;
+  //       this._api.getVehicle(id)
+  //         .then(function(data) {
+  //           self._callback(data);
+  //         })
+  //         .catch(function(err) {
+  //           console.error(err);
+  //         })
+  //         .then(function() {
+  //           if (self._isRunning) {
+  //             setTimeout(function() { self._update(); }, self._interval);
+  //           }
+  //         });
+  //     },
+  //
+  //     /** stop updating */
+  //     stop: function() {
+  //       this._isRunning = false;
+  //     }
+  //   };
+  // }
+
+  // (websocket)
   _createWorker() {
     var baseUrl = this._api.baseUrl;
     return {
-      _interval: 10,
       _baseUrl: baseUrl,
       _api: null,
       _id: null,
@@ -178,20 +276,24 @@ class VehicleLayer extends Layer {
       },
 
       _update: function() {
-        var id = this._id;
         var self = this;
-        this._api.getVehicle(id)
-          .then(function(data) {
-            self._callback(data);
-          })
-          .catch(function(err) {
-            console.error(err);
-          })
-          .then(function() {
-            if (self._isRunning) {
-              setTimeout(function() { self._update(); }, self._interval);
-            }
-          });
+
+        var socket = this._api.wsVehicle(this._id);
+        socket.onclose = function(event) {
+          self._isRunning = false;
+          console.log('closed vehicle ' + self._id);
+        };
+        socket.onmessage = function(event) {
+          // here, "event" is an instance of MessageEvent, which cannot be serialized to send to the UI thread,
+          // hence, we just extract the data object (sent by another peer) and transfer it to the UI thread.
+          // console.log(event.data);
+          if (event.data) {
+            self._callback(JSON.parse(event.data));
+          }
+        };
+        socket.onopen = function() {
+          console.log('opened vehicle ' + self._id);
+        };
       },
 
       /** stop updating */
