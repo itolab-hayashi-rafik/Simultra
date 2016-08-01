@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Simultra</title>
+    <link rel="stylesheet" href="/stylesheets/maps/main.css">
+    <link rel="stylesheet" href="/vendor/vizicities.css">
+    <link rel="stylesheet" href="/vendor/simultra.css">
+</head>
+<body>
+<div id="world"></div>
+<script src="/vendor/three.min.js"></script>
+<script src="/vendor/TweenMax.min.js"></script>
+<script src="/vendor/operative.min.js"></script>
+<script src="/vendor/vizicities.min.js"></script>
+<script src="/vendor/jquery-3.0.0.min.js"></script>
+<script src="/vendor/simultra.js"></script>
+<script type="text/javascript">
+    // FIXME: something is wrong with the Simultra compilation. it's not UMD...
+    window.Simultra = window.Simultra.default;
+
+    if (typeof Simultra === 'function') {
+        simultra = new Simultra('http://localhost:3000');
+        simultra.start();
+    }
+</script>
+</body>
+</html>
