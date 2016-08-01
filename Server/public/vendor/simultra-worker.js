@@ -107,6 +107,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var GET_VEHICLE = function GET_VEHICLE(vid) {
 	  return '/api/v1/vehicles/' + vid;
 	};
+	var WS_VEHICLE = function WS_VEHICLE(vid) {
+	  return '/api/v1/vehicles/' + vid + '/ws';
+	};
 	
 	var GET_PEDESTRIANS = '/api/v1/pedestrians';
 	var UPDATE_PEDESTRIANS = '/api/v1/pedestrians';
@@ -124,6 +127,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(API).call(this));
 	
 	    _this.baseUrl = baseUrl;
+	    _this.wsBaseUrl = baseUrl.replace(/^https?:\/\//, 'ws://');
 	    return _this;
 	  }
 	
@@ -154,6 +158,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        url: this.baseUrl + GET_VEHICLE(vid),
 	        method: 'get'
 	      });
+	    }
+	  }, {
+	    key: 'wsVehicle',
+	    value: function wsVehicle(vid) {
+	      return new WebSocket(this.wsBaseUrl + WS_VEHICLE(vid));
 	    }
 	    // ---
 	

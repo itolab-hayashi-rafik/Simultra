@@ -1621,6 +1621,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _API2 = _interopRequireDefault(_API);
 	
+	var _WorkerUtils = __webpack_require__(10);
+	
+	var _WorkerUtils2 = _interopRequireDefault(_WorkerUtils);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1684,6 +1688,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._isRunning = true;
 	
 	      var self = this;
+	
+	      // start all of the workers
+	      this._pedestrians.forEach(function (pedestrian, id) {
+	        if (pedestrian.worker) {
+	          pedestrian.worker.start(id, self._createWorkerCallback());
+	        }
+	      });
+	
+	      // start pedestrian manager
+	      var ws = this._api.wsPedestrians();
+	      ws.onclose = function (event) {
+	        console.log('closed pedestrian manager');
+	      };
+	      ws.onmessage = function (event) {
+	        self._onMessage(event.data);
+	      };
+	      ws.onopen = function () {
+	        console.log('opened pedestrian manager');
+	      };
+	      this._ws = ws;
+	
 	      setTimeout(function () {
 	        self._update();
 	      }, 0);
@@ -1697,7 +1722,72 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'stop',
 	    value: function stop() {
 	      this._isRunning = false;
+	
+	      // terminate pedestrian manager
+	      if (this._ws) {
+	        this._ws.close();
+	      }
+	
+	      // terminate all of the workers
+	      this._pedestrians.forEach(function (pedestrian) {
+	        if (pedestrian.worker) {
+	          pedestrian.worker.stop();
+	        }
+	      });
 	    }
+	  }, {
+	    key: '_onMessage',
+	    value: function _onMessage(data) {
+	      var self = this;
+	      if (data === 'creation') {
+	        setTimeout(function () {
+	          self._update();
+	        }, 0);
+	      } else if (data === 'deletion') {
+	        setTImeout(function () {
+	          self._update();
+	        }, 0);
+	      } else {
+	        console.error('unknown message ' + data);
+	      }
+	    }
+	
+	    // (rest)
+	    // _update() {
+	    //   var self = this;
+	    //
+	    //   if (this._isRunning) {
+	    //
+	    //     this._lastUpdatedAt = Date.now();
+	    //
+	    //     this._api.getPedestrians()
+	    //       .then(function(data) {
+	    //
+	    //         self._performUpdate(data);
+	    //
+	    //       }).catch(function(err) {
+	    //
+	    //       console.error('Error updating the pedestrian layer:' + err);
+	    //
+	    //     }).then(function() {
+	    //
+	    //       if (self._isRunning) {
+	    //         // calculate the delay
+	    //         var lastUpdate = self._lastUpdatedAt;
+	    //         var now = Date.now();
+	    //         var delay = UPDATE_INTERVAL_MS - (now - lastUpdate);
+	    //
+	    //         // register the next update
+	    //         setTimeout(function() { self._update(); }, (delay > 0) ? delay : 0);
+	    //       }
+	    //
+	    //     });
+	    //
+	    //   }
+	    // }
+	
+	    // (websocket)
+	
 	  }, {
 	    key: '_update',
 	    value: function _update() {
@@ -1713,19 +1803,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }).catch(function (err) {
 	
 	          console.error('Error updating the pedestrian layer:' + err);
-	        }).then(function () {
-	
-	          if (self._isRunning) {
-	            // calculate the delay
-	            var lastUpdate = self._lastUpdatedAt;
-	            var now = Date.now();
-	            var delay = UPDATE_INTERVAL_MS - (now - lastUpdate);
-	
-	            // register the next update
-	            setTimeout(function () {
-	              self._update();
-	            }, delay > 0 ? delay : 0);
-	          }
 	        });
 	      }
 	    }
@@ -1735,52 +1812,109 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var self = this;
 	      var viziLayer = this._getViziLayer();
 	
-	      // dictionaries to hold parameters
-	      var locations = {};
-	      var velocities = {};
-	      var accelerations = {};
-	
 	      // map pedestrian parameters into dictionaries
 	      data.forEach(function (pedestrian) {
 	        // if pedestrian does not exist
-	        if (!(pedestrian.id in self._pedestrians)) {
+	        if (!self._hasPedestrian(pedestrian)) {
 	          // add to pedestrian layer
-	          var object = viziLayer.addPedestrian(pedestrian.type, new _vizi2.default.LatLon(pedestrian.location.lat, pedestrian.location.lon), pedestrian.angle);
-	          // add entry to dictionary
-	          self._pedestrians[pedestrian.id] = {
-	            data: pedestrian,
-	            object: object
-	          };
-	
-	          console.log('added pedestrian: ' + JSON.stringify(pedestrian));
+	          self._addPedestrian(pedestrian);
 	        }
-	        // if exists
-	        else {
-	            // update properties
-	            var pedestrianData = self._pedestrians[pedestrian.id].data;
-	            Object.keys(pedestrian).forEach(function (key) {
-	              pedestrianData[key] = pedestrian[key];
-	            });
-	
-	            console.log('updated pedestrian: ' + JSON.stringify(pedestrian));
-	          }
-	
-	        // for simulation
-	        locations[pedestrian.id] = {
-	          lat: pedestrian.location.lat, lon: pedestrian.location.lon, angle: pedestrian.angle
-	        };
-	        velocities[pedestrian.id] = {
-	          vx: pedestrian.velocity, vy: 0.0, vz: 0.0, wheel: pedestrian.wheel
-	        };
-	        accelerations[pedestrian.id] = {
-	          ax: pedestrian.acceleration, ay: 0.0, az: 0.0
-	        };
 	      });
+	    }
+	  }, {
+	    key: '_hasPedestrian',
+	    value: function _hasPedestrian(pedestrian) {
+	      return pedestrian.id in this._pedestrians;
+	    }
+	  }, {
+	    key: '_addPedestrian',
+	    value: function _addPedestrian(pedestrian) {
+	      var viziLayer = this._getViziLayer();
 	
-	      // update simulation parameters
-	      viziLayer._setSimLocations(locations);
-	      viziLayer._setSimVelocities(velocities);
-	      viziLayer._setSimAccelerations(accelerations);
+	      // add pedestrian to the vizi layer
+	      var object = viziLayer.addPedestrian(pedestrian.type, new _vizi2.default.LatLon(pedestrian.location.lat, pedestrian.location.lon), pedestrian.angle);
+	
+	      // create a new updating thread
+	      var worker = operative(this._createWorker(), _WorkerUtils2.default.getDependencies());
+	
+	      // add entry to dictionary
+	      this._pedestrians[pedestrian.id] = {
+	        data: pedestrian,
+	        object: object,
+	        worker: worker
+	      };
+	
+	      // start the worker
+	      worker.start(pedestrian.id, this._createWorkerCallback());
+	
+	      console.log('added pedestrian: ' + JSON.stringify(pedestrian));
+	    }
+	
+	    // (websocket)
+	
+	  }, {
+	    key: '_createWorker',
+	    value: function _createWorker() {
+	      var baseUrl = this._api.baseUrl;
+	      return {
+	        _baseUrl: baseUrl,
+	        _api: null,
+	        _id: null,
+	        _callback: null,
+	        _isRunning: false,
+	
+	        /** start updating the pedestrian */
+	        start: function start(id, callback) {
+	          this._api = new SimWorker.API(this._baseUrl);
+	          this._id = id;
+	          this._callback = callback;
+	          this._isRunning = true;
+	
+	          var self = this;
+	          setTimeout(function () {
+	            self._update();
+	          }, self._interval);
+	        },
+	
+	        _update: function _update() {
+	          var self = this;
+	
+	          var socket = this._api.wsPedestrian(this._id);
+	          socket.onclose = function (event) {
+	            self._isRunning = false;
+	            console.log('closed pedestrian ' + self._id);
+	          };
+	          socket.onmessage = function (event) {
+	            // here, "event" is an instance of MessageEvent, which cannot be serialized to send to the UI thread,
+	            // hence, we just extract the data object (sent by another peer) and transfer it to the UI thread.
+	            // console.log(event.data);
+	            if (event.data) {
+	              self._callback(JSON.parse(event.data));
+	            }
+	          };
+	          socket.onopen = function () {
+	            console.log('opened pedestrian ' + self._id);
+	          };
+	        },
+	
+	        /** stop updating */
+	        stop: function stop() {
+	          this._isRunning = false;
+	        }
+	      };
+	    }
+	  }, {
+	    key: '_createWorkerCallback',
+	    value: function _createWorkerCallback() {
+	      return function (that) {
+	        return function (pedestrian) {
+	          var viziLayer = that._getViziLayer();
+	
+	          // update the object in vizi layer
+	          viziLayer.setLocation(pedestrian.id, pedestrian.location.lat, pedestrian.location.lon, -pedestrian.angle);
+	          viziLayer.setVelocity(pedestrian.id, pedestrian.velocity, 0, 0, 0);
+	        };
+	      }(this);
 	    }
 	  }]);
 	
@@ -1822,11 +1956,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	var GET_VEHICLE = function GET_VEHICLE(vid) {
 	  return '/api/v1/vehicles/' + vid;
 	};
+	var WS_VEHICLES = '/api/v1/vehicles-ws';
+	var WS_VEHICLE = function WS_VEHICLE(vid) {
+	  return '/api/v1/vehicles/' + vid + '/ws';
+	};
 	
 	var GET_PEDESTRIANS = '/api/v1/pedestrians';
 	var UPDATE_PEDESTRIANS = '/api/v1/pedestrians';
 	var GET_PEDESTRIAN = function GET_PEDESTRIAN(pid) {
 	  return '/api/v1/pedestrians/' + pid;
+	};
+	var WS_PEDESTRIANS = '/api/v1/pedestrians-ws';
+	var WS_PEDESTRIAN = function WS_PEDESTRIAN(pid) {
+	  return '/api/v1/pedestrians/' + pid + '/ws';
 	};
 	// ---
 	
@@ -1839,6 +1981,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(API).call(this));
 	
 	    _this.baseUrl = baseUrl;
+	    _this.wsBaseUrl = baseUrl.replace(/^https?:\/\//, 'ws://');
 	    return _this;
 	  }
 	
@@ -1870,6 +2013,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        method: 'get'
 	      });
 	    }
+	  }, {
+	    key: 'wsVehicles',
+	    value: function wsVehicles() {
+	      return new WebSocket(this.wsBaseUrl + WS_VEHICLES);
+	    }
+	  }, {
+	    key: 'wsVehicle',
+	    value: function wsVehicle(vid) {
+	      return new WebSocket(this.wsBaseUrl + WS_VEHICLE(vid));
+	    }
 	    // ---
 	
 	    // --- Pedestrians
@@ -1898,6 +2051,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        url: this.baseUrl + GET_PEDESTRIAN(pid),
 	        method: 'get'
 	      });
+	    }
+	  }, {
+	    key: 'wsPedestrians',
+	    value: function wsPedestrians() {
+	      return new WebSocket(this.wsBaseUrl + WS_PEDESTRIANS);
+	    }
+	  }, {
+	    key: 'wsPedestrian',
+	    value: function wsPedestrian(pid) {
+	      return new WebSocket(this.wsBaseUrl + WS_PEDESTRIAN(pid));
 	    }
 	    // ---
 	
@@ -2092,6 +2255,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      });
 	
+	      // start vehicle manager
+	      var ws = this._api.wsVehicles();
+	      ws.onclose = function (event) {
+	        console.log('closed vehicle manager');
+	      };
+	      ws.onmessage = function (event) {
+	        self._onMessage(event.data);
+	      };
+	      ws.onopen = function () {
+	        console.log('opened vehicle manager');
+	      };
+	      this._ws = ws;
+	
 	      setTimeout(function () {
 	        self._update();
 	      }, 0);
@@ -2106,6 +2282,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function stop() {
 	      this._isRunning = false;
 	
+	      // terminate vehicle manager
+	      if (this._ws) {
+	        this._ws.close();
+	      }
+	
 	      // terminate all of the workers
 	      this._vehicles.forEach(function (vehicle) {
 	        if (vehicle.worker) {
@@ -2113,6 +2294,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      });
 	    }
+	  }, {
+	    key: '_onMessage',
+	    value: function _onMessage(data) {
+	      var self = this;
+	      if (data === 'creation') {
+	        setTimeout(function () {
+	          self._update();
+	        }, 0);
+	      } else if (data === 'deletion') {
+	        setTImeout(function () {
+	          self._update();
+	        }, 0);
+	      } else {
+	        console.error('unknown message ' + data);
+	      }
+	    }
+	
+	    // (rest)
+	    // _update() {
+	    //   var self = this;
+	    //
+	    //   if (this._isRunning) {
+	    //
+	    //     this._lastUpdatedAt = Date.now();
+	    //
+	    //     this._api.getVehicles()
+	    //       .then(function(data) {
+	    //
+	    //         self._performUpdate(data);
+	    //
+	    //       }).catch(function(err) {
+	    //
+	    //       console.error('Error updating the vehicle layer: ' + err);
+	    //
+	    //     }).then(function() {
+	    //
+	    //       if (self._isRunning) {
+	    //         // calculate the delay
+	    //         var lastUpdate = self._lastUpdatedAt;
+	    //         var now = Date.now();
+	    //         var delay = UPDATE_INTERVAL_MS - (now - lastUpdate);
+	    //
+	    //         // register the next update
+	    //         setTimeout(function() { self._update(); }, (delay > 0) ? delay : 0);
+	    //       }
+	    //
+	    //     });
+	    //
+	    //   }
+	    // }
+	
+	    // (websocket)
+	
 	  }, {
 	    key: '_update',
 	    value: function _update() {
@@ -2128,19 +2362,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }).catch(function (err) {
 	
 	          console.error('Error updating the vehicle layer: ' + err);
-	        }).then(function () {
-	
-	          if (self._isRunning) {
-	            // calculate the delay
-	            var lastUpdate = self._lastUpdatedAt;
-	            var now = Date.now();
-	            var delay = UPDATE_INTERVAL_MS - (now - lastUpdate);
-	
-	            // register the next update
-	            setTimeout(function () {
-	              self._update();
-	            }, delay > 0 ? delay : 0);
-	          }
 	        });
 	      }
 	    }
@@ -2186,12 +2407,60 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      console.log('added vehicle: ' + JSON.stringify(vehicle));
 	    }
+	
+	    // (rest)
+	    // _createWorker() {
+	    //   var baseUrl = this._api.baseUrl;
+	    //   return {
+	    //     _interval: 10,
+	    //     _baseUrl: baseUrl,
+	    //     _api: null,
+	    //     _id: null,
+	    //     _callback: null,
+	    //     _isRunning: false,
+	    //
+	    //     /** start updating the vehicle */
+	    //     start: function(id, callback) {
+	    //       this._api = new SimWorker.API(this._baseUrl);
+	    //       this._id = id;
+	    //       this._callback = callback;
+	    //       this._isRunning = true;
+	    //
+	    //       var self = this;
+	    //       setTimeout(function() { self._update(); }, self._interval);
+	    //     },
+	    //
+	    //     _update: function() {
+	    //       var id = this._id;
+	    //       var self = this;
+	    //       this._api.getVehicle(id)
+	    //         .then(function(data) {
+	    //           self._callback(data);
+	    //         })
+	    //         .catch(function(err) {
+	    //           console.error(err);
+	    //         })
+	    //         .then(function() {
+	    //           if (self._isRunning) {
+	    //             setTimeout(function() { self._update(); }, self._interval);
+	    //           }
+	    //         });
+	    //     },
+	    //
+	    //     /** stop updating */
+	    //     stop: function() {
+	    //       this._isRunning = false;
+	    //     }
+	    //   };
+	    // }
+	
+	    // (websocket)
+	
 	  }, {
 	    key: '_createWorker',
 	    value: function _createWorker() {
 	      var baseUrl = this._api.baseUrl;
 	      return {
-	        _interval: 10,
 	        _baseUrl: baseUrl,
 	        _api: null,
 	        _id: null,
@@ -2212,19 +2481,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 	
 	        _update: function _update() {
-	          var id = this._id;
 	          var self = this;
-	          this._api.getVehicle(id).then(function (data) {
-	            self._callback(data);
-	          }).catch(function (err) {
-	            console.error(err);
-	          }).then(function () {
-	            if (self._isRunning) {
-	              setTimeout(function () {
-	                self._update();
-	              }, self._interval);
+	
+	          var socket = this._api.wsVehicle(this._id);
+	          socket.onclose = function (event) {
+	            self._isRunning = false;
+	            console.log('closed vehicle ' + self._id);
+	          };
+	          socket.onmessage = function (event) {
+	            // here, "event" is an instance of MessageEvent, which cannot be serialized to send to the UI thread,
+	            // hence, we just extract the data object (sent by another peer) and transfer it to the UI thread.
+	            // console.log(event.data);
+	            if (event.data) {
+	              self._callback(JSON.parse(event.data));
 	            }
-	          });
+	          };
+	          socket.onopen = function () {
+	            console.log('opened vehicle ' + self._id);
+	          };
 	        },
 	
 	        /** stop updating */
