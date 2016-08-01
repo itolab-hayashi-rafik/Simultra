@@ -107,6 +107,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var GET_VEHICLE = function GET_VEHICLE(vid) {
 	  return '/api/v1/vehicles/' + vid;
 	};
+	var WS_VEHICLES = '/api/v1/vehicles-ws';
 	var WS_VEHICLE = function WS_VEHICLE(vid) {
 	  return '/api/v1/vehicles/' + vid + '/ws';
 	};
@@ -115,6 +116,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var UPDATE_PEDESTRIANS = '/api/v1/pedestrians';
 	var GET_PEDESTRIAN = function GET_PEDESTRIAN(pid) {
 	  return '/api/v1/pedestrians/' + pid;
+	};
+	var WS_PEDESTRIANS = '/api/v1/pedestrians-ws';
+	var WS_PEDESTRIAN = function WS_PEDESTRIAN(pid) {
+	  return '/api/v1/pedestrians/' + pid + '/ws';
 	};
 	// ---
 	
@@ -160,6 +165,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    }
 	  }, {
+	    key: 'wsVehicles',
+	    value: function wsVehicles() {
+	      return new WebSocket(this.wsBaseUrl + WS_VEHICLES);
+	    }
+	  }, {
 	    key: 'wsVehicle',
 	    value: function wsVehicle(vid) {
 	      return new WebSocket(this.wsBaseUrl + WS_VEHICLE(vid));
@@ -192,6 +202,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        url: this.baseUrl + GET_PEDESTRIAN(pid),
 	        method: 'get'
 	      });
+	    }
+	  }, {
+	    key: 'wsPedestrians',
+	    value: function wsPedestrians() {
+	      return new WebSocket(this.wsBaseUrl + WS_PEDESTRIANS);
+	    }
+	  }, {
+	    key: 'wsPedestrian',
+	    value: function wsPedestrian(pid) {
+	      return new WebSocket(this.wsBaseUrl + WS_PEDESTRIAN(pid));
 	    }
 	    // ---
 	
