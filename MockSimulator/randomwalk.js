@@ -144,6 +144,7 @@ function updateVehicle() {
     edgeCurrent = edgeNext;
     edgeNext = null;
     t = 0.0;
+    ratio = 0.0;
   }
 
   // nodes
