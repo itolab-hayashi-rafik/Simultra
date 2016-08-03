@@ -1,23 +1,36 @@
 package main
 
 import (
+	"strconv"
+	"sync"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	. "./models"
-	"strconv"
 )
 
 var (
 	// vehicles
 	vManagerHub = NewHub()
-	vHubs = make(map[string]*Hub)
-	vehicles = make(map[string]*Vehicle)
+	vHubs = struct {
+		sync.RWMutex
+		m map[string]*Hub
+	}{m: make(map[string]*Hub)}
+	vehicles = struct {
+		sync.RWMutex
+		m map[string]*Vehicle
+	}{m: make(map[string]*Vehicle)}
 
 	// pedestrians
 	pManagerHub = NewHub()
-	pHubs = make(map[string]*Hub)
-	pedestrians = make(map[string]*Pedestrian)
+	pHubs = struct {
+		sync.RWMutex
+		m map[string]*Hub
+	}{m: make(map[string]*Hub)}
+	pedestrians = struct {
+		sync.RWMutex
+		m map[string]*Pedestrian
+	}{m: make(map[string]*Pedestrian)}
 )
 
 func main() {
@@ -67,10 +80,12 @@ func main() {
 			// ---------------------------------------------------------------
 			// vehicle list
 			v1.GET("/vehicles", func(c *gin.Context) {
-				values := make([]Vehicle, 0, len(vehicles))
-				for _, v := range vehicles {
+				vehicles.RLock()
+				values := make([]Vehicle, 0, len(vehicles.m))
+				for _, v := range vehicles.m {
 					values = append(values, *v)
 				}
+				vehicles.RUnlock()
 				c.JSON(200, values)
 			})
 
@@ -78,8 +93,12 @@ func main() {
 			v1.POST("/vehicles/new", func(c *gin.Context) {
 				var vehicle Vehicle
 				c.BindJSON(&vehicle)
-				vehicle.Id = strconv.Itoa(len(vehicles))
-				vehicles[vehicle.Id] = &vehicle
+				vehicles.RLock()
+				vehicle.Id = strconv.Itoa(len(vehicles.m))
+				vehicles.RUnlock()
+				vehicles.Lock()
+				vehicles.m[vehicle.Id] = &vehicle
+				vehicles.Unlock()
 
 				// broadcast this creation action to vehicle managers
 				vManagerHub.Broadcast("creation")
@@ -93,22 +112,31 @@ func main() {
 				var vehicle Vehicle
 				c.BindJSON(&vehicle)
 				vehicle.Id = id
-				vehicles[vehicle.Id] = &vehicle
+				vehicles.Lock()
+				vehicles.m[vehicle.Id] = &vehicle
+				vehicles.Unlock()
 				c.JSON(200, vehicle)
 			})
 
 			// get vehicle
 			v1.GET("/vehicles/:id", func(c *gin.Context) {
 				id := c.Param("id")
-				c.JSON(200, vehicles[id])
+				vehicles.RLock()
+				vehicle := vehicles.m[id]
+				vehicles.RUnlock()
+				c.JSON(200, vehicle)
 			})
 
 			// delete vehicle
 			v1.DELETE("/vehicles/:id", func(c *gin.Context) {
 				id := c.Param("id")
-				vehicle, ok := vehicles[id]
+				vehicles.RLock()
+				vehicle, ok := vehicles.m[id]
+				vehicles.RUnlock()
 				if ok {
-					delete(vehicles, id)
+					vehicles.Lock()
+					delete(vehicles.m, id)
+					vehicles.Unlock()
 
 					// broadcast this creation action to vehicle managers
 					vManagerHub.Broadcast("deletion")
@@ -134,10 +162,12 @@ func main() {
 			// ---------------------------------------------------------------
 			// pedestrian list
 			v1.GET("/pedestrians", func(c *gin.Context) {
-				values := make([]Pedestrian, 0, len(pedestrians))
-				for _, v := range pedestrians {
+				pedestrians.RLock()
+				values := make([]Pedestrian, 0, len(pedestrians.m))
+				for _, v := range pedestrians.m {
 					values = append(values, *v)
 				}
+				pedestrians.RUnlock()
 				c.JSON(200, values)
 			})
 
@@ -145,8 +175,12 @@ func main() {
 			v1.POST("/pedestrians/new", func(c *gin.Context) {
 				var pedestrian Pedestrian
 				c.BindJSON(&pedestrian)
-				pedestrian.Id = strconv.Itoa(len(pedestrians))
-				pedestrians[pedestrian.Id] = &pedestrian
+				pedestrians.RLock()
+				pedestrian.Id = strconv.Itoa(len(pedestrians.m))
+				pedestrians.RUnlock()
+				pedestrians.Lock()
+				pedestrians.m[pedestrian.Id] = &pedestrian
+				pedestrians.Unlock()
 
 				// broadcast this creation action to vehicle managers
 				pManagerHub.Broadcast("creation")
@@ -160,22 +194,31 @@ func main() {
 				var pedestrian Pedestrian
 				c.BindJSON(&pedestrian)
 				pedestrian.Id = id
-				pedestrians[pedestrian.Id] = &pedestrian
+				pedestrians.Lock()
+				pedestrians.m[pedestrian.Id] = &pedestrian
+				pedestrians.Unlock()
 				c.JSON(200, pedestrian)
 			})
 
 			// get vehicle
 			v1.GET("/pedestrians/:id", func(c *gin.Context) {
 				id := c.Param("id")
-				c.JSON(200, pedestrians[id])
+				pedestrians.RLock()
+				pedestrian := pedestrians.m[id]
+				pedestrians.RUnlock()
+				c.JSON(200, pedestrian)
 			})
 
 			// delete vehicle
 			v1.DELETE("/pedestrians/:id", func(c *gin.Context) {
 				id := c.Param("id")
-				pedestrian, ok := pedestrians[id]
+				pedestrians.RLock()
+				pedestrian, ok := pedestrians.m[id]
+				pedestrians.RUnlock()
 				if ok {
-					delete(pedestrians, id)
+					pedestrians.Lock()
+					delete(pedestrians.m, id)
+					pedestrians.Unlock()
 
 					// broadcast this creation action to vehicle managers
 					pManagerHub.Broadcast("deletion")
@@ -208,12 +251,18 @@ func vehicleManagerWsHandler(w http.ResponseWriter, r *http.Request) {
 // creates a hub if necessary and serve websocket connection for the client
 func vehicleWsHandler(id string, w http.ResponseWriter, r *http.Request) {
 	// create a hub if not exists
-	if _, ok := vHubs[id]; !ok {
-		vHubs[id] = NewHub()
-		go vHubs[id].Run()
+	vHubs.RLock()
+	hub, ok := vHubs.m[id]
+	vHubs.RUnlock()
+	if !ok {
+		hub = NewHub()
+		vHubs.Lock()
+		vHubs.m[id] = hub
+		vHubs.Unlock()
+		go hub.Run()
 	}
 	// start serving the client
-	ServeWs(vHubs[id], w, r)
+	ServeWs(hub, w, r)
 }
 
 // serve websocket connection for the client to broadcast pedestrians' creation/deletion
@@ -225,10 +274,16 @@ func pedestrianManagerWsHandler(w http.ResponseWriter, r *http.Request) {
 // creates a hub if necessary and serve websocket connection for the client
 func pedestrianWsHandler(id string, w http.ResponseWriter, r *http.Request) {
 	// create a hub if not exists
-	if _, ok := pHubs[id]; !ok {
-		pHubs[id] = NewHub()
-		go pHubs[id].Run()
+	pHubs.RLock()
+	hub, ok := pHubs.m[id]
+	pHubs.RUnlock()
+	if !ok {
+		hub = NewHub()
+		pHubs.Lock()
+		pHubs.m[id] = hub
+		pHubs.Unlock()
+		go hub.Run()
 	}
 	// start serving the client
-	ServeWs(pHubs[id], w, r)
+	ServeWs(hub, w, r)
 }
