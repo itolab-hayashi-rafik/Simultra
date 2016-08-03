@@ -99,10 +99,10 @@ func (c *Client) writePump() {
 			w.Write(message)
 
 			// send queued messages if exists
-			n := len(c.send)
-			for i := 0; i < n; i++ {
-				w.Write(<-c.send)
-			}
+			//n := len(c.send)
+			//for i := 0; i < n; i++ {
+			//	w.Write(<-c.send)
+			//}
 
 			// close the writer
 			if err := w.Close(); err != nil {
