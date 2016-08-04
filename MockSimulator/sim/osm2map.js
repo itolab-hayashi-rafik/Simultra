@@ -9,6 +9,13 @@ function osm2map(features) {
   var edges = [];
 
   features.forEach(function(feature) {
+    if (!feature.properties.kind) {
+      return;
+    }
+    if (feature.properties.kind !== 'major_road') {
+      return;
+    }
+
     if (feature.geometry.coordinates) {
       var coordinates = feature.geometry.coordinates;
       if (feature.geometry.type === 'LineString') {
