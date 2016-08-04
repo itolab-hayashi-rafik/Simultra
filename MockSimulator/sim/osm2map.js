@@ -31,7 +31,7 @@ function osm2map(features) {
           }
           if (prevId) {
             edges.push({from: prevId, to: id});
-            // edges.push({from: id, to: prevId});
+            edges.push({from: id, to: prevId});
           }
           prevId = id;
         });
@@ -84,26 +84,27 @@ function main() {
     'https://vector.mapzen.com/osm/roads/16/57693/25922.json?api_key=vector-tiles-NT5Emiw',
     'https://vector.mapzen.com/osm/roads/16/57693/25923.json?api_key=vector-tiles-NT5Emiw',
     'https://vector.mapzen.com/osm/roads/16/57693/25924.json?api_key=vector-tiles-NT5Emiw',
-    'https://vector.mapzen.com/osm/roads/16/57693/25925.json?api_key=vector-tiles-NT5Emiw',
-    'https://vector.mapzen.com/osm/roads/16/57693/25926.json?api_key=vector-tiles-NT5Emiw',
+    // 'https://vector.mapzen.com/osm/roads/16/57693/25925.json?api_key=vector-tiles-NT5Emiw',
+    // 'https://vector.mapzen.com/osm/roads/16/57693/25926.json?api_key=vector-tiles-NT5Emiw',
 
     'https://vector.mapzen.com/osm/roads/16/57694/25922.json?api_key=vector-tiles-NT5Emiw',
     'https://vector.mapzen.com/osm/roads/16/57694/25923.json?api_key=vector-tiles-NT5Emiw',
     'https://vector.mapzen.com/osm/roads/16/57694/25924.json?api_key=vector-tiles-NT5Emiw',
-    'https://vector.mapzen.com/osm/roads/16/57694/25925.json?api_key=vector-tiles-NT5Emiw',
-    'https://vector.mapzen.com/osm/roads/16/57694/25926.json?api_key=vector-tiles-NT5Emiw',
+    // 'https://vector.mapzen.com/osm/roads/16/57694/25925.json?api_key=vector-tiles-NT5Emiw',
+    // 'https://vector.mapzen.com/osm/roads/16/57694/25926.json?api_key=vector-tiles-NT5Emiw',
 
     'https://vector.mapzen.com/osm/roads/16/57695/25922.json?api_key=vector-tiles-NT5Emiw',
     'https://vector.mapzen.com/osm/roads/16/57695/25923.json?api_key=vector-tiles-NT5Emiw',
     'https://vector.mapzen.com/osm/roads/16/57695/25924.json?api_key=vector-tiles-NT5Emiw',
-    'https://vector.mapzen.com/osm/roads/16/57695/25925.json?api_key=vector-tiles-NT5Emiw',
-    'https://vector.mapzen.com/osm/roads/16/57695/25926.json?api_key=vector-tiles-NT5Emiw',
+    // 'https://vector.mapzen.com/osm/roads/16/57695/25925.json?api_key=vector-tiles-NT5Emiw',
+    // 'https://vector.mapzen.com/osm/roads/16/57695/25926.json?api_key=vector-tiles-NT5Emiw',
   ];
 
   fetch(urls, function(features) {
     res = osm2map(features);
     console.log(res);
-    save('highway/2', res.nodes, res.edges);
+    save('highway/3d', res.nodes, res.edges);
+    save('highway/3d', res.nodes, res.edges);
   });
 }
 main();
