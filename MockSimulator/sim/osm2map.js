@@ -81,19 +81,19 @@ function main() {
   // var url = 'https://vector.mapzen.com/osm/roads/18/230780/103697.json?api_key=vector-tiles-NT5Emiw';
   // var url = 'https://vector.mapzen.com/osm/roads/16/57694/25924.json?api_key=vector-tiles-NT5Emiw';
   var urls = [
-    'https://vector.mapzen.com/osm/roads/16/57693/25922.json?api_key=vector-tiles-NT5Emiw',
+    // 'https://vector.mapzen.com/osm/roads/16/57693/25922.json?api_key=vector-tiles-NT5Emiw',
     'https://vector.mapzen.com/osm/roads/16/57693/25923.json?api_key=vector-tiles-NT5Emiw',
     'https://vector.mapzen.com/osm/roads/16/57693/25924.json?api_key=vector-tiles-NT5Emiw',
     // 'https://vector.mapzen.com/osm/roads/16/57693/25925.json?api_key=vector-tiles-NT5Emiw',
     // 'https://vector.mapzen.com/osm/roads/16/57693/25926.json?api_key=vector-tiles-NT5Emiw',
 
-    'https://vector.mapzen.com/osm/roads/16/57694/25922.json?api_key=vector-tiles-NT5Emiw',
+    // 'https://vector.mapzen.com/osm/roads/16/57694/25922.json?api_key=vector-tiles-NT5Emiw',
     'https://vector.mapzen.com/osm/roads/16/57694/25923.json?api_key=vector-tiles-NT5Emiw',
     'https://vector.mapzen.com/osm/roads/16/57694/25924.json?api_key=vector-tiles-NT5Emiw',
     // 'https://vector.mapzen.com/osm/roads/16/57694/25925.json?api_key=vector-tiles-NT5Emiw',
     // 'https://vector.mapzen.com/osm/roads/16/57694/25926.json?api_key=vector-tiles-NT5Emiw',
 
-    'https://vector.mapzen.com/osm/roads/16/57695/25922.json?api_key=vector-tiles-NT5Emiw',
+    // 'https://vector.mapzen.com/osm/roads/16/57695/25922.json?api_key=vector-tiles-NT5Emiw',
     'https://vector.mapzen.com/osm/roads/16/57695/25923.json?api_key=vector-tiles-NT5Emiw',
     'https://vector.mapzen.com/osm/roads/16/57695/25924.json?api_key=vector-tiles-NT5Emiw',
     // 'https://vector.mapzen.com/osm/roads/16/57695/25925.json?api_key=vector-tiles-NT5Emiw',
@@ -103,8 +103,8 @@ function main() {
   fetch(urls, function(features) {
     res = osm2map(features);
     console.log(res);
-    save('highway/3d', res.nodes, res.edges);
-    save('highway/3d', res.nodes, res.edges);
+    save('highway/4d', res.nodes, res.edges);
+    save('highway/4d', res.nodes, res.edges);
   });
 }
 main();

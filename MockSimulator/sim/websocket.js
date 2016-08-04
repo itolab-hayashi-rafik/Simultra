@@ -39,7 +39,7 @@ function updateVehicle(callback) {
 // main function
 function main() {
   // initialize sim
-  var sim = new Sim('./highway/3d-nodes.json', './highway/3d-edges.json');
+  var sim = new Sim('./highway/4d-nodes.json', './highway/4d-edges.json');
 
   // initialize the vehicle
   newVehicle(sim.getVehicle(), function(vehicle) {
