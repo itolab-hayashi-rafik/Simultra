@@ -93,10 +93,8 @@ func main() {
 			v1.POST("/vehicles/new", func(c *gin.Context) {
 				var vehicle Vehicle
 				c.BindJSON(&vehicle)
-				vehicles.RLock()
-				vehicle.Id = strconv.Itoa(len(vehicles.m))
-				vehicles.RUnlock()
 				vehicles.Lock()
+				vehicle.Id = strconv.Itoa(len(vehicles.m))
 				vehicles.m[vehicle.Id] = &vehicle
 				vehicles.Unlock()
 
@@ -175,10 +173,8 @@ func main() {
 			v1.POST("/pedestrians/new", func(c *gin.Context) {
 				var pedestrian Pedestrian
 				c.BindJSON(&pedestrian)
-				pedestrians.RLock()
-				pedestrian.Id = strconv.Itoa(len(pedestrians.m))
-				pedestrians.RUnlock()
 				pedestrians.Lock()
+				pedestrian.Id = strconv.Itoa(len(pedestrians.m))
 				pedestrians.m[pedestrian.Id] = &pedestrian
 				pedestrians.Unlock()
 
