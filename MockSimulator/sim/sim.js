@@ -2,6 +2,8 @@
  * Mockup Simulator Core
  */
 
+T_COEFF = 5000.;
+
 /* constructor */
 var Sim = function(nodefile, edgefile) {
   this._nodes = [];
@@ -52,6 +54,9 @@ Sim.prototype._initVehicle = function() {
   var nodeFrom = this._nodeMap[this._edgeCurrent.from];
   var nodeTo = this._nodeMap[this._edgeCurrent.to];
 
+  // setup T
+  this._T = T_COEFF*vecLen({x: nodeFrom.lon - nodeTo.lon, y: nodeFrom.lat - nodeTo.lat});
+
   // set location and angle
   var v1 = {x: nodeTo.lon - nodeFrom.lon, y: nodeTo.lat - nodeFrom.lat};
   var v1len = Math.sqrt(Math.pow(v1.x, 2) + Math.pow(v1.y, 2));
@@ -68,23 +73,34 @@ Sim.prototype.setVehicle = function(vehicle) {
   this._vehicle = vehicle;
 };
 
+Sim.prototype._selectNextEdge = function() {
+  // find edges that connect to
+  var candidates = this._findEdges(this._edgeCurrent.to);
+  // randomly choose next node to go to
+  return candidates[Math.floor(Math.random() * candidates.length)];
+};
+
 Sim.prototype.update = function(delta) {
   this._t += delta;
 
   // select next edge to go to, if necessary
   if (this._edgeNext === null) {
-    // find edges that connect to
-    var candidates = this._findEdges(this._edgeCurrent.to);
-    // randomly choose next node to go to
-    this._edgeNext = candidates[Math.floor(Math.random() * candidates.length)];
+    this._edgeNext = this._selectNextEdge();
   }
+
+  var nodeFrom;
+  var nodeTo;
 
   // move to next edge
   while (this._T < this._t) {
     console.log('move to next edge');
     this._edgeCurrent = this._edgeNext;
-    this._edgeNext = null;
+    this._edgeNext = this._selectNextEdge();
     this._t -= this._T;
+
+    nodeFrom = this._nodeMap[this._edgeCurrent.from];
+    nodeTo = this._nodeMap[this._edgeCurrent.to];
+    this._T = T_COEFF*vecLen({x: nodeFrom.lon - nodeTo.lon, y: nodeFrom.lat - nodeTo.lat});
   }
 
   var ratio = this._t / this._T;
@@ -138,6 +154,17 @@ function vecRot(v1, v2) {
   var theta = (sinTheta >= 0.0) ? Math.acos(cosTheta) : - Math.acos(cosTheta);
 
   return theta;
+}
+
+/**
+ * calculate the distance between v1 and v2
+ * @param v1
+ * @param v2
+ * @returns {number}
+ */
+function vecLen(v) {
+  console.log(v);
+  return Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
 }
 
 /**
