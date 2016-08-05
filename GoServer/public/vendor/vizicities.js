@@ -19845,8 +19845,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // position
 	      if (this.updatePosition) {
-	        this.root.position.x += Math.sin(this.angle) * forwardDelta;
-	        this.root.position.z += Math.cos(this.angle) * forwardDelta;
+	        this.root.position.x += Math.cos(-this.angle) * forwardDelta;
+	        this.root.position.z += Math.sin(-this.angle) * forwardDelta;
+	        this.label.position.copy(this.root.position);
 	
 	        this.root.rotation.y = this.angle;
 	      }
