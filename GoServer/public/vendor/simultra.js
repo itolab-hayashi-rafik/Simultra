@@ -1907,6 +1907,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_createWorkerCallback',
 	    value: function _createWorkerCallback() {
 	      return function (that) {
+	        var prevSender = '';
 	        return function (msg) {
 	          var sender = msg.sender;
 	          var pedestrian = msg.data;
@@ -1914,6 +1915,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var viziLayer = that._getViziLayer();
 	
 	          // update the object in vizi layer
+	          if (prevSender !== sender) {
+	            viziLayer.setLabelText(pedestrian.id, sender);
+	            prevSender = sender;
+	          }
 	          viziLayer.setLocation(pedestrian.id, pedestrian.location.lat, pedestrian.location.lon, -pedestrian.angle);
 	          viziLayer.setVelocity(pedestrian.id, pedestrian.velocity, 0, 0, 0);
 	        };
@@ -2516,6 +2521,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_createWorkerCallback',
 	    value: function _createWorkerCallback() {
 	      return function (that) {
+	        var prevSender = '';
 	        return function (msg) {
 	          var sender = msg.sender;
 	          var vehicle = msg.data;
@@ -2523,6 +2529,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var viziLayer = that._getViziLayer();
 	
 	          // update the object in vizi layer
+	          if (prevSender !== sender) {
+	            viziLayer.setLabelText(vehicle.id, sender);
+	            prevSender = sender;
+	          }
 	          viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, -vehicle.angle);
 	          viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
 	        };
