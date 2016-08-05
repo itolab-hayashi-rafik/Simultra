@@ -12,7 +12,7 @@ var Sim = function(nodefile, edgefile) {
   this._vehicle = {
     type: 'veyron',
     location: {lat: 0, lon: 0},
-    velocity: 100 * 1000 / 3600, // 40 km/h = 40*1000/3600 m/s
+    velocity: 40 * 1000 / 3600, // 40 km/h = 40*1000/3600 m/s
     acceleration: 0, // m/ss
     angle: 0.0, // rad
     wheel: 0.0, // rad,
