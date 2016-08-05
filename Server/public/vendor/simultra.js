@@ -1907,7 +1907,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_createWorkerCallback',
 	    value: function _createWorkerCallback() {
 	      return function (that) {
-	        return function (pedestrian) {
+	        return function (msg) {
+	          var sender = msg.sender;
+	          var pedestrian = msg.data;
+	
 	          var viziLayer = that._getViziLayer();
 	
 	          // update the object in vizi layer
@@ -2222,7 +2225,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            wheel: '/javascripts/maps/objs/veyron/parts/veyron_wheel_bin.js'
 	          },
 	          textureFile: '/javascripts/maps/objs/veyron/texture.png',
-	          scale: 0.1,
+	          scale: 0.025,
 	          translation: { x: 0, y: 0, z: 0 },
 	          rotation: { x: 0, y: 90 * Math.PI / 180, z: 0 }
 	        }
@@ -2464,6 +2467,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _baseUrl: baseUrl,
 	        _api: null,
 	        _id: null,
+	        _socket: null,
 	        _callback: null,
 	        _isRunning: false,
 	
@@ -2477,7 +2481,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var self = this;
 	          setTimeout(function () {
 	            self._update();
-	          }, self._interval);
+	          }, 0);
 	        },
 	
 	        _update: function _update() {
@@ -2499,6 +2503,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          socket.onopen = function () {
 	            console.log('opened vehicle ' + self._id);
 	          };
+	          self._socket = socket;
 	        },
 	
 	        /** stop updating */
@@ -2511,7 +2516,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_createWorkerCallback',
 	    value: function _createWorkerCallback() {
 	      return function (that) {
-	        return function (vehicle) {
+	        return function (msg) {
+	          var sender = msg.sender;
+	          var vehicle = msg.data;
+	
 	          var viziLayer = that._getViziLayer();
 	
 	          // update the object in vizi layer
