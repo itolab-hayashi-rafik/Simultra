@@ -2,7 +2,7 @@
  * Mockup Simulator Core
  */
 
-T_COEFF = 5000.;
+R_EARTH = 6378137.0;
 
 /* constructor */
 var Sim = function(nodefile, edgefile) {
@@ -12,7 +12,7 @@ var Sim = function(nodefile, edgefile) {
   this._vehicle = {
     type: 'veyron',
     location: {lat: 0, lon: 0},
-    velocity: 0.0, // km/h
+    velocity: 100 * 1000 / 3600, // 40 km/h = 40*1000/3600 m/s
     acceleration: 0, // m/ss
     angle: 0.0, // rad
     wheel: 0.0, // rad,
@@ -55,7 +55,8 @@ Sim.prototype._initVehicle = function() {
   var nodeTo = this._nodeMap[this._edgeCurrent.to];
 
   // setup T
-  this._T = T_COEFF*vecLen({x: nodeFrom.lon - nodeTo.lon, y: nodeFrom.lat - nodeTo.lat});
+  var distance = latlonDistance(nodeFrom.lat, nodeFrom.lon, nodeTo.lat, nodeTo.lon);
+  this._T = distance / this._vehicle.velocity;
 
   // set location and angle
   var v1 = {x: nodeTo.lon - nodeFrom.lon, y: nodeTo.lat - nodeFrom.lat};
@@ -100,7 +101,8 @@ Sim.prototype.update = function(delta) {
 
     nodeFrom = this._nodeMap[this._edgeCurrent.from];
     nodeTo = this._nodeMap[this._edgeCurrent.to];
-    this._T = T_COEFF*vecLen({x: nodeFrom.lon - nodeTo.lon, y: nodeFrom.lat - nodeTo.lat});
+    var distance = latlonDistance(nodeFrom.lat, nodeFrom.lon, nodeTo.lat, nodeTo.lon);
+    this._T = distance / this._vehicle.velocity;
   }
 
   var ratio = this._t / this._T;
@@ -176,6 +178,35 @@ function vecLen(v) {
  */
 function mix(v1, v2, a) {
   return ((1.0 - a) * v1 + a * v2);
+}
+
+/**
+ * calculate the distance between two locations
+ * @param lat1
+ * @param lon1
+ * @param lat2
+ * @param lon2
+ * @returns {number} distance in [m]
+ */
+function latlonDistance(lat1, lon1, lat2, lon2) {
+  lat1 = deg2rad(lat1); lon1 = deg2rad(lon1);
+  lat2 = deg2rad(lat2); lon2 = deg2rad(lon2);
+  var dlat = lat2 - lat1;
+  var dlon = lon2 - lon1;
+  var a = Math.pow(Math.sin(dlat/2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon/2), 2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  var d = R_EARTH * c;
+  return d;
+}
+
+/**
+ * converts degree to radian
+ * @param deg
+ * @returns {number|*}
+ */
+function deg2rad(deg) {
+  rad = deg * Math.PI/180; // radians = degrees * pi/180
+  return rad;
 }
 
 module.exports = Sim;
