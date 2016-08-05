@@ -307,6 +307,7 @@ class VehicleLayer extends Layer {
 
   _createWorkerCallback() {
     return (function(that) {
+      var prevSender = '';
       return function(msg) {
         var sender = msg.sender;
         var vehicle = msg.data;
@@ -314,6 +315,10 @@ class VehicleLayer extends Layer {
         var viziLayer = that._getViziLayer();
 
         // update the object in vizi layer
+        if (prevSender !== sender) {
+          viziLayer.setLabelText(vehicle.id, sender);
+          prevSender = sender;
+        }
         viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, -vehicle.angle);
         viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
       };

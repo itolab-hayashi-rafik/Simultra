@@ -257,6 +257,7 @@ class PedestrianLayer extends Layer {
 
   _createWorkerCallback() {
     return (function(that) {
+      var prevSender = '';
       return function(msg) {
         var sender = msg.sender;
         var pedestrian = msg.data;
@@ -264,6 +265,10 @@ class PedestrianLayer extends Layer {
         var viziLayer = that._getViziLayer();
 
         // update the object in vizi layer
+        if (prevSender !== sender) {
+          viziLayer.setLabelText(pedestrian.id, sender);
+          prevSender = sender;
+        }
         viziLayer.setLocation(pedestrian.id, pedestrian.location.lat, pedestrian.location.lon, -pedestrian.angle);
         viziLayer.setVelocity(pedestrian.id, pedestrian.velocity, 0, 0, 0);
       };
