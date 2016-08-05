@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"github.com/gorilla/websocket"
 	"time"
+	"encoding/json"
 )
 
 const (
@@ -28,6 +29,9 @@ type Client struct {
 	// the hub
 	hub *Hub
 
+	// The identification
+	id string
+
 	// The websocket connection
 	conn *websocket.Conn
 
@@ -36,9 +40,10 @@ type Client struct {
 }
 
 // Create a new Client instance
-func NewClient(hub *Hub, conn *websocket.Conn) *Client {
+func NewClient(hub *Hub, id string, conn *websocket.Conn) *Client {
 	return &Client{
 		hub: hub,
+		id: id,
 		conn: conn,
 		send: make(chan []byte, 256),
 	}
@@ -57,11 +62,27 @@ func (c *Client) readPump() {
 		return nil
 	})
 	for {
+		// read message from the client
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
 				log.Printf("error: %v", err)
 			}
+			break
+		}
+
+		// unmarshall json and construct a message to broadcast
+		var data interface{}
+		json.Unmarshal(message, &data)
+		msg := &Message{
+			Sender: c.id,
+			Data: data,
+		}
+
+		// marshall
+		message, err = json.Marshal(&msg)
+		if err != nil {
+			log.Printf("error: %v", err)
 			break
 		}
 		c.hub.broadcast <- message
@@ -124,7 +145,11 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := NewClient(hub, conn)
+	id := ""
+	if ids, ok := r.URL.Query()["id"]; ok {
+		id = ids[0]
+	}
+	client := NewClient(hub, id, conn)
 	client.hub.register <- client
 	go client.writePump()
 	client.readPump()

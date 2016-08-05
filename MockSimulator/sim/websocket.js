@@ -2,6 +2,7 @@
 var request = require('superagent');
 var WebSocketClient = require('websocket').client;
 var Sim = require('./sim');
+var Utils = require('./utils');
 
 var baseUrl = 'http://localhost:3000';
 var wsBaseUrl = 'ws://localhost:3000';
@@ -38,6 +39,11 @@ function updateVehicle(callback) {
 
 // main function
 function main() {
+  // obtain ip address
+  var ipAddrs = Utils.getLocalAddress();
+  var ip = ipAddrs.ipv4.length > 0 ? ipAddrs.ipv4[0].address : null;
+  var id = ip ? ip : "unknown";
+
   // initialize sim
   var sim = new Sim('./highway/4d-nodes.json', './highway/4d-edges.json');
 
@@ -61,7 +67,7 @@ function main() {
           console.log(data);
         } else if (msg.type === 'binary') {
           var data = msg.binaryData;
-          console.log(data);
+          // console.log(data);
         } else {
           console.log('Unknown message type!');
           console.log('typeof msg = '+(typeof msg));
@@ -99,7 +105,7 @@ function main() {
     });
 
     // connect to the server
-    var url = wsBaseUrl+'/api/v1/vehicles/' + vehicle.id + '/ws';
+    var url = wsBaseUrl+'/api/v1/vehicles/' + vehicle.id + '/ws?id=' + id;
     console.log("connecting to " + url);
     // client.connect(url, 'echo-protocol');
     client.connect(url);

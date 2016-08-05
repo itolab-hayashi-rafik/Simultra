@@ -257,7 +257,10 @@ class PedestrianLayer extends Layer {
 
   _createWorkerCallback() {
     return (function(that) {
-      return function(pedestrian) {
+      return function(msg) {
+        var sender = msg.sender;
+        var pedestrian = msg.data;
+
         var viziLayer = that._getViziLayer();
 
         // update the object in vizi layer

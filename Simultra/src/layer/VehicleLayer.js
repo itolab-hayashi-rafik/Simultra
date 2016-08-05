@@ -307,7 +307,10 @@ class VehicleLayer extends Layer {
 
   _createWorkerCallback() {
     return (function(that) {
-      return function(vehicle) {
+      return function(msg) {
+        var sender = msg.sender;
+        var vehicle = msg.data;
+
         var viziLayer = that._getViziLayer();
 
         // update the object in vizi layer
