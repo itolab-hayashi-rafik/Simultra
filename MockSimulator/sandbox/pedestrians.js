@@ -4,7 +4,7 @@
 var request = require('superagent');
 
 var baseUrl = 'http://localhost:3000';
-var offset = 0.0001;
+var offset = 0.00001;
 var r_earth = 6378137.0;
 
 var NODES = [
@@ -29,7 +29,7 @@ for (var i = 0; i < NODES.length; i++) {
 // data to send
 var pedestrian = {
   type: 'monkey',
-  location: {lat: 35.156324 + offset, lon: 136.923108 + offset},
+  location: {lat: 35.156374 + offset, lon: 136.923022 + offset},
   velocity: 0.0, // km/h
   acceleration: 0, // m/ss
   angle: 0.0, // rad
