@@ -18938,7 +18938,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      simObject.id = total - 1;
 	
 	      // enable cpu update if necessary
-	      // simObject.updatePosition = !this._options.enableGpuComputation; // FIXME: this should be enabled
+	      simObject.updatePosition = !this._options.enableGpuComputation; // FIXME: this should be enabled
 	
 	      // add Object3D to the layer
 	      _get(Object.getPrototypeOf(SimObjectLayer.prototype), 'add', this).call(this, simObject.root);
