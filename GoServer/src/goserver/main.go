@@ -235,7 +235,7 @@ func main() {
 		}
 	}
 
-	r.Run("localhost:3000")
+	r.Run(":3000")
 }
 
 // serve websocket connection for the client to broadcast vehicles' creation/deletion
