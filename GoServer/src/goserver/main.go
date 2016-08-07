@@ -48,7 +48,7 @@ func main() {
 		wsdebug.GET("/vehicles", func(c *gin.Context) {
 			r.LoadHTMLGlob("views/wsdebug/*.html")
 			c.HTML(200, "index.html", gin.H{
-				"url": "ws://localhost:3000/api/v1/vehicles-ws",
+				"path": "/api/v1/vehicles-ws",
 			})
 		})
 
@@ -56,7 +56,7 @@ func main() {
 			id := c.Param("id")
 			r.LoadHTMLGlob("views/wsdebug/*.html")
 			c.HTML(200, "index.html", gin.H{
-				"url": "ws://localhost:3000/api/v1/vehicles/"+id+"/ws",
+				"path": "/api/v1/vehicles/"+id+"/ws",
 			})
 		})
 	}

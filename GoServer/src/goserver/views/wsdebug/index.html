@@ -26,7 +26,7 @@
                 return false;
             };
             if (window["WebSocket"]) {
-                conn = new WebSocket("{{.url}}");
+                conn = new WebSocket('ws://' + location.host + "{{.path}}");
                 conn.onclose = function (evt) {
                     var item = document.createElement("div");
                     item.innerHTML = "<b>Connection closed.</b>";
