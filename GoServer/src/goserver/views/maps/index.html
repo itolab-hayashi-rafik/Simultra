@@ -21,7 +21,7 @@
     window.Simultra = window.Simultra.default;
 
     if (typeof Simultra === 'function') {
-        simultra = new Simultra('http://localhost:3000');
+        simultra = new Simultra(location.protocol + '//' + location.host);
         simultra.start();
     }
 </script>
