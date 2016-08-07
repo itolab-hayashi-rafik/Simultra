@@ -18938,21 +18938,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	      simObject.id = total - 1;
 	
 	      // enable cpu update if necessary
-	      simObject.updatePosition = !this._options.enableGpuComputation; // FIXME: this should be enabled
+	      simObject.updatePosition = !this._options.enableGpuComputation;
 	
 	      // add Object3D to the layer
 	      _get(Object.getPrototypeOf(SimObjectLayer.prototype), 'add', this).call(this, simObject.root);
 	
 	      // add CSS2DObject to the DOM2D layer
-	      _get(Object.getPrototypeOf(SimObjectLayer.prototype), 'addDOM2D', this).call(this, simObject.label);
+	      this.addDOM2D(simObject.label);
 	    }
 	
 	    // remove SimObject
 	  }, {
 	    key: 'remove',
 	    value: function remove(simObject) {
+	      // remove from the array
 	      this._simObjects.splice(this._simObjects.indexOf(simObject), 1);
+	
+	      // remove Object3D from the layer
 	      _get(Object.getPrototypeOf(SimObjectLayer.prototype), 'remove', this).call(this, simObject.root);
+	
+	      // remove CSS2DObject from the DOM2D layer
+	      this.removeDOM2D(simObject.label);
 	    }
 	  }, {
 	    key: '_onAdd',
