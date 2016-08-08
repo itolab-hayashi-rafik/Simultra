@@ -49,6 +49,10 @@ class Layer extends EventEmitter {
   }
 
   remove() {
+    if (this._viziLayer && this._simultra._world) {
+      this._simultra._world.removeLayer(this._viziLayer);
+    }
+
     this._simultra = null;
     this._onRemove();
 

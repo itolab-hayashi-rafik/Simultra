@@ -773,6 +773,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'remove',
 	    value: function remove() {
+	      if (this._viziLayer && this._simultra._world) {
+	        this._simultra._world.removeLayer(this._viziLayer);
+	      }
+	
 	      this._simultra = null;
 	      this._onRemove();
 	
