@@ -66,7 +66,19 @@ func main() {
 		maps.GET("/", func(c *gin.Context) {
 			r.LoadHTMLGlob("views/maps/*.html")
 			c.HTML(200, "index.html", gin.H{
-				"key1": "value1",
+				"debug": (c.DefaultQuery("debug", "false") == "true"),
+				"renderer": c.DefaultQuery("renderer", "cpu"),
+				"dynamic": (c.DefaultQuery("dynamic", "true") == "true"),
+			})
+		})
+
+		maps.GET("/test", func(c *gin.Context) {
+			r.LoadHTMLGlob("views/maps/*.html")
+			c.HTML(200, "index.html", gin.H{
+				"debug": (c.DefaultQuery("debug", "true") == "true"),
+				"renderer": c.DefaultQuery("renderer", "cpu"),
+				"dynamic": (c.DefaultQuery("dynamic", "false") == "true"),
+				"test": true,
 			})
 		})
 	}

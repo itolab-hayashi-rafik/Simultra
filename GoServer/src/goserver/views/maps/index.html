@@ -22,8 +22,41 @@
     window.Simultra = window.Simultra.default;
 
     if (typeof Simultra === 'function') {
-        simultra = new Simultra(location.protocol + '//' + location.host);
+        simultra = new Simultra(location.protocol + '//' + location.host, null, {
+            debug: {{.debug}},
+            renderer: "{{.renderer}}"
+        });
+        {{if .dynamic}}
         simultra.start();
+        {{end}}
+
+        {{if .test}}
+        <!-- beginning of test -->
+        // remove building layer
+        simultra._buildingLayer.remove();
+
+        // add cars
+        var veyrons = [];
+        for (var i = 0; i < 100; i++) {
+            veyrons.push(
+                    simultra._vehicleLayer._addVehicle({
+                        type: 'veyron',
+                        location: {lat: 35.156324 + (0.0003*~~(i/10)), lon: 136.923108 + 0.0003*(i%10)},
+                        velocity: 40 / 3600 * 1000,
+                        angle: 0.0,
+                        wheel: 30*Math.PI/180.0
+                    })
+            );
+        }
+
+        // sets the vehicles to move
+        simultra._vehicleLayer._viziLayer.on('loadCompleted', function() {
+            veyrons.forEach(function(veyron, id) {
+                simultra._vehicleLayer._viziLayer.setVelocity(id, veyron.data.velocity, 0, 0, veyron.data.wheel);
+            });
+        });
+        <!-- end of test -->
+        {{end}}
     }
 </script>
 </body>
