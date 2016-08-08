@@ -18996,8 +18996,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_performSimUpdate',
 	    value: function _performSimUpdate(delta) {
 	      if (this._gpuCompute) {
-	        console.log('_performSimUpdate');
-	
 	        var now = performance.now();
 	
 	        this._positionUniforms.time.value = now;
@@ -19124,7 +19122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var simObject = this._simObjects[id];
 	
 	        // update the vehicle
-	        simObject.setVelocity(vx); // FIXME: use vy, vz, wheel?
+	        simObject.setVelocity(vx); // TODO: use vy, vz?
 	      }
 	    }
 	  }, {
@@ -19906,7 +19904,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  vertexShader: [].join('\n'),
 	
-	  fragmentShader: ["uniform float time;", "uniform float delta; // about 0.016", "uniform sampler2D textureAcceleration;", "const float PI = 3.141592653589793;", "const float PI_05 = PI / 2.0;", "const float PI_2 = PI * 2.0;", "const float L = 2.0;", "const float SPEED_LIMIT = 10.0;", "void main() {", " vec2 uv = gl_FragCoord.xy / resolution.xy;", " vec4 selfVelocity = texture2D( textureVelocity, uv );", " vec4 selfAcceleration = texture2D( textureAcceleration, uv );", " float velocity = selfVelocity.x;", " float wheel = selfVelocity.w;", " float acceleration = selfAcceleration.x;", " // update velocity", " //velocity += acceleration;", " gl_FragColor = vec4(velocity, 0.0, 0.0, wheel);",
+	  fragmentShader: ["uniform float time;", "uniform float delta; // about 0.016", "uniform sampler2D textureAcceleration;", "const float PI = 3.141592653589793;", "const float PI_05 = PI / 2.0;", "const float PI_2 = PI * 2.0;", "const float L = 2.0;", "const float SPEED_LIMIT = 10.0;", "void main() {", " vec2 uv = gl_FragCoord.xy / resolution.xy;", " vec4 selfVelocity = texture2D( textureVelocity, uv );", " vec4 selfAcceleration = texture2D( textureAcceleration, uv );", " float velocity = selfVelocity.x;", " float wheel = selfVelocity.w;", " float acceleration = selfAcceleration.x;", " // update velocity", " velocity += acceleration;", " gl_FragColor = vec4(velocity, 0.0, 0.0, wheel);",
 	
 	  // " vec4 selfVelocity = texture2D( textureVelocity, uv );",
 	  // " vec3 velocity = selfVelocity.xyz;",
@@ -21270,6 +21268,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }, {
+	    key: '_setVelocity',
+	    value: function _setVelocity(id, vx, vy, vz, wheel) {
+	      _get(Object.getPrototypeOf(VehicleLayer.prototype), '_setVelocity', this).call(this, id, vx, vy, vz, wheel);
+	
+	      // if the vehicle exists
+	      if (id in this._simObjects) {
+	        var simObject = this._simObjects[id];
+	        simObject.setWheelAngle(wheel);
+	      }
+	    }
+	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
 	      // Run common destruction logic from parent
@@ -21455,7 +21464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.rearRightWheelMesh = null;
 	
 	    // --- constants
-	    this.STEERING_RADIUS_RATIO = 0.0023;
+	    this.STEERING_RADIUS_RATIO = 0.0023 / vehicleModel.scale;
 	
 	    // --- make a vehicle
 	    this._createVehicle();
@@ -21470,7 +21479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Vehicle, [{
 	    key: 'setWheelAngle',
 	    value: function setWheelAngle(wheelAngle) {
-	      wheelAngle = wheelAngle;
+	      this.wheelAngle = wheelAngle;
 	
 	      this.frontLeftWheelRoot.rotation.y = wheelAngle;
 	      this.frontRightWheelRoot.rotation.y = wheelAngle;
