@@ -127,7 +127,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Simultra).call(this));
 	
 	    var defaultOptions = {
-	      debug: true
+	      debug: true,
+	      renderer: 'cpu'
 	    };
 	    _this._options = (0, _extend2.default)({}, defaultOptions, options);
 	
@@ -173,17 +174,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_setupLayers',
 	    value: function _setupLayers() {
 	      // Basemap
-	      this._basemapLayer = new _BasemapLayer2.default().addTo(this);
+	      this._basemapLayer = new _BasemapLayer2.default(this._options).addTo(this);
 	      // Highway
-	      this._highwayLayer = new _HighwayLayer2.default().addTo(this);
+	      this._highwayLayer = new _HighwayLayer2.default(this._options).addTo(this);
 	      // Footway
-	      this._footwayLayer = new _FootwayLayer2.default().addTo(this);
+	      this._footwayLayer = new _FootwayLayer2.default(this._options).addTo(this);
 	      // Building
-	      this._buildingLayer = new _BuildingLayer2.default().addTo(this);
+	      this._buildingLayer = new _BuildingLayer2.default(this._options).addTo(this);
 	      // Vehicle
-	      this._vehicleLayer = new _VehicleLayer2.default().addTo(this);
+	      this._vehicleLayer = new _VehicleLayer2.default(this._options).addTo(this);
 	      // Pedestrian
-	      this._pedestrianLayer = new _PedestrianLayer2.default().addTo(this);
+	      this._pedestrianLayer = new _PedestrianLayer2.default(this._options).addTo(this);
 	    }
 	  }, {
 	    key: '_setupDebug',
@@ -1698,7 +1699,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function PedestrianLayer(options) {
 	    _classCallCheck(this, PedestrianLayer);
 	
-	    var defaultOptions = {};
+	    var defaultOptions = {
+	      renderer: 'cpu'
+	    };
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
@@ -1725,6 +1728,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          rotation: { x: 0, y: 0, z: 0 }
 	        }
 	      }, {
+	        enableGpuComputation: this._options.renderer === 'gpu',
 	        simWidth: 32,
 	        style: {
 	          height: 0
@@ -1895,16 +1899,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var worker = operative(this._createWorker(), _WorkerUtils2.default.getDependencies());
 	
 	      // add entry to dictionary
-	      this._pedestrians[pedestrian.id] = {
+	      var entry = {
 	        data: pedestrian,
 	        object: object,
 	        worker: worker
 	      };
+	      this._pedestrians[pedestrian.id] = entry;
 	
 	      // start the worker
-	      worker.start(pedestrian.id, this._createWorkerCallback());
+	      if (this._isRunning) {
+	        worker.start(pedestrian.id, this._createWorkerCallback());
+	      }
 	
 	      console.log('added pedestrian: ' + JSON.stringify(pedestrian));
+	      return entry;
 	    }
 	
 	    // (websocket)
@@ -2263,7 +2271,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function VehicleLayer(options) {
 	    _classCallCheck(this, VehicleLayer);
 	
-	    var defaultOptions = {};
+	    var defaultOptions = {
+	      renderer: 'cpu'
+	    };
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
@@ -2292,6 +2302,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          rotation: { x: 0, y: 90 * Math.PI / 180, z: 0 }
 	        }
 	      }, {
+	        enableGpuComputation: this._options.renderer === 'gpu',
 	        simWidth: 32,
 	        style: {
 	          height: 0
@@ -2461,16 +2472,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var worker = (0, _operative2.default)(this._createWorker(), _WorkerUtils2.default.getDependencies());
 	
 	      // add entry to dictionary
-	      this._vehicles[vehicle.id] = {
+	      var entry = {
 	        data: vehicle,
 	        object: object,
 	        worker: worker
 	      };
+	      this._vehicles[vehicle.id] = entry;
 	
 	      // start the worker
-	      worker.start(vehicle.id, this._createWorkerCallback());
+	      if (this._isRunning) {
+	        worker.start(vehicle.id, this._createWorkerCallback());
+	      }
 	
 	      console.log('added vehicle: ' + JSON.stringify(vehicle));
+	      return entry;
 	    }
 	
 	    // (rest)
