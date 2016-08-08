@@ -2,6 +2,7 @@ import VIZI from 'vizi';
 import EventEmitter from 'eventemitter3';
 import extend from 'extend';
 import Stats from 'stats';
+import THREEx from 'threex';
 
 import BasemapLayer from './layer/BasemapLayer';
 import BuildingLayer from './layer/BuildingLayer';
@@ -85,6 +86,16 @@ class Simultra extends EventEmitter {
         document.body.appendChild(stats.dom);
         this._stats = stats;
       }
+
+      // THREEx.RendererStats
+      if (typeof THREEx.RendererStats === 'function') {
+        var rendererStats = new THREEx.RendererStats();
+        rendererStats.domElement.style.position = 'absolute';
+        rendererStats.domElement.style.left = '0px';
+        rendererStats.domElement.style.bottom   = '0px';
+        document.body.appendChild(rendererStats.domElement);
+        this._rendererStats = rendererStats;
+      }
     }
   }
 
@@ -94,6 +105,11 @@ class Simultra extends EventEmitter {
       // Stats
       if (this._stats) {
         this._stats.update();
+      }
+
+      // RenderStats
+      if (this._rendererStats) {
+        this._rendererStats.update(this._world._engine._renderer);
       }
     }
   }

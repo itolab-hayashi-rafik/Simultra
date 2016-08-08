@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	. "./models"
+	"math"
 )
 
 var (
@@ -74,11 +75,15 @@ func main() {
 
 		maps.GET("/test", func(c *gin.Context) {
 			r.LoadHTMLGlob("views/maps/*.html")
+			n, _ := strconv.Atoi(c.DefaultQuery("n", "100"))
+			sn := int(math.Floor(math.Sqrt(float64(n))))
 			c.HTML(200, "index.html", gin.H{
 				"debug": (c.DefaultQuery("debug", "true") == "true"),
 				"renderer": c.DefaultQuery("renderer", "cpu"),
 				"dynamic": (c.DefaultQuery("dynamic", "false") == "true"),
 				"test": true,
+				"n": n,
+				"sn": sn,
 			})
 		})
 	}

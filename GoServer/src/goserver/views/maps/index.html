@@ -12,6 +12,7 @@
 <div id="world"></div>
 <script src="/vendor/three.min.js"></script>
 <script src="/vendor/stats.min.js"></script>
+<script src="/vendor/threex.rendererstats.js"></script>
 <script src="/vendor/TweenMax.min.js"></script>
 <script src="/vendor/operative.min.js"></script>
 <script src="/vendor/vizicities.min.js"></script>
@@ -37,11 +38,11 @@
 
         // add cars
         var veyrons = [];
-        for (var i = 0; i < 100; i++) {
+        for (var i = 0; i < {{.n}}; i++) {
             veyrons.push(
                     simultra._vehicleLayer._addVehicle({
                         type: 'veyron',
-                        location: {lat: 35.156324 + (0.0003*~~(i/10)), lon: 136.923108 + 0.0003*(i%10)},
+                        location: {lat: 35.156324 + (0.0003*~~(i/{{.sn}})), lon: 136.923108 + 0.0003*(i%{{.sn}})},
                         velocity: 40 / 3600 * 1000,
                         angle: 0.0,
                         wheel: 30*Math.PI/180.0

@@ -83,7 +83,9 @@ function build() {
         // Proxy the global operative variable to require('operative')
         'operative': 'operative',
         // Proxy the global Stats variable to require('stats')
-        'stats': 'Stats'
+        'stats': 'Stats',
+        // Proxy the global THREEx variable to require('THREEx')
+        'threex': 'THREEx'
       },
       module: {
         loaders: [

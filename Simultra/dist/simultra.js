@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("VIZI"), require("Stats"), require("operative"));
+		module.exports = factory(require("VIZI"), require("Stats"), require("THREEx"), require("operative"));
 	else if(typeof define === 'function' && define.amd)
-		define(["VIZI", "Stats", "operative"], factory);
+		define(["VIZI", "Stats", "THREEx", "operative"], factory);
 	else if(typeof exports === 'object')
-		exports["Simultra"] = factory(require("VIZI"), require("Stats"), require("operative"));
+		exports["Simultra"] = factory(require("VIZI"), require("Stats"), require("THREEx"), require("operative"));
 	else
-		root["Simultra"] = factory(root["VIZI"], root["Stats"], root["operative"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_19__) {
+		root["Simultra"] = factory(root["VIZI"], root["Stats"], root["THREEx"], root["operative"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_5__, __WEBPACK_EXTERNAL_MODULE_20__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -78,35 +78,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _stats2 = _interopRequireDefault(_stats);
 	
-	var _BasemapLayer = __webpack_require__(5);
+	var _threex = __webpack_require__(5);
+	
+	var _threex2 = _interopRequireDefault(_threex);
+	
+	var _BasemapLayer = __webpack_require__(6);
 	
 	var _BasemapLayer2 = _interopRequireDefault(_BasemapLayer);
 	
-	var _BuildingLayer = __webpack_require__(12);
+	var _BuildingLayer = __webpack_require__(13);
 	
 	var _BuildingLayer2 = _interopRequireDefault(_BuildingLayer);
 	
-	var _FootwayLayer = __webpack_require__(13);
+	var _FootwayLayer = __webpack_require__(14);
 	
 	var _FootwayLayer2 = _interopRequireDefault(_FootwayLayer);
 	
-	var _HighwayLayer = __webpack_require__(14);
+	var _HighwayLayer = __webpack_require__(15);
 	
 	var _HighwayLayer2 = _interopRequireDefault(_HighwayLayer);
 	
-	var _PedestrianLayer = __webpack_require__(15);
+	var _PedestrianLayer = __webpack_require__(16);
 	
 	var _PedestrianLayer2 = _interopRequireDefault(_PedestrianLayer);
 	
-	var _VehicleLayer = __webpack_require__(18);
+	var _VehicleLayer = __webpack_require__(19);
 	
 	var _VehicleLayer2 = _interopRequireDefault(_VehicleLayer);
 	
-	var _API = __webpack_require__(16);
+	var _API = __webpack_require__(17);
 	
 	var _API2 = _interopRequireDefault(_API);
 	
-	var _index = __webpack_require__(7);
+	var _index = __webpack_require__(8);
 	
 	var _index2 = _interopRequireDefault(_index);
 	
@@ -199,6 +203,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          document.body.appendChild(stats.dom);
 	          this._stats = stats;
 	        }
+	
+	        // THREEx.RendererStats
+	        if (typeof _threex2.default.RendererStats === 'function') {
+	          var rendererStats = new _threex2.default.RendererStats();
+	          rendererStats.domElement.style.position = 'absolute';
+	          rendererStats.domElement.style.left = '0px';
+	          rendererStats.domElement.style.bottom = '0px';
+	          document.body.appendChild(rendererStats.domElement);
+	          this._rendererStats = rendererStats;
+	        }
 	      }
 	    }
 	  }, {
@@ -209,6 +223,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Stats
 	        if (this._stats) {
 	          this._stats.update();
+	        }
+	
+	        // RenderStats
+	        if (this._rendererStats) {
+	          this._rendererStats.update(this._world._engine._renderer);
 	        }
 	      }
 	    }
@@ -670,6 +689,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 5 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_5__;
+
+/***/ },
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -688,11 +713,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extend2 = _interopRequireDefault(_extend);
 	
-	var _Layer2 = __webpack_require__(6);
+	var _Layer2 = __webpack_require__(7);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
-	var _index = __webpack_require__(7);
+	var _index = __webpack_require__(8);
 	
 	var _index2 = _interopRequireDefault(_index);
 	
@@ -738,7 +763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = BasemapLayer;
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -849,7 +874,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Layer;
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -858,19 +883,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	
-	var _BuildingUtils = __webpack_require__(8);
+	var _BuildingUtils = __webpack_require__(9);
 	
 	var _BuildingUtils2 = _interopRequireDefault(_BuildingUtils);
 	
-	var _FootwayUtils = __webpack_require__(9);
+	var _FootwayUtils = __webpack_require__(10);
 	
 	var _FootwayUtils2 = _interopRequireDefault(_FootwayUtils);
 	
-	var _HighwayUtils = __webpack_require__(10);
+	var _HighwayUtils = __webpack_require__(11);
 	
 	var _HighwayUtils2 = _interopRequireDefault(_HighwayUtils);
 	
-	var _WorkerUtils = __webpack_require__(11);
+	var _WorkerUtils = __webpack_require__(12);
 	
 	var _WorkerUtils2 = _interopRequireDefault(_WorkerUtils);
 	
@@ -891,7 +916,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Util;
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -949,7 +974,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = BuildingUtils;
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1024,7 +1049,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = FootwayUtils;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1284,7 +1309,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = HighwayUtils;
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1346,7 +1371,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = WorkerUtils;
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1365,11 +1390,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extend2 = _interopRequireDefault(_extend);
 	
-	var _Layer2 = __webpack_require__(6);
+	var _Layer2 = __webpack_require__(7);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
-	var _BuildingUtils = __webpack_require__(8);
+	var _BuildingUtils = __webpack_require__(9);
 	
 	var _BuildingUtils2 = _interopRequireDefault(_BuildingUtils);
 	
@@ -1434,7 +1459,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = BuildingLayer;
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1453,11 +1478,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extend2 = _interopRequireDefault(_extend);
 	
-	var _Layer2 = __webpack_require__(6);
+	var _Layer2 = __webpack_require__(7);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
-	var _FootwayUtils = __webpack_require__(9);
+	var _FootwayUtils = __webpack_require__(10);
 	
 	var _FootwayUtils2 = _interopRequireDefault(_FootwayUtils);
 	
@@ -1539,7 +1564,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = FootwayLayer;
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1558,11 +1583,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extend2 = _interopRequireDefault(_extend);
 	
-	var _Layer2 = __webpack_require__(6);
+	var _Layer2 = __webpack_require__(7);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
-	var _HighwayUtils = __webpack_require__(10);
+	var _HighwayUtils = __webpack_require__(11);
 	
 	var _HighwayUtils2 = _interopRequireDefault(_HighwayUtils);
 	
@@ -1652,7 +1677,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = HighwayLayer;
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1671,15 +1696,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extend2 = _interopRequireDefault(_extend);
 	
-	var _Layer2 = __webpack_require__(6);
+	var _Layer2 = __webpack_require__(7);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
-	var _API = __webpack_require__(16);
+	var _API = __webpack_require__(17);
 	
 	var _API2 = _interopRequireDefault(_API);
 	
-	var _WorkerUtils = __webpack_require__(11);
+	var _WorkerUtils = __webpack_require__(12);
 	
 	var _WorkerUtils2 = _interopRequireDefault(_WorkerUtils);
 	
@@ -1997,7 +2022,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = PedestrianLayer;
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2008,7 +2033,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _WebClient2 = __webpack_require__(17);
+	var _WebClient2 = __webpack_require__(18);
 	
 	var _WebClient3 = _interopRequireDefault(_WebClient2);
 	
@@ -2145,7 +2170,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = API;
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2220,7 +2245,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = WebClient;
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2239,19 +2264,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extend2 = _interopRequireDefault(_extend);
 	
-	var _operative = __webpack_require__(19);
+	var _operative = __webpack_require__(20);
 	
 	var _operative2 = _interopRequireDefault(_operative);
 	
-	var _Layer2 = __webpack_require__(6);
+	var _Layer2 = __webpack_require__(7);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
-	var _API = __webpack_require__(16);
+	var _API = __webpack_require__(17);
 	
 	var _API2 = _interopRequireDefault(_API);
 	
-	var _WorkerUtils = __webpack_require__(11);
+	var _WorkerUtils = __webpack_require__(12);
 	
 	var _WorkerUtils2 = _interopRequireDefault(_WorkerUtils);
 	
@@ -2618,10 +2643,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = VehicleLayer;
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_19__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_20__;
 
 /***/ }
 /******/ ])
