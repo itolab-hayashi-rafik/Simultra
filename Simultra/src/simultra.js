@@ -1,5 +1,7 @@
 import VIZI from 'vizi';
 import EventEmitter from 'eventemitter3';
+import extend from 'extend';
+import Stats from 'stats';
 
 import BasemapLayer from './layer/BasemapLayer';
 import BuildingLayer from './layer/BuildingLayer';
@@ -12,8 +14,13 @@ import API from './io/API';
 import Util from './util/index';
 
 class Simultra extends EventEmitter {
-  constructor(baseUrl, defaultCoords) {
+  constructor(baseUrl, defaultCoords, options) {
     super();
+
+    var defaultOptions = {
+      debug: true
+    };
+    this._options = extend({}, defaultOptions, options);
 
     this._api = new API(baseUrl);
     this._isRunning = false;
@@ -22,9 +29,12 @@ class Simultra extends EventEmitter {
 
     this._setupWorld(coords);
     this._setupLayers();
+    this._setupDebug();
   }
 
   _setupWorld(coords) {
+    var self = this;
+
     // create a world
     var world = VIZI.world('world', {
       skybox: true,
@@ -38,6 +48,11 @@ class Simultra extends EventEmitter {
 
     // Add controls
     VIZI.Controls.orbit().addTo(world);
+
+    // add callbacks
+    world.on('preUpdate', function(delta) {
+      self._onWorldUpdate(delta);
+    });
 
     // set the instance properties
     this._world = world;
@@ -56,6 +71,30 @@ class Simultra extends EventEmitter {
     this._vehicleLayer = new VehicleLayer().addTo(this);
     // Pedestrian
     this._pedestrianLayer = new PedestrianLayer().addTo(this);
+  }
+
+  _setupDebug() {
+    if (this._options.debug) {
+      // Stats
+      if (typeof Stats === 'function') {
+        var stats = new Stats();
+        stats.dom.style.position = 'absolute';
+        stats.dom.style.top = '0px';
+        stats.dom.style.zIndex = 100;
+        document.body.appendChild(stats.dom);
+        this._stats = stats;
+      }
+    }
+  }
+
+  _onWorldUpdate(delta) {
+    // for debugging
+    if (this._options.debug) {
+      // Stats
+      if (this._stats) {
+        this._stats.update();
+      }
+    }
   }
 
   /**

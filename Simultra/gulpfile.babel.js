@@ -81,7 +81,9 @@ function build() {
         // Proxy the global VIZI variable to require('vizi')
         'vizi': 'VIZI',
         // Proxy the global operative variable to require('operative')
-        'operative': 'operative'
+        'operative': 'operative',
+        // Proxy the global Stats variable to require('stats')
+        'stats': 'Stats'
       },
       module: {
         loaders: [
