@@ -12,7 +12,9 @@ const UPDATE_INTERVAL_MS = 10000;
 
 class VehicleLayer extends Layer {
   constructor(options) {
-    var defaultOptions = {};
+    var defaultOptions = {
+      renderer: 'cpu'
+    };
 
     var _options = extend({}, defaultOptions, options);
     super(_options);
@@ -37,6 +39,7 @@ class VehicleLayer extends Layer {
         rotation: {x: 0, y: 90 * Math.PI / 180, z: 0}
       }
     }, {
+      enableGpuComputation: this._options.renderer === 'gpu',
       simWidth: 32,
       style: {
         height: 0
@@ -196,16 +199,20 @@ class VehicleLayer extends Layer {
     var worker = operative(this._createWorker(), WorkerUtils.getDependencies());
 
     // add entry to dictionary
-    this._vehicles[vehicle.id] = {
+    var entry = {
       data: vehicle,
       object: object,
       worker: worker
     };
+    this._vehicles[vehicle.id] = entry;
 
     // start the worker
-    worker.start(vehicle.id, this._createWorkerCallback());
+    if (this._isRunning) {
+      worker.start(vehicle.id, this._createWorkerCallback());
+    }
 
     console.log('added vehicle: ' + JSON.stringify(vehicle));
+    return entry;
   }
 
   // (rest)

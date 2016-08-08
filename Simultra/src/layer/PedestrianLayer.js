@@ -11,7 +11,9 @@ const UPDATE_INTERVAL_MS = 1000;
 
 class PedestrianLayer extends Layer {
   constructor(options) {
-    var defaultOptions = {};
+    var defaultOptions = {
+      renderer: 'cpu'
+    };
 
     var _options = extend({}, defaultOptions, options);
     super(_options);
@@ -34,6 +36,7 @@ class PedestrianLayer extends Layer {
         rotation: {x: 0, y: 0, z: 0}
       }
     }, {
+      enableGpuComputation: this._options.renderer === 'gpu',
       simWidth: 32,
       style: {
         height: 0
@@ -194,16 +197,20 @@ class PedestrianLayer extends Layer {
     var worker = operative(this._createWorker(), WorkerUtils.getDependencies());
 
     // add entry to dictionary
-    this._pedestrians[pedestrian.id] = {
+    var entry = {
       data: pedestrian,
       object: object,
       worker: worker
     };
+    this._pedestrians[pedestrian.id] = entry;
 
     // start the worker
-    worker.start(pedestrian.id, this._createWorkerCallback());
+    if (this._isRunning) {
+      worker.start(pedestrian.id, this._createWorkerCallback());
+    }
 
     console.log('added pedestrian: ' + JSON.stringify(pedestrian));
+    return entry;
   }
 
   // (websocket)

@@ -18,7 +18,8 @@ class Simultra extends EventEmitter {
     super();
 
     var defaultOptions = {
-      debug: true
+      debug: true,
+      renderer: 'cpu'
     };
     this._options = extend({}, defaultOptions, options);
 
@@ -60,17 +61,17 @@ class Simultra extends EventEmitter {
 
   _setupLayers() {
     // Basemap
-    this._basemapLayer = new BasemapLayer().addTo(this);
+    this._basemapLayer = new BasemapLayer(this._options).addTo(this);
     // Highway
-    this._highwayLayer = new HighwayLayer().addTo(this);
+    this._highwayLayer = new HighwayLayer(this._options).addTo(this);
     // Footway
-    this._footwayLayer = new FootwayLayer().addTo(this);
+    this._footwayLayer = new FootwayLayer(this._options).addTo(this);
     // Building
-    this._buildingLayer = new BuildingLayer().addTo(this);
+    this._buildingLayer = new BuildingLayer(this._options).addTo(this);
     // Vehicle
-    this._vehicleLayer = new VehicleLayer().addTo(this);
+    this._vehicleLayer = new VehicleLayer(this._options).addTo(this);
     // Pedestrian
-    this._pedestrianLayer = new PedestrianLayer().addTo(this);
+    this._pedestrianLayer = new PedestrianLayer(this._options).addTo(this);
   }
 
   _setupDebug() {
