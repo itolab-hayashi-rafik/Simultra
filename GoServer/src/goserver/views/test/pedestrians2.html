@@ -1,0 +1,494 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>three.js webgl - deferred daylight</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            color: #fff;
+            font-family:Monospace;
+            font-size:13px;
+            text-align:center;
+            font-weight: bold;
+
+            background-color: #000;
+            margin: 0px;
+            overflow: hidden;
+        }
+
+        #info {
+            color:#fff;
+            position: relative;
+            margin: 0 auto -2.1em;
+            top: 0px;
+
+            padding: 5px;
+            z-index:100;
+        }
+
+        a { color: skyblue; }
+
+        #stats { position: absolute; top:0; left: 0 }
+        #stats #fps { background: transparent !important }
+        #stats #fps #fpsText { color: #aaa !important }
+        #stats #fps #fpsGraph { display: none }
+
+        #loading { background: #0af; color: white; padding: 0.25em 1em; position: absolute; right:0 }
+    </style>
+</head>
+
+<body>
+<div id="info">
+    <a href="http://threejs.org" target="_blank">three.js</a> - deferred renderer - daylight -
+    supermale by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=83">Paolo Piselli</a> -
+    use arrows to control characters, mouse for camera
+</div>
+
+<div id="loading">Loading ...</div>
+
+<script src="/vendor/three.max.deferredday.js"></script>
+
+<!--
+<script src="../build/three.min.js"></script>
+
+<script src="js/renderers/WebGLDeferredRenderer.js"></script>
+<script src="js/ShaderDeferred.js"></script>
+
+<script src="js/shaders/CopyShader.js"></script>
+<script src="js/shaders/FXAAShader.js"></script>
+<script src="js/shaders/SSAOShader.js"></script>
+<script src="js/shaders/FilmShader.js"></script>
+<script src="js/shaders/RGBShiftShader.js"></script>
+
+<script src="js/postprocessing/EffectComposer.js"></script>
+<script src="js/postprocessing/RenderPass.js"></script>
+<script src="js/postprocessing/ShaderPass.js"></script>
+<script src="js/postprocessing/MaskPass.js"></script>
+<script src="js/postprocessing/FilmPass.js"></script>
+
+<script src="js/controls/TrackballControls.js"></script>
+<script src="js/controls/OrbitControls.js"></script>
+
+<script src='js/MD2CharacterComplex.js'></script>
+
+<script src='js/Detector.js'></script>
+-->
+
+<script src='/vendor/stats.min.js'></script>
+<script src='/vendor/threex.rendererstats.js'></script>
+
+<script>
+
+    if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+    var SCALE = 1;
+    var MARGIN = 100;
+
+    var SCREEN_WIDTH = window.innerWidth;
+    var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+
+    var container, camera, scene, renderer;
+
+    var characters = [];
+    var nCharacters = 0;
+
+    var cameraControls;
+
+    var controls = {
+
+        moveForward: false,
+        moveBackward: false,
+        moveLeft: false,
+        moveRight: false
+
+    };
+
+    var clock = new THREE.Clock();
+
+    init();
+    animate();
+
+    function init() {
+
+        container = document.createElement( 'div' );
+        document.body.appendChild( container );
+
+        // CAMERA
+
+        camera = new THREE.PerspectiveCamera( 30, SCREEN_WIDTH / SCREEN_HEIGHT, 10, 40000 );
+        camera.position.set( 0, 40, 3300 );
+
+        // SCENE
+
+        scene = new THREE.Scene();
+        scene.fog = new THREE.Fog( 0xffffff, 1000, 4000 );
+
+        scene.add( camera );
+
+        // LIGHTS
+
+        dayLight = new THREE.DayLight();
+
+        dayLight.skyColor.setHSV( 0.56, 0.975, 1 );
+        dayLight.groundColor.setHSV( 0.225, 0.975, 0.9275 );
+        dayLight.hemiPosition.set( 0, 1000, 0 );
+
+        dayLight.position.set( 500, 750, 200 );
+
+        dayLight.sunIntensity = 2.5;
+
+        dayLight.castShadow = true;
+        dayLight.shadowMapWidth = 512;
+        dayLight.shadowMapHeight = 512;
+
+        dayLight.shadowMapDarkness = 0.95;
+        dayLight.shadowCascade = true;
+        dayLight.shadowCascadeCount = 4;
+        dayLight.shadowCascadeNearZ = [ -1.000, 0.98, 0.99, 0.995 ];
+        dayLight.shadowCascadeFarZ  = [  0.98, 0.99, 0.995, 0.998 ];
+
+        dayLight.shadowCameraNear = 5;
+        dayLight.shadowCameraFar = 15000;
+
+        scene.add( dayLight );
+
+        // SKYDOME
+
+        var map = THREE.ImageUtils.loadTexture( "/textures/sky/skydome.jpg" );
+        map.flipY = false;
+
+        var skyGeo = new THREE.SphereGeometry( 25000, 16, 8, 0, Math.PI*2, 0, Math.PI * 0.5 );
+        sky = new THREE.Mesh( skyGeo, new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.BackSide, map: map } ) );
+        scene.add( sky );
+
+        //
+
+        var test = new THREE.Mesh( new THREE.SphereGeometry( 50, 16, 8 ), new THREE.MeshPhongMaterial( { color: 0xffffff, shinines: 1 } ) );
+        test.position.y = 50;
+        test.castShadow = true;
+        scene.add( test );
+
+        //  GROUND
+
+        var gt = THREE.ImageUtils.loadCompressedTexture( "/textures/terrain/grasslight-big.dds" );
+        var gg = new THREE.PlaneGeometry( 160000, 160000 );
+        var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x222222, shinines: 100, map: gt, bumpMap: gt, bumpScale: 3, metal: true } );
+
+        gt.repeat.set( 640, 640 );
+        gt.wrapS = gt.wrapT = THREE.RepeatWrapping;
+        gt.anisotropy = 4;
+
+        var ground = new THREE.Mesh( gg, gm );
+        ground.rotation.x = - Math.PI / 2;
+        ground.receiveShadow = true;
+
+        scene.add( ground );
+
+
+        // RENDERER
+
+        renderer = new THREE.WebGLDeferredRenderer( { antialias: true, tonemapping: THREE.UnchartedOperator, brightness: 2, scale: SCALE } );
+        renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+        container.appendChild( renderer.domElement );
+
+        renderer.domElement.style.position = "absolute";
+        renderer.domElement.style.top = MARGIN + "px";
+        renderer.domElement.style.left = "0px";
+
+        //
+
+        renderer.gammaInput = true;
+        renderer.gammaOutput = true;
+        renderer.shadowMapEnabled = true;
+
+        renderer.shadowMapCascade = true;
+        renderer.shadowMapType = THREE.PCFSoftShadowMap;
+        //renderer.shadowMapDebug = true;
+
+        renderer.shadowMapSlopeDepthBias = true;
+        renderer.shadowMapCullFace = THREE.CullFaceBack;
+
+        // EFFECTS
+
+        effectSSAO = new THREE.ShaderPass( THREE.SSAOShader );
+
+        effectSSAO.uniforms[ 'size' ].value.set( Math.floor( SCALE * SCREEN_WIDTH ), Math.floor( SCALE * SCREEN_HEIGHT ) );
+        effectSSAO.uniforms[ 'cameraNear' ].value = camera.near;
+        effectSSAO.uniforms[ 'cameraFar' ].value = camera.far;
+        effectSSAO.uniforms[ 'fogEnabled' ].value = 0;
+        effectSSAO.uniforms[ 'aoClamp' ].value = 0.5;
+        effectSSAO.uniforms[ 'lumInfluence' ].value = 0.59;
+        //effectSSAO.uniforms[ 'onlyAO' ].value = 1;
+
+        effectSSAO.material.defines = { "FLOAT_DEPTH": true };
+        //renderer.addEffect( effectSSAO, "tDepth" );
+
+
+        effectFilm = new THREE.FilmPass( 0.1, 0.05, 1048, false );
+        //renderer.addEffect( effectFilm );
+
+        effectRGB = new THREE.ShaderPass( THREE.RGBShiftShader );
+        effectRGB.uniforms[ 'amount' ].value = 0.001;
+        //renderer.addEffect( effectRGB );
+
+        // STATS
+
+        stats = new Stats();
+        container.appendChild( stats.domElement );
+
+        // RENDERER STATS
+
+        rendererStats = new THREEx.RendererStats();
+        rendererStats.domElement.style.position = 'absolute';
+        rendererStats.domElement.style.left = '0px';
+        rendererStats.domElement.style.bottom = '0px';
+        container.appendChild( rendererStats.domElement );
+
+        if (renderer.renderer.info.programs === undefined) {
+            renderer.renderer.info.programs = [];
+        }
+
+        // EVENTS
+
+        window.addEventListener( 'resize', onWindowResize, false );
+        document.addEventListener( 'keydown', onKeyDown, false );
+        document.addEventListener( 'keyup', onKeyUp, false );
+
+        // CONTROLS
+
+        //cameraControls = new THREE.TrackballControls( camera, renderer.domElement );
+        //cameraControls.target.set( 0, 50, 0 );
+
+        cameraControls = new THREE.OrbitControls( camera );
+
+
+        // CHARACTER
+        /*
+         var configOgro = {
+
+         baseUrl: "models/animated/ogro/",
+
+         body: "ogro-light.js",
+         skins: [ "grok.jpg", "ogrobase.png", "arboshak.png", "ctf_r.png", "ctf_b.png", "darkam.png", "freedom.png",
+         "gib.png", "gordogh.png", "igdosh.png", "khorne.png", "nabogro.png",
+         "sharokh.png" ],
+         weapons:  [ [ "weapon-light.js", "weapon.jpg" ] ],
+         animations: {
+         move: "run",
+         idle: "stand",
+         jump: "jump",
+         attack: "attack",
+         crouchMove: "cwalk",
+         crouchIdle: "cstand",
+         crouchAttach: "crattack"
+         },
+
+         walkSpeed: 350,
+         crouchSpeed: 175
+
+         };
+         */
+
+        var configSupermale = {
+
+            baseUrl: "/models/animated/supermale/",
+
+            body: "supermale-light.js",
+            skins: [ "CaptainA.png", "CaptainB.png", "CaptainC.png", "CyclopsDL.png", "Carnge.png", "ctf_b.png", "ctf_r.png",
+                "DD_classic.png", "Deadpool.png", "DoubleD.png", "DukeNuke.png", "Fist.png", "Flash.png",
+                "GL_Classic.png", "GreenLan.png", "He-Man.png", "Hulk.png", "IM_classic.png", "JohnBlade.png",
+                "kw_aqua.png", "kw_black.png", "kw_blue.png", "kw_green.png", "kw_orange.png",
+                "Magneto.png", "Nightwing.png", "Punisher.png", "Running.png",
+                "Running2.png", "Silver.png", "Sm2099.png", "SpawnDL.png",
+                "spiderman.png", "Superman.png", "Tick.png" ],
+            weapons:  [],
+            animations: {
+                move: "run",
+                idle: "stand",
+                jump: "jump",
+                attack: "attack",
+                crouchMove: "crwalk",
+                crouchIdle: "crstnd",
+                crouchAttach: "crattak"
+            },
+
+            walkSpeed: 400,
+            crouchSpeed: 50
+
+        };
+
+        var nRows = 10;
+        var nSkins = configSupermale.skins.length;
+
+        nCharacters = nSkins * nRows * {{.n}};
+
+        for ( var i = 0; i < nCharacters; i ++ ) {
+
+            var character = new THREE.MD2CharacterComplex();
+            character.scale = 3;
+            character.controls = controls;
+
+            characters.push( character );
+
+
+        }
+
+        var baseCharacter = new THREE.MD2CharacterComplex();
+        baseCharacter.scale = 3;
+
+        baseCharacter.onLoadComplete = function () {
+
+            THREE.GeometryUtils.flipV( baseCharacter.meshBody.geometry );
+            //THREE.GeometryUtils.flipV( baseCharacter.meshWeapon.geometry );
+
+            var k = 0;
+
+            for ( var j = 0; j < nRows; j ++ ) {
+
+                for ( var i = 0; i < nSkins; i ++ ) {
+
+                    var cloneCharacter = characters[ k ];
+
+                    cloneCharacter.shareParts( baseCharacter );
+
+                    cloneCharacter.enableShadows( true );
+
+                    cloneCharacter.setWeapon( 0 );
+                    cloneCharacter.setSkin( Math.floor( Math.random() * nSkins ) );
+
+                    cloneCharacter.root.position.x = ( i - nSkins/2 ) * 150;
+                    cloneCharacter.root.position.z = j * 250;
+
+                    cloneCharacter.meshBody.materialTexture.color.setHSV( 0, 0, 0.95 );
+                    cloneCharacter.meshBody.materialTexture.specular.setHSV( 0, 0, 0.91 );
+                    cloneCharacter.meshBody.materialTexture.shinines = 100;
+                    cloneCharacter.meshBody.materialTexture.metal = true;
+                    cloneCharacter.meshBody.materialTexture.wrapAround = true;
+
+                    //cloneCharacter.meshBody.materialTexture.map = null;
+                    //cloneCharacter.meshWeapon.materialTexture.map = null;
+
+                    scene.add( cloneCharacter.root );
+
+                    k ++;
+
+                }
+
+            }
+
+            camera.position.set( 0, -10, 3300 );
+
+            var gyro = new THREE.Gyroscope();
+            gyro.add( camera );
+
+            characters[ Math.floor( nSkins/2 ) ].root.add( gyro );
+
+            var elLoading = document.getElementById( "loading" );
+            elLoading.style.display = "none";
+
+        };
+
+        baseCharacter.loadParts( configSupermale );
+
+    }
+
+    // EVENT HANDLERS
+
+    function onWindowResize( event ) {
+
+        SCREEN_WIDTH = window.innerWidth;
+        SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN
+
+        renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+        camera.aspect = SCREEN_WIDTH/ SCREEN_HEIGHT;
+        camera.updateProjectionMatrix();
+
+    }
+
+    function onKeyDown ( event ) {
+
+        switch( event.keyCode ) {
+
+            case 38: /*up*/
+            case 87: /*W*/ 	controls.moveForward = true; break;
+
+            case 40: /*down*/
+            case 83: /*S*/ 	 controls.moveBackward = true; break;
+
+            case 37: /*left*/
+            case 65: /*A*/   controls.moveLeft = true; break;
+
+            case 39: /*right*/
+            case 68: /*D*/    controls.moveRight = true; break;
+
+                //case 67: /*C*/     controls.crouch = true; break;
+                //case 32: /*space*/ controls.jump = true; break;
+                //case 17: /*ctrl*/  controls.attack = true; break;
+
+        }
+
+    };
+
+    function onKeyUp ( event ) {
+
+        switch( event.keyCode ) {
+
+            case 38: /*up*/
+            case 87: /*W*/ controls.moveForward = false; break;
+
+            case 40: /*down*/
+            case 83: /*S*/ 	 controls.moveBackward = false; break;
+
+            case 37: /*left*/
+            case 65: /*A*/ 	 controls.moveLeft = false; break;
+
+            case 39: /*right*/
+            case 68: /*D*/ 	  controls.moveRight = false; break;
+
+                //case 67: /*C*/     controls.crouch = false; break;
+                //case 32: /*space*/ controls.jump = false; break;
+                //case 17: /*ctrl*/  controls.attack = false; break;
+
+        }
+
+    };
+
+    //
+
+    function animate() {
+
+        requestAnimationFrame( animate );
+        render();
+
+        stats.update();
+        rendererStats.update(renderer.renderer);
+
+    }
+
+    function render() {
+
+        var delta = clock.getDelta();
+
+        cameraControls.update( delta );
+
+        //delta *= 0.35;
+        delta *= 0.7;
+
+        for ( var i = 0; i < nCharacters; i ++ ) {
+
+            characters[ i ].update( delta + i * 0.001 * delta * Math.random());
+
+        }
+
+        renderer.render( scene, camera );
+
+    }
+
+</script>
+
+</body>
+</html>

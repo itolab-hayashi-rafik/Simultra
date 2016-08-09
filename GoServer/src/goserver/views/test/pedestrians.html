@@ -40,6 +40,7 @@
 
 <script src="/vendor/xg.min.rgba.js"></script>
 <script src="/vendor/stats.min.js"></script>
+<script src="/vendor/threex.rendererstats.js"></script>
 
 <script>
 
@@ -231,6 +232,14 @@
 
         stats = new Stats();
         container.appendChild( stats.domElement );
+
+        // RENDERER STATS
+
+        rendererStats = new THREEx.RendererStats();
+        rendererStats.domElement.style.position = 'absolute';
+        rendererStats.domElement.style.left = '0px';
+        rendererStats.domElement.style.bottom = '0px';
+        container.appendChild( rendererStats.domElement );
 
         // EVENTS
 
@@ -513,6 +522,7 @@
 
         render();
         stats.update();
+        rendererStats.update(renderer);
 
     }
 

@@ -98,6 +98,14 @@ func main() {
 				"n": n,
 			})
 		})
+
+		test.GET("/pedestrians2", func(c *gin.Context) {
+			r.LoadHTMLGlob("views/test/*.html")
+			n, _ := strconv.Atoi(c.DefaultQuery("n", "1"))
+			c.HTML(200, "pedestrians2.html", gin.H{
+				"n": n,
+			})
+		})
 	}
 
 	api := r.Group("/api")
