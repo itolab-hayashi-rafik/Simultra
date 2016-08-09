@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<!-- saved from url=(0066)http://alteredqualia.com/xg/examples/deferred_shadowmap_point.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>xg - deferred rendering - shadow map [pointlights]</title>
+
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            font-family: Monospace;
+            background-color: #000;
+            color: #fff;
+            margin: 0px;
+            overflow: hidden;
+        }
+
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            display:block;
+        }
+
+        #info a { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+
+        #stats { position: absolute; top:10px; left: 5px }
+        #stats #fps { background: transparent !important }
+        #stats #fps #fpsText { color: #aaa !important }
+        #stats #fps #fpsGraph { display: none }
+    </style>
+</head>
+
+<body>
+
+<div id="info">
+    <a href="http://alteredqualia.com/" target="_blank">xg</a> - deferred renderer - pointlights shadowmap -
+    walker from <a href="http://www.sintel.org/">Sintel</a>
+</div>
+
+<script src="/vendor/xg.min.rgba.js"></script>
+<script src="/vendor/stats.min.js"></script>
+
+<script>
+
+    if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+    //var SHADOW_MAP_WIDTH = 1024, SHADOW_MAP_HEIGHT = 1024;
+    var SHADOW_MAP_WIDTH = 512, SHADOW_MAP_HEIGHT = 512;
+    //var SHADOW_MAP_WIDTH = 256, SHADOW_MAP_HEIGHT = 256;
+
+    var MARGIN = 100;
+    var SCALE = 0.75;
+
+    var SCREEN_WIDTH = window.innerWidth;
+    var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+    var FLOOR = -250;
+
+    // controls
+
+    var mouseX = 0;
+    var mouseY = 0;
+
+    var targetX = 0, targetY = 0;
+    var angle = 0;
+    var height = 0;
+    var target = new XG.Vector3( 0, FLOOR+150, 0 );
+
+    var windowHalfX = window.innerWidth / 2;
+    var windowHalfY = window.innerHeight / 2;
+
+    //
+
+    var camera, controls, scene, renderer;
+    var container, stats;
+
+    var NEAR = 5, FAR = 10000;
+
+    var morph, morphs = [];
+
+    var clock = new XG.Clock();
+
+    // lights
+
+    var light1, light2, light3;
+    var sphereGeometry = new XG.SphereGeometry( 7.5, 16, 8 );
+
+    //
+
+    init();
+    animate();
+
+
+    function init() {
+
+        container = document.createElement( 'div' );
+        document.body.appendChild( container );
+
+        // SCENE CAMERA
+
+        camera = new XG.PerspectiveCamera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
+        camera.position.set( 1000, FLOOR + 150, 100 );
+
+        camera.lookAt( new XG.Vector3( 0, FLOOR + 60, 0 ) );
+
+        // SCENE
+
+        scene = new XG.Scene();
+
+        // LIGHTS
+
+        var intensity = 0.8;
+        var distance = 1500;
+
+        var shadowCameraNear = 1;
+        var shadowCameraFar = 2200;
+
+        var shadowDarkness = 0.9;
+
+        var shadowBias = 0.0002; // bias for backface culling
+        //shadowBias = -0.0005; // bias for frontface culling
+
+        shadowBias = 0;
+
+        //
+
+        light1 = new XG.PointLight( 0x3366ff, intensity, distance );
+        light1.position.set( 0, 500, 1000 );
+
+        light1.castShadow = true;
+
+        light1.shadowCameraNear = shadowCameraNear;
+        light1.shadowCameraFar = shadowCameraFar;
+
+        light1.shadowBias = shadowBias;
+        light1.shadowDarkness = shadowDarkness;
+
+        light1.shadowMapWidth = SHADOW_MAP_WIDTH;
+        light1.shadowMapHeight = SHADOW_MAP_HEIGHT;
+
+        scene.add( light1 );
+
+        //
+
+        light2 = new XG.PointLight( 0xff6633, intensity, distance );
+        light2.position.set( 0, 500, -1000 );
+
+        light2.castShadow = true;
+
+        light2.shadowCameraNear = shadowCameraNear;
+        light2.shadowCameraFar = shadowCameraFar;
+
+        light2.shadowBias = shadowBias;
+        light2.shadowDarkness = shadowDarkness;
+
+        light2.shadowMapWidth = SHADOW_MAP_WIDTH;
+        light2.shadowMapHeight = SHADOW_MAP_HEIGHT;
+
+        scene.add( light2 );
+
+        //
+
+        light3 = new XG.PointLight( 0xffccaa, intensity, distance );
+        light3.position.set( 1500, 500, 500 );
+
+        light3.castShadow = true;
+
+        light3.shadowCameraNear = shadowCameraNear;
+        light3.shadowCameraFar = shadowCameraFar;
+
+        light3.shadowBias = shadowBias;
+        light3.shadowDarkness = shadowDarkness;
+
+        light3.shadowMapWidth = SHADOW_MAP_WIDTH;
+        light3.shadowMapHeight = SHADOW_MAP_HEIGHT;
+
+        scene.add( light3 );
+
+        //
+
+        emitter1 = createEmitter( light1 );
+        emitter2 = createEmitter( light2 );
+        emitter3 = createEmitter( light3 );
+
+        scene.add( emitter1 );
+        scene.add( emitter2 );
+        scene.add( emitter3 );
+
+        //
+
+        createScene();
+
+        // RENDERER
+
+        var parameters = { width: SCREEN_WIDTH, height: SCREEN_HEIGHT, scale: SCALE,
+            antialias: true,
+            tonemapping: XG.UnchartedOperator, brightness: 8,
+            useMultipleRenderTargets: true };
+
+        renderer = new XG.DeferredRenderer( parameters );
+        renderer.domElement.style.position = "relative";
+        renderer.domElement.style.top = MARGIN + 'px';
+        container.appendChild( renderer.domElement );
+
+        //
+
+        renderer.shadowMapEnabled = true;
+        renderer.shadowMapType = XG.PCFSoftShadowMap;
+        //renderer.shadowMapType = XG.PCFShadowMap;
+        //renderer.shadowMapType = XG.BasicShadowMap;
+
+        renderer.shadowMapSlopeDepthBias = true;
+        renderer.shadowMapSlopeScale = 3;
+        renderer.shadowMapSlopeBias = 0.0001;
+
+        renderer.shadowMapCullFace = XG.CullFaceBack;
+
+        renderer.shadowMapUseDepthTextures = true;
+
+        //
+
+        renderer.bloomEnabled = true;
+
+        //
+
+        renderer.renderer.maxMorphTargets = 2;
+        renderer.renderer.maxMorphNormals = 2;
+        renderer.renderer.sortObjects = false;
+
+        // STATS
+
+        stats = new Stats();
+        container.appendChild( stats.domElement );
+
+        // EVENTS
+
+        window.addEventListener( 'resize', onWindowResize, false );
+        document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+    }
+
+    function createEmitter( light ) {
+
+        var sphereMaterial = new XG.EmissiveMaterial( { color: light.color.getHex(), intensity: light.intensity } );
+        var lightSphere = new XG.Mesh( sphereGeometry, sphereMaterial );
+        lightSphere.position = light.position;
+
+        return lightSphere;
+
+    }
+
+    function createScene( ) {
+
+        // GROUND
+
+        var floorMap = XG.ImageUtils.loadCompressedTexture( "/textures/materials/stone.dds" );
+        floorMap.wrapS = floorMap.wrapT = XG.RepeatWrapping;
+        floorMap.repeat.set( 64, 64 );
+        floorMap.anisotropy = 4;
+
+        var wallMap = XG.ImageUtils.loadCompressedTexture( "/textures/materials/rocks.dds" );
+        wallMap.wrapS = wallMap.wrapT = XG.RepeatWrapping;
+        wallMap.anisotropy = 4;
+        wallMap.repeat.set( 3.6 * 4, 4 );
+
+        var pipeMap = XG.ImageUtils.loadCompressedTexture( "/textures/materials/water.dds" );
+        pipeMap.wrapS = pipeMap.wrapT = XG.RepeatWrapping;
+        pipeMap.repeat.set( 8, 8 );
+        pipeMap.anisotropy = 4;
+
+        //
+
+        var ceilingMaterial = new XG.PhongMaterial( { color: 0xffffff, specular: 0x444444, shininess: 100, bumpMap: floorMap } );
+        var groundMaterial = new XG.PhongMaterial( { color: 0x555555, specular: 0x444444, shininess: 100, bumpMap: floorMap } );
+        var wallMaterial = new XG.PhongMaterial( { color: 0xffffff, specular: 0x444444, shininess: 100, bumpMap: wallMap } );
+
+        var simpleMaterial = new XG.PhongMaterial( { color: 0xffffff, specular: 0x444444, shininess: 100 } );
+        var simpleMaterial2 = new XG.PhongMaterial( { color: 0x888888, specular: 0x444444, shininess: 100 } );
+        var metalMaterial = new XG.PhongMaterial( { color: 0x000000, specular: 0xff3300, shininess: 1500, bumpMap: pipeMap } );
+        var pipeMaterial = new XG.PhongMaterial( { color: 0xaaaaff, specular: 0x444444, shininess: 1500, bumpMap: pipeMap } );
+
+
+        // floor
+
+        var groundGeo = new XG.PlaneGeometry( 10000, 10000 );
+        var ground = new XG.Mesh( groundGeo, groundMaterial );
+
+        ground.position.set( 0, FLOOR, 0 );
+        ground.rotation.setX( - Math.PI / 2 );
+
+        scene.add( ground );
+
+        // right
+
+        var wallGeo = new XG.BoxGeometry( 3600, 1000, 5 );
+        var mesh = new XG.Mesh( wallGeo, wallMaterial );
+
+        mesh.position.set( 0, FLOOR + 500, -800 );
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        scene.add( mesh );
+
+        // left
+
+        var mesh = new XG.Mesh( wallGeo, wallMaterial );
+
+        mesh.position.set( 0, FLOOR + 500, 800 );
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        scene.add( mesh );
+
+        // ceiling
+
+        var mesh = new XG.Mesh( groundGeo, ceilingMaterial );
+
+        mesh.position.setY( FLOOR + 400 );
+        mesh.rotation.setX( Math.PI / 2 );
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        scene.add( mesh );
+
+        // right curb
+
+        var curbGeo = new XG.BoxGeometry( 3600, 10, 25 );
+        var mesh = new XG.Mesh( curbGeo, simpleMaterial );
+
+        mesh.position.set( 0, FLOOR + 5, -780 );
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        scene.add( mesh );
+
+        // left curb
+
+        var mesh = new XG.Mesh( curbGeo, simpleMaterial );
+
+        mesh.position.set( 0, FLOOR + 5, 780 );
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        scene.add( mesh );
+
+        // left pipes
+
+        var pipeGeo = new XG.CylinderGeometry( 20, 20, 500, 16 );
+        var mesh = new XG.Mesh( pipeGeo, metalMaterial );
+
+        mesh.position.set( -200, FLOOR + 250, 750 );
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        scene.add( mesh );
+
+        var mesh = new XG.Mesh( pipeGeo, metalMaterial );
+
+        mesh.position.set( -270, FLOOR + 250, 750 );
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        scene.add( mesh );
+
+        var mesh = new XG.Mesh( new XG.BoxGeometry( 150, 20, 150 ), simpleMaterial2 );
+
+        mesh.position.set( -235, FLOOR + 10, 780 );
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        scene.add( mesh );
+
+        // right pipes
+
+        var horizontalPipeGeo = new XG.CylinderGeometry( 10, 10, 4000, 16 );
+        var mesh = new XG.Mesh( horizontalPipeGeo, pipeMaterial );
+
+        mesh.position.set( 0, FLOOR + 360, -780 );
+        mesh.rotation.setZ( Math.PI / 2 );
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        scene.add( mesh );
+
+        var mesh = new XG.Mesh( horizontalPipeGeo, pipeMaterial );
+
+        mesh.position.set( 0, FLOOR + 330, -780 );
+        mesh.rotation.setZ( Math.PI / 2 );
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        scene.add( mesh );
+
+        // grid
+
+        var gridGeo = new XG.Geometry();
+        var stickGeo = new XG.BoxGeometry( 5, 400, 5 );
+        var railGeo = new XG.BoxGeometry( 3600, 10, 10 );
+
+        var transform = new XG.Matrix4();
+
+        for ( var i = 0; i < 100; i ++ ) {
+
+            transform.setPositionXYZ( i * 50 - 2000, FLOOR + 200, 0 );
+            gridGeo.merge( stickGeo, transform );
+
+        }
+
+        transform.setPositionXYZ( 0, FLOOR + 5, 0 );
+        gridGeo.merge( railGeo, transform );
+
+        transform.setPositionXYZ( 0, FLOOR + 395, 0 );
+        gridGeo.merge( railGeo, transform );
+
+        var mesh = new XG.Mesh( gridGeo, simpleMaterial2 );
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        scene.add( mesh );
+
+        // MORPHS
+
+        function addMorph( geometries, scale, speed, duration, x, y, z, fudgeColor, hue ) {
+
+            var material1 = new XG.PhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 500, morphTargets: true, morphNormals: true, wrapAround: false } );
+            var material2 = new XG.PhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 500, morphTargets: true, morphNormals: true, wrapAround: false } );
+
+            if ( fudgeColor ) {
+
+                material1.color.setHSV( hue + 0.025 * Math.random(), 0.8, 1 );
+
+            }
+
+            for ( var i = 0; i < geometries.length; i ++ ) {
+
+                var geometry = geometries[ i ];
+                geometry.computeVertexNormals();
+                geometry.computeMorphNormals();
+
+            }
+
+            var object = new XG.MorphMesh( geometries, [ material1, material2 ] );
+            object.autoCreateAnimations( 6 );
+            object.speed = speed;
+
+            object.playAnimation( "__default" );
+            object.animationsList[0].time = Math.random();
+
+            object.scale.multiplyScalar( scale );
+            object.position.set( x, y, z );
+            object.rotation.setY( Math.PI/2 );
+
+            object.castShadow = true;
+            object.receiveShadow = true;
+
+            scene.add( object );
+            morphs.push( object );
+
+        }
+
+        var loader = new XG.JSONLoader();
+        loader.load( "/models/morphs/elderlyWalk.js", function( geometries, materials ) {
+
+            for ( var i = 0; i < {{.n}}; i ++ ) {
+
+                addMorph( geometries, 125, 95, 1200, -1500 + Math.random() * 3000, FLOOR,  200 + Math.random() * 300, true, 0 );
+                addMorph( geometries, 125, 95, 1200, -1500 + Math.random() * 3000, FLOOR, -200 - Math.random() * 300, true, 0.6 );
+
+            }
+
+        }, { "mergeMaterials": true } );
+
+    }
+
+    //
+
+    function onWindowResize() {
+
+        windowHalfX = window.innerWidth / 2;
+        windowHalfY = window.innerHeight / 2;
+
+        SCREEN_WIDTH = window.innerWidth;
+        SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+
+        camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+    }
+
+    function onDocumentMouseMove( event ) {
+
+        mouseX = ( event.clientX - windowHalfX ) * 1;
+        mouseY = ( event.clientY - windowHalfY ) * 1;
+
+    }
+
+    //
+
+    function animate() {
+
+        requestAnimationFrame( animate );
+
+        render();
+        stats.update();
+
+    }
+
+    function render() {
+
+        var time = 0.75 * Date.now();
+        var delta = clock.getDelta();
+
+        // update morphs
+
+        var x, y, z;
+
+        for ( var i = 0; i < morphs.length; i ++ ) {
+
+            morph = morphs[ i ];
+
+            morph.update( delta );
+
+            morph.position.data[0] += morph.speed * delta;
+
+            if ( morph.position.data[0]  > 2000 )  {
+
+                morph.position.data[0] = -1500 - Math.random() * 500;
+
+            }
+
+        }
+
+        // update lights
+
+        //time = 0;
+
+        x = Math.sin( 0.0003 * time ) * 800;
+        z = Math.cos( 0.0003 * time ) * 400;
+        y = Math.cos( 0.0003 * time ) * 100 + 110 + FLOOR;
+
+        light1.position.set( x, y, z );
+
+        x = Math.sin( 0.0005 * time ) * 800;
+        z = Math.cos( 0.0005 * time ) * 400;
+        y = Math.cos( 0.0003 * time ) * 125 + 135 + FLOOR;
+
+        light2.position.set( x, y, z );
+
+        x = Math.sin( 0.0004 * time ) * 800;
+        z = Math.cos( 0.0004 * time ) * 400;
+        y = Math.cos( 0.0004 * time ) * 125 + 145 + FLOOR;
+
+        light3.position.set( x, y, z );
+
+        // update camera
+
+        targetX = mouseX * .002;
+        targetY = mouseY * .002;
+
+        angle  += 0.05 * ( targetX - angle );
+        height += 0.05 * ( targetY - height );
+
+        var aa = 0.45 * angle + 1.57;
+        x =  Math.sin( aa ) * 1000;
+        z =  Math.cos( aa ) * 1000;
+        y = -100 * height + FLOOR + 150;
+
+        camera.position.set( x, y, z );
+
+        camera.lookAt( target );
+
+        // render
+
+        renderer.render( scene, camera );
+
+    }
+
+</script><div><canvas width="3118" height="1270" style="width: 1559px; height: 635px; position: relative; top: 100px;"></canvas><div id="stats" style="width: 80px; opacity: 0.9; cursor: pointer;"><div id="fps" style="padding: 0px 0px 3px 3px; text-align: left; background-color: rgb(0, 0, 34);"><div id="fpsText" style="color: rgb(0, 255, 255); font-family: Helvetica, Arial, sans-serif; font-size: 9px; font-weight: bold; line-height: 15px;">19 FPS (2-24)</div><div id="fpsGraph" style="position: relative; width: 74px; height: 30px; background-color: rgb(0, 255, 255);"><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 29.4px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 24.6px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 22.8px; float: left; background-color: rgb(17, 17, 51);"></span><span style="width: 1px; height: 24.3px; float: left; background-color: rgb(17, 17, 51);"></span></div></div><div id="ms" style="padding: 0px 0px 3px 3px; text-align: left; display: none; background-color: rgb(0, 34, 0);"><div id="msText" style="color: rgb(0, 255, 0); font-family: Helvetica, Arial, sans-serif; font-size: 9px; font-weight: bold; line-height: 15px;">36 MS (7-1167)</div><div id="msGraph" style="position: relative; width: 74px; height: 30px; background-color: rgb(0, 255, 0);"><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.6px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 26.85px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 28.05px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 28.35px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 28.95px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.6px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 12.45px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.6px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 14.4px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 28.2px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 16.2px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 14.7px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.75px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 16.8px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 28.2px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 14.85px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.75px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 17.4px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.45px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.15px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.9px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.6px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 26.4px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 25.65px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 19.65px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 28.2px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 16.35px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 16.8px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 28.35px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 24px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 23.55px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 14.85px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.45px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 17.55px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.3px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 25.2px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 15.15px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.45px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 25.05px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 14.85px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.45px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 24.6px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 23.1px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 14.7px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.45px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 25.05px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 14.55px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.9px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 17.7px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.45px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 24.9px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 13.8px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 21.3px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 15px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.6px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 24.9px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 25.2px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 14.55px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.6px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 17.85px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 27.3px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(17, 51, 17);"></span><span style="width: 1px; height: 24.6px; float: left; background-color: rgb(17, 51, 17);"></span></div></div></div></div>
+
+
+
+</body>
+</html>
