@@ -84,6 +84,7 @@ func main() {
 				"test": true,
 				"n": n,
 				"sn": sn,
+				"mono": (c.DefaultQuery("mono", "true") == "true"),
 			})
 		})
 	}

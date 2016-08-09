@@ -5,7 +5,11 @@
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <title>Simultra</title>
     <link rel="stylesheet" href="/stylesheets/maps/main.css">
+    {{if .mono}}
+    <link rel="stylesheet" href="/vendor/vizicities-mono.css">
+    {{else}}
     <link rel="stylesheet" href="/vendor/vizicities.css">
+    {{end}}
     <link rel="stylesheet" href="/vendor/simultra.css">
 </head>
 <body>
@@ -15,7 +19,11 @@
 <script src="/vendor/threex.rendererstats.js"></script>
 <script src="/vendor/TweenMax.min.js"></script>
 <script src="/vendor/operative.min.js"></script>
+{{if .mono}}
+<script src="/vendor/vizicities-mono.min.js"></script>
+{{else}}
 <script src="/vendor/vizicities.min.js"></script>
+{{end}}
 <script src="/vendor/jquery-3.0.0.min.js"></script>
 <script src="/vendor/simultra.js"></script>
 <script type="text/javascript">

@@ -21365,12 +21365,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // internal helper methods
 	  function createBody(geometry, materials) {
+	    geometry.sortFacesByMaterialIndex();
+	
 	    scope.bodyGeometry = geometry;
 	    scope.bodyMaterials = materials;
 	
 	    onCreated();
 	  }
 	  function createWheel(geometry, materials) {
+	    geometry.sortFacesByMaterialIndex();
+	
 	    scope.wheelGeometry = geometry;
 	    scope.wheelMaterials = materials;
 	
@@ -21514,14 +21518,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // wheels rolling
 	      if (this.updateWheel) {
-	        var angularSpeedRatio = 1 / (this.modelScale * (this.wheelDiameter / 2));
+	        var angularSpeedRatio = 1 / (this.model.scale * (this.wheelDiameter / 2.));
 	        var wheelDelta = forwardDelta * angularSpeedRatio;
-	        if (this.loaded) {
-	          this.frontLeftWheelMesh.rotation.x += wheelDelta;
-	          this.frontRightWheelMesh.rotation.x += wheelDelta;
-	          this.backLeftWheelMesh.rotation.x += wheelDelta;
-	          this.backRightWheelMesh.rotation.x += wheelDelta;
-	        }
+	
+	        this.frontLeftWheelMesh.rotation.x += wheelDelta;
+	        this.frontRightWheelMesh.rotation.x += wheelDelta;
+	        this.rearLeftWheelMesh.rotation.x += wheelDelta;
+	        this.rearRightWheelMesh.rotation.x += wheelDelta;
 	      }
 	    }
 	
@@ -21555,10 +21558,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var delta = new THREE.Vector3();
 	
 	        // setup combined materials
-	        // var bodyFaceMaterial = new THREE.MultiMaterial(bodyMaterials);
-	        // var wheelFaceMaterial = new THREE.MultiMaterial(wheelMaterials);
-	        var bodyFaceMaterial = new THREE.MeshPhongMaterial({ color: 0x00000bb });
-	        var wheelFaceMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
+	        var bodyFaceMaterial = new THREE.MultiMaterial(bodyMaterials);
+	        var wheelFaceMaterial = new THREE.MultiMaterial(wheelMaterials);
+	        // var bodyFaceMaterial = new THREE.MeshFaceMaterial(bodyMaterials);
+	        // var wheelFaceMaterial = new THREE.MeshFaceMaterial(wheelMaterials);
+	        // var bodyFaceMaterial = new THREE.MeshPhongMaterial({ color: 0x00000bb });
+	        // var wheelFaceMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
 	
 	        // create body mesh
 	        this.bodyMesh = new THREE.Mesh(bodyGeometry, bodyFaceMaterial);
@@ -21571,6 +21576,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.frontLeftWheelRoot.position.add(delta);
 	        this.frontLeftWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
 	        this.frontLeftWheelMesh.scale.set(s, s, s);
+	        this.frontLeftWheelMesh.rotateY(0.0);
 	        this.frontLeftWheelRoot.add(this.frontLeftWheelMesh);
 	        root.add(this.frontLeftWheelRoot);
 	        // front right
@@ -21578,18 +21584,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.frontRightWheelRoot.position.add(delta);
 	        this.frontRightWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
 	        this.frontRightWheelMesh.scale.set(s, s, s);
+	        this.frontRightWheelMesh.rotateY(Math.PI);
 	        this.frontRightWheelRoot.add(this.frontRightWheelMesh);
 	        root.add(this.frontRightWheelRoot);
 	        // rear left
 	        delta.multiplyVectors(wheelOffset, new THREE.Vector3(s, s, -s));
 	        this.rearLeftWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
 	        this.rearLeftWheelMesh.scale.set(s, s, s);
+	        this.rearLeftWheelMesh.rotateY(0.0);
 	        this.rearLeftWheelMesh.position.add(delta);
 	        root.add(this.rearLeftWheelMesh);
 	        // rear right
 	        delta.multiplyVectors(wheelOffset, new THREE.Vector3(-s, s, -s));
 	        this.rearRightWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
 	        this.rearRightWheelMesh.scale.set(s, s, s);
+	        this.rearRightWheelMesh.rotateY(Math.PI);
 	        this.rearRightWheelMesh.position.add(delta);
 	        root.add(this.rearRightWheelMesh);
 	
