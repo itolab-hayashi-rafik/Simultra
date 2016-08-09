@@ -6,11 +6,11 @@ A Multi-agent Urban Traffic Simulator
 
 ## About this project
 
-Simultra is a multi-agent traffic simulator developed at [Ito Takayuki Laboratory](http://www.itolab.nitech.ac.jp/itolab_hp) in Nagoya Institute of Technology. This work is still in progress and expected to finish the implementation by the end of the fiscal year 2017.
+Simultra is a multi-agent traffic simulator developed at [Ito Takayuki Laboratory](http://www.itolab.nitech.ac.jp/itolab_hp) in Nagoya Institute of Technology. This work is still in progress and expected be done by the end of the fiscal year 2017.
 
 ## Related work
 
-+ [itolab-hayashi-rafik/vizivities](https://github.com/itolab-hayashi-rafik/vizicities): An extended framework of [vizicities](https://github.com/UDST/vizicities) to realize adding vehicles and pedestrians in the 3D world.
++ [itolab-hayashi-rafik/vizivities](https://github.com/itolab-hayashi-rafik/vizicities): An extended framework of [vizicities](https://github.com/UDST/vizicities) with an additional feature to add objects such as vehicles and pedestrians in the 3D world.
 + [itolab-hayashi-rafik/jose-toolbox](https://github.com/itolab-hayashi-rafik/jose-toolbox): A toolbox to manipulate JOSE compute nodes (in NICT TestBed).
 
 ## Special Thanks to
