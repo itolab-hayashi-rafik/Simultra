@@ -323,6 +323,7 @@ class VehicleLayer extends Layer {
 
         // update the object in vizi layer
         if (prevSender !== sender) {
+          viziLayer.setLabelClass(vehicle.id, 'label vehicle');
           viziLayer.setLabelText(vehicle.id, sender);
           prevSender = sender;
         }

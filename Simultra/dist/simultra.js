@@ -2012,6 +2012,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          // update the object in vizi layer
 	          if (prevSender !== sender) {
+	            viziLayer.setLabelClass(pedestrian.id, 'label pedestrian');
 	            viziLayer.setLabelText(pedestrian.id, sender);
 	            prevSender = sender;
 	          }
@@ -2633,6 +2634,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          // update the object in vizi layer
 	          if (prevSender !== sender) {
+	            viziLayer.setLabelClass(vehicle.id, 'label vehicle');
 	            viziLayer.setLabelText(vehicle.id, sender);
 	            prevSender = sender;
 	          }

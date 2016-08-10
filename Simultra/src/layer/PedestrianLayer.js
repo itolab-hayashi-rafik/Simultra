@@ -273,6 +273,7 @@ class PedestrianLayer extends Layer {
 
         // update the object in vizi layer
         if (prevSender !== sender) {
+          viziLayer.setLabelClass(pedestrian.id, 'label pedestrian');
           viziLayer.setLabelText(pedestrian.id, sender);
           prevSender = sender;
         }
