@@ -25,7 +25,8 @@
     if (typeof Simultra === 'function') {
         simultra = new Simultra(location.protocol + '//' + location.host, null, {
             debug: {{.debug}},
-            renderer: "{{.renderer}}"
+            renderer: "{{.renderer}}",
+            renderBuilding: !{{.test}},
         });
         {{if .dynamic}}
         simultra.start();
@@ -33,9 +34,6 @@
 
         {{if .test}}
         <!-- beginning of test -->
-        // remove building layer
-        simultra._buildingLayer.remove();
-
         // add cars
         var veyrons = [];
         for (var i = 0; i < {{.n}}; i++) {
