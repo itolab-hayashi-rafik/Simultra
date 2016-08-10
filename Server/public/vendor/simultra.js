@@ -132,7 +132,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var defaultOptions = {
 	      debug: true,
-	      renderer: 'cpu'
+	      renderer: 'cpu',
+	      renderBasemap: true,
+	      renderHighway: true,
+	      renderFootway: true,
+	      renderBuilding: true,
+	      renderVehicle: true,
+	      renderPedestrian: true
 	    };
 	    _this._options = (0, _extend2.default)({}, defaultOptions, options);
 	
@@ -178,17 +184,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_setupLayers',
 	    value: function _setupLayers() {
 	      // Basemap
-	      this._basemapLayer = new _BasemapLayer2.default(this._options).addTo(this);
+	      this._basemapLayer = this._options.renderBasemap ? new _BasemapLayer2.default(this._options).addTo(this) : null;
 	      // Highway
-	      this._highwayLayer = new _HighwayLayer2.default(this._options).addTo(this);
+	      this._highwayLayer = this._options.renderHighway ? new _HighwayLayer2.default(this._options).addTo(this) : null;
 	      // Footway
-	      this._footwayLayer = new _FootwayLayer2.default(this._options).addTo(this);
+	      this._footwayLayer = this._options.renderFootway ? new _FootwayLayer2.default(this._options).addTo(this) : null;
 	      // Building
-	      this._buildingLayer = new _BuildingLayer2.default(this._options).addTo(this);
+	      this._buildingLayer = this._options.renderBuilding ? new _BuildingLayer2.default(this._options).addTo(this) : null;
 	      // Vehicle
-	      this._vehicleLayer = new _VehicleLayer2.default(this._options).addTo(this);
+	      this._vehicleLayer = this._options.renderVehicle ? new _VehicleLayer2.default(this._options).addTo(this) : null;
 	      // Pedestrian
-	      this._pedestrianLayer = new _PedestrianLayer2.default(this._options).addTo(this);
+	      this._pedestrianLayer = this._options.renderPedestrian ? new _PedestrianLayer2.default(this._options).addTo(this) : null;
 	    }
 	  }, {
 	    key: '_setupDebug',
@@ -251,8 +257,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'start',
 	    value: function start() {
-	      this._vehicleLayer.start();
-	      this._pedestrianLayer.start();
+	      this._vehicleLayer && this._vehicleLayer.start();
+	      this._pedestrianLayer && this._pedestrianLayer.start();
 	      this._isRunning = true;
 	    }
 	
@@ -263,8 +269,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'stop',
 	    value: function stop() {
-	      this._vehicleLayer.stop();
-	      this._pedestrianLayer.stop();
+	      this._vehicleLayer && this._vehicleLayer.stop();
+	      this._pedestrianLayer && this._pedestrianLayer.stop();
 	      this._isRunning = false;
 	    }
 	

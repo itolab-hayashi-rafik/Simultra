@@ -20,7 +20,13 @@ class Simultra extends EventEmitter {
 
     var defaultOptions = {
       debug: true,
-      renderer: 'cpu'
+      renderer: 'cpu',
+      renderBasemap: true,
+      renderHighway: true,
+      renderFootway: true,
+      renderBuilding: true,
+      renderVehicle: true,
+      renderPedestrian: true
     };
     this._options = extend({}, defaultOptions, options);
 
@@ -62,17 +68,17 @@ class Simultra extends EventEmitter {
 
   _setupLayers() {
     // Basemap
-    this._basemapLayer = new BasemapLayer(this._options).addTo(this);
+    this._basemapLayer    = this._options.renderBasemap    ? new BasemapLayer(this._options).addTo(this)    : null;
     // Highway
-    this._highwayLayer = new HighwayLayer(this._options).addTo(this);
+    this._highwayLayer    = this._options.renderHighway    ? new HighwayLayer(this._options).addTo(this)    : null;
     // Footway
-    this._footwayLayer = new FootwayLayer(this._options).addTo(this);
+    this._footwayLayer    = this._options.renderFootway    ? new FootwayLayer(this._options).addTo(this)    : null;
     // Building
-    this._buildingLayer = new BuildingLayer(this._options).addTo(this);
+    this._buildingLayer   = this._options.renderBuilding   ? new BuildingLayer(this._options).addTo(this)   : null;
     // Vehicle
-    this._vehicleLayer = new VehicleLayer(this._options).addTo(this);
+    this._vehicleLayer    = this._options.renderVehicle    ? new VehicleLayer(this._options).addTo(this)    : null;
     // Pedestrian
-    this._pedestrianLayer = new PedestrianLayer(this._options).addTo(this);
+    this._pedestrianLayer = this._options.renderPedestrian ? new PedestrianLayer(this._options).addTo(this) : null;
   }
 
   _setupDebug() {
@@ -127,8 +133,8 @@ class Simultra extends EventEmitter {
    * Starts updating the view
    */
   start() {
-    this._vehicleLayer.start();
-    this._pedestrianLayer.start();
+    this._vehicleLayer    && this._vehicleLayer.start();
+    this._pedestrianLayer && this._pedestrianLayer.start();
     this._isRunning = true;
   }
 
@@ -136,8 +142,8 @@ class Simultra extends EventEmitter {
    * Stops updating the view
    */
   stop() {
-    this._vehicleLayer.stop();
-    this._pedestrianLayer.stop();
+    this._vehicleLayer    && this._vehicleLayer.stop();
+    this._pedestrianLayer && this._pedestrianLayer.stop();
     this._isRunning = false;
   }
 
