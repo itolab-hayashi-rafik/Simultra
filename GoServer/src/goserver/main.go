@@ -106,6 +106,20 @@ func main() {
 				"n": n,
 			})
 		})
+
+		test.GET("/suzannes", func(c *gin.Context) {
+			r.LoadHTMLGlob("views/test/*.html")
+			n, _ := strconv.Atoi(c.DefaultQuery("n", "5000"))
+			fov, _ := strconv.Atoi(c.DefaultQuery("fov", "60"))
+			near, _ := strconv.Atoi(c.DefaultQuery("near", "1"))
+			far, _ := strconv.Atoi(c.DefaultQuery("far", "10000"))
+			c.HTML(200, "suzannes.html", gin.H{
+				"n": n,
+				"fov": fov,
+				"near": near,
+				"far": far,
+			})
+		})
 	}
 
 	api := r.Group("/api")
