@@ -1,5 +1,7 @@
 package models
 
+import "sync"
+
 type Vehicle struct {
 	Id string `json:"id"`
 	Type string `json:"type"`
@@ -9,4 +11,9 @@ type Vehicle struct {
 	Angle float64 `json:"angle"`
 	Wheel float64 `json:"wheel"`
 	L float64 `json:"L"`
+}
+
+type concurrentVehicleMap struct {
+	sync.RWMutex
+	m map[string]*Vehicle
 }

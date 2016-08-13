@@ -1,5 +1,7 @@
 package models
 
+import "sync"
+
 type Hub struct {
 	// Registered clients
 	clients map[*Client]bool
@@ -12,6 +14,11 @@ type Hub struct {
 
 	// Unregister requests from clients
 	unregister chan *Client
+}
+
+type concurrentHubMap struct {
+	sync.RWMutex
+	m map[string]*Hub
 }
 
 // Create a new Hub instance
