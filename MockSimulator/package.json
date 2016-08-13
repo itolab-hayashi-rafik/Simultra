@@ -2,6 +2,7 @@
   "name": "mock-simulator",
   "version": "0.0.1",
   "dependencies": {
+    "moment": "^2.14.1",
     "superagent": "^2.0.0",
     "websocket": "^1.0.23"
   }
