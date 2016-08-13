@@ -99,7 +99,7 @@ struct WebApi {
             let url = WebApi.baseUrl + "/vehicles/" + vehicle.id! + "/ws?id=" + id
             return WSController(socket: WebSocket(url: NSURL(string: url)!))
         }
-        struct WSController {
+        class WSController {
             let socket: WebSocket!
             var callback: ((JSON) -> Void)?
             
@@ -116,7 +116,8 @@ struct WebApi {
                 socket.onText = { (value: String) in
                     print("[websocket] received: \(value)")
                     if (self.callback != nil) {
-                        let json = JSON(value)
+                        let data = value.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
+                        let json = JSON(data: data)
                         self.callback!(json)
                     }
                 }
@@ -130,7 +131,7 @@ struct WebApi {
                 self.socket.writeString(json as String)
             }
             
-            mutating func setCallback(callback: (JSON) -> Void) {
+            func setCallback(callback: (JSON) -> Void) {
                 self.callback = callback
             }
             

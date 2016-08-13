@@ -15,6 +15,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     var vehicle: Vehicle!
     var api: WebApi.Vehicles.WSController?
     
+    @IBOutlet weak var labelVehicle: UILabel!
+    @IBOutlet weak var labelLatitude: UILabel!
+    @IBOutlet weak var labelLongitude: UILabel!
+    @IBOutlet weak var labelAngle: UILabel!
+    @IBOutlet weak var labelVelocity: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -65,9 +71,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func openApi() -> WebApi.Vehicles.WSController {
-        var controller = WebApi.Vehicles.ws(vehicle)
+        let controller = WebApi.Vehicles.ws(vehicle)
         controller.setCallback({ json in
             self.vehicle.update(json["data"])
+            self.labelVehicle.text = self.vehicle.id
+            self.labelLatitude.text = String(self.vehicle.location.lat)
+            self.labelLongitude.text = String(self.vehicle.location.lon)
+            self.labelAngle.text = String(self.vehicle.angle)
+            self.labelVelocity.text = String(self.vehicle.velocity)
         })
         return controller
     }

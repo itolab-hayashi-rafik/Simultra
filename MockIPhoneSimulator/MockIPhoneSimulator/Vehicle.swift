@@ -44,7 +44,8 @@ class Vehicle {
         print("[vehicle] updating: \(json)")
         self.id = json["id"].stringValue
         self.type = json["type"].stringValue
-        self.location = Location(lat: json["location.lat"].doubleValue, lon: json["location.lon"].doubleValue)
+        self.location.lat = json["location"]["lat"].doubleValue
+        self.location.lon = json["location"]["lon"].doubleValue
         self.velocity = json["velocity"].doubleValue
         self.wheel = json["wheel"].doubleValue
     }
