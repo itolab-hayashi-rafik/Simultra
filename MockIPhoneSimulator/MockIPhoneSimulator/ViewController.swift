@@ -78,6 +78,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         self.lm.stopUpdatingHeading()
         
         // close websocket
+        self.api?.close()
         self.api = nil
     }
     

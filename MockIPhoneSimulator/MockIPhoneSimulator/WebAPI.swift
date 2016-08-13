@@ -133,6 +133,10 @@ struct WebApi {
             mutating func setCallback(callback: (JSON) -> Void) {
                 self.callback = callback
             }
+            
+            func close() {
+                self.socket.disconnect()
+            }
         }
     }
 }
