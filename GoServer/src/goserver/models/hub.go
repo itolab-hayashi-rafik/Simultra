@@ -3,6 +3,9 @@ package models
 import "sync"
 
 type Hub struct {
+	// connected hubs
+	hubs map[*Hub]bool
+
 	// Registered clients
 	clients map[*Client]bool
 
@@ -24,11 +27,16 @@ type concurrentHubMap struct {
 // Create a new Hub instance
 func NewHub() *Hub {
 	return &Hub {
+		hubs:	    make(map[*Hub]bool),
 		clients:    make(map[*Client]bool),
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 	}
+}
+
+func (h *Hub) ConnectTo(hub Hub) {
+	h.hubs[&hub] = true
 }
 
 // Hub broadcast
@@ -48,6 +56,9 @@ func (h *Hub) Run() {
 				close(client.send)
 			}
 		case message := <- h.broadcast:
+			for hub := range h.hubs {
+				hub.broadcast <- message
+			}
 			for client := range h.clients {
 				select {
 				case client.send <- message:

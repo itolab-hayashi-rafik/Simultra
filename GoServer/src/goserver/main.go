@@ -117,7 +117,10 @@ func main() {
 			// websocket endpoint for a vehicle
 			v1.GET("/vehicles/:id/ws", func(c *gin.Context) {
 				id := c.Param("id")
-				vehicleManager.WsHandler(id, c.Writer, c.Request)
+				switch id {
+				case "all": vehicleManager.WsUnionedHandler(c.Writer, c.Request)
+				default: vehicleManager.WsHandler(id, c.Writer, c.Request)
+				}
 			})
 
 
@@ -170,7 +173,10 @@ func main() {
 			// websocket endpoint for a vehicle
 			v1.GET("/pedestrians/:id/ws", func(c *gin.Context) {
 				id := c.Param("id")
-				pedestrianManager.WsHandler(id, c.Writer, c.Request)
+				switch id {
+				case "all": pedestrianManager.WsUnionedHandler(c.Writer, c.Request)
+				default: pedestrianManager.WsHandler(id, c.Writer, c.Request)
+				}
 			})
 		}
 	}

@@ -7,6 +7,7 @@ import (
 
 type PedestrianManager struct {
 	managerHub *Hub
+	unionedHub *Hub
 	hubs concurrentHubMap
 	pedestrians concurrentPedestrianMap
 }
@@ -72,6 +73,7 @@ func (pm *PedestrianManager) WsHandler(id string, w http.ResponseWriter, r *http
 	pm.hubs.RUnlock()
 	if !ok {
 		hub = NewHub()
+		hub.ConnectTo(*pm.unionedHub)
 		pm.hubs.Lock()
 		pm.hubs.m[id] = hub
 		pm.hubs.Unlock()
@@ -79,6 +81,11 @@ func (pm *PedestrianManager) WsHandler(id string, w http.ResponseWriter, r *http
 	}
 	// start serving the client
 	ServeWs(hub, w, r)
+}
+
+func (pm *PedestrianManager) WsUnionedHandler(w http.ResponseWriter, r *http.Request) {
+	// start serving the client
+	ServeWs(pm.unionedHub, w, r)
 }
 
 func (pm *PedestrianManager) WsManagerHandler(w http.ResponseWriter, r *http.Request) {
@@ -90,10 +97,13 @@ var sharedPedestrianManager *PedestrianManager = newPedestrianManager()
 
 func newPedestrianManager() *PedestrianManager {
 	managerHub := NewHub()
+	unionedHub := NewHub()
 	go managerHub.Run()
+	go unionedHub.Run()
 
 	return &PedestrianManager{
 		managerHub: managerHub,
+		unionedHub: unionedHub,
 		hubs: concurrentHubMap{m: make(map[string]*Hub)},
 		pedestrians: concurrentPedestrianMap{m: make(map[string]*Pedestrian)},
 	}

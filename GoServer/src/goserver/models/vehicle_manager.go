@@ -7,6 +7,7 @@ import (
 
 type VehicleManager struct {
 	managerHub *Hub
+	unionedHub *Hub
 	hubs concurrentHubMap
 	vehicles concurrentVehicleMap
 }
@@ -72,6 +73,7 @@ func (vm *VehicleManager) WsHandler(id string, w http.ResponseWriter, r *http.Re
 	vm.hubs.RUnlock()
 	if !ok {
 		hub = NewHub()
+		hub.ConnectTo(*vm.unionedHub)
 		vm.hubs.Lock()
 		vm.hubs.m[id] = hub
 		vm.hubs.Unlock()
@@ -79,6 +81,11 @@ func (vm *VehicleManager) WsHandler(id string, w http.ResponseWriter, r *http.Re
 	}
 	// start serving the client
 	ServeWs(hub, w, r)
+}
+
+func (vm *VehicleManager) WsUnionedHandler(w http.ResponseWriter, r *http.Request) {
+	// start serving the client
+	ServeWs(vm.unionedHub, w, r)
 }
 
 func (vm *VehicleManager) WsManagerHandler(w http.ResponseWriter, r *http.Request) {
@@ -90,9 +97,12 @@ var sharedVehicleManager *VehicleManager = newVehicleManager()
 
 func newVehicleManager() *VehicleManager {
 	managerHub := NewHub()
+	unionedHub := NewHub()
 	go managerHub.Run()
+	go unionedHub.Run()
 	return &VehicleManager{
 		managerHub: managerHub,
+		unionedHub: unionedHub,
 		hubs: concurrentHubMap{m: make(map[string]*Hub)},
 		vehicles: concurrentVehicleMap{m: make(map[string]*Vehicle)},
 	}
