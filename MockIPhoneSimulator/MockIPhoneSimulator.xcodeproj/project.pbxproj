@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0F4A544F308609E322BB7EA5 /* Pods_MockIPhoneSimulator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37C787776419A0476A19B9E8 /* Pods_MockIPhoneSimulator.framework */; };
+		2A9FAA4DC29E06776BC28D5D /* Pods_MockIPhoneSimulatorUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A508AA29E51E2020FE703F89 /* Pods_MockIPhoneSimulatorUITests.framework */; };
 		2F5ED6E41D5F08FD009E3AF9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F5ED6E31D5F08FD009E3AF9 /* AppDelegate.swift */; };
 		2F5ED6E61D5F08FD009E3AF9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F5ED6E51D5F08FD009E3AF9 /* ViewController.swift */; };
 		2F5ED6E91D5F08FD009E3AF9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2F5ED6E71D5F08FD009E3AF9 /* Main.storyboard */; };
@@ -14,6 +16,8 @@
 		2F5ED6EE1D5F08FD009E3AF9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2F5ED6EC1D5F08FD009E3AF9 /* LaunchScreen.storyboard */; };
 		2F5ED6F91D5F08FD009E3AF9 /* MockIPhoneSimulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F5ED6F81D5F08FD009E3AF9 /* MockIPhoneSimulatorTests.swift */; };
 		2F5ED7041D5F08FD009E3AF9 /* MockIPhoneSimulatorUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F5ED7031D5F08FD009E3AF9 /* MockIPhoneSimulatorUITests.swift */; };
+		2F5ED7121D5F0AF4009E3AF9 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 2F5ED7111D5F0AF4009E3AF9 /* Podfile */; };
+		96898AC74098ED7C7B2FAB2D /* Pods_MockIPhoneSimulatorTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8930A2E8202F1F2D0785081B /* Pods_MockIPhoneSimulatorTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +38,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0EAD8D636ACA8B2AFAF07B43 /* Pods-MockIPhoneSimulatorUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MockIPhoneSimulatorUITests.release.xcconfig"; path = "../Pods/Target Support Files/Pods-MockIPhoneSimulatorUITests/Pods-MockIPhoneSimulatorUITests.release.xcconfig"; sourceTree = "<group>"; };
+		120459600F277C8A7D59496C /* Pods-MockIPhoneSimulator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MockIPhoneSimulator.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-MockIPhoneSimulator/Pods-MockIPhoneSimulator.debug.xcconfig"; sourceTree = "<group>"; };
+		24564532CE2FEA59FDB9C0EC /* Pods-MockIPhoneSimulator.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MockIPhoneSimulator.release.xcconfig"; path = "../Pods/Target Support Files/Pods-MockIPhoneSimulator/Pods-MockIPhoneSimulator.release.xcconfig"; sourceTree = "<group>"; };
 		2F5ED6E01D5F08FD009E3AF9 /* MockIPhoneSimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MockIPhoneSimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F5ED6E31D5F08FD009E3AF9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2F5ED6E51D5F08FD009E3AF9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -47,6 +54,13 @@
 		2F5ED6FF1D5F08FD009E3AF9 /* MockIPhoneSimulatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MockIPhoneSimulatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F5ED7031D5F08FD009E3AF9 /* MockIPhoneSimulatorUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockIPhoneSimulatorUITests.swift; sourceTree = "<group>"; };
 		2F5ED7051D5F08FD009E3AF9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2F5ED7111D5F0AF4009E3AF9 /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		37C787776419A0476A19B9E8 /* Pods_MockIPhoneSimulator.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MockIPhoneSimulator.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6D01A5DB356D7401A00BAE1A /* Pods-MockIPhoneSimulatorUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MockIPhoneSimulatorUITests.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-MockIPhoneSimulatorUITests/Pods-MockIPhoneSimulatorUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		8930A2E8202F1F2D0785081B /* Pods_MockIPhoneSimulatorTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MockIPhoneSimulatorTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A508AA29E51E2020FE703F89 /* Pods_MockIPhoneSimulatorUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MockIPhoneSimulatorUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D176C2F67AA52299740E4F81 /* Pods-MockIPhoneSimulatorTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MockIPhoneSimulatorTests.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-MockIPhoneSimulatorTests/Pods-MockIPhoneSimulatorTests.debug.xcconfig"; sourceTree = "<group>"; };
+		F9FFE0058042CBB5879193F9 /* Pods-MockIPhoneSimulatorTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MockIPhoneSimulatorTests.release.xcconfig"; path = "../Pods/Target Support Files/Pods-MockIPhoneSimulatorTests/Pods-MockIPhoneSimulatorTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0F4A544F308609E322BB7EA5 /* Pods_MockIPhoneSimulator.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96898AC74098ED7C7B2FAB2D /* Pods_MockIPhoneSimulatorTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,6 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2A9FAA4DC29E06776BC28D5D /* Pods_MockIPhoneSimulatorUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,10 +94,13 @@
 		2F5ED6D71D5F08FD009E3AF9 = {
 			isa = PBXGroup;
 			children = (
+				2F5ED7111D5F0AF4009E3AF9 /* Podfile */,
 				2F5ED6E21D5F08FD009E3AF9 /* MockIPhoneSimulator */,
 				2F5ED6F71D5F08FD009E3AF9 /* MockIPhoneSimulatorTests */,
 				2F5ED7021D5F08FD009E3AF9 /* MockIPhoneSimulatorUITests */,
 				2F5ED6E11D5F08FD009E3AF9 /* Products */,
+				C624C33341EE6F330A898FB3 /* Pods */,
+				D441244EB66B41B62C6BC0DE /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -125,6 +145,29 @@
 			path = MockIPhoneSimulatorUITests;
 			sourceTree = "<group>";
 		};
+		C624C33341EE6F330A898FB3 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				120459600F277C8A7D59496C /* Pods-MockIPhoneSimulator.debug.xcconfig */,
+				24564532CE2FEA59FDB9C0EC /* Pods-MockIPhoneSimulator.release.xcconfig */,
+				D176C2F67AA52299740E4F81 /* Pods-MockIPhoneSimulatorTests.debug.xcconfig */,
+				F9FFE0058042CBB5879193F9 /* Pods-MockIPhoneSimulatorTests.release.xcconfig */,
+				6D01A5DB356D7401A00BAE1A /* Pods-MockIPhoneSimulatorUITests.debug.xcconfig */,
+				0EAD8D636ACA8B2AFAF07B43 /* Pods-MockIPhoneSimulatorUITests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		D441244EB66B41B62C6BC0DE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				37C787776419A0476A19B9E8 /* Pods_MockIPhoneSimulator.framework */,
+				8930A2E8202F1F2D0785081B /* Pods_MockIPhoneSimulatorTests.framework */,
+				A508AA29E51E2020FE703F89 /* Pods_MockIPhoneSimulatorUITests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -132,9 +175,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2F5ED7081D5F08FD009E3AF9 /* Build configuration list for PBXNativeTarget "MockIPhoneSimulator" */;
 			buildPhases = (
+				653F8A2D1EFC1B1DFC618462 /* [CP] Check Pods Manifest.lock */,
 				2F5ED6DC1D5F08FD009E3AF9 /* Sources */,
 				2F5ED6DD1D5F08FD009E3AF9 /* Frameworks */,
 				2F5ED6DE1D5F08FD009E3AF9 /* Resources */,
+				FCB26DD93A188ABD5608711D /* [CP] Embed Pods Frameworks */,
+				0739A63391EF4A3DFD9C1924 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -149,9 +195,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2F5ED70B1D5F08FD009E3AF9 /* Build configuration list for PBXNativeTarget "MockIPhoneSimulatorTests" */;
 			buildPhases = (
+				DA01DF1F58863F4D000DB5B3 /* [CP] Check Pods Manifest.lock */,
 				2F5ED6F01D5F08FD009E3AF9 /* Sources */,
 				2F5ED6F11D5F08FD009E3AF9 /* Frameworks */,
 				2F5ED6F21D5F08FD009E3AF9 /* Resources */,
+				4EF9C6A09E0344ED1566F12F /* [CP] Embed Pods Frameworks */,
+				8F501F2739CBB1F175980AA7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -167,9 +216,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2F5ED70E1D5F08FD009E3AF9 /* Build configuration list for PBXNativeTarget "MockIPhoneSimulatorUITests" */;
 			buildPhases = (
+				EA79AEA72C86AC247298E4BA /* [CP] Check Pods Manifest.lock */,
 				2F5ED6FB1D5F08FD009E3AF9 /* Sources */,
 				2F5ED6FC1D5F08FD009E3AF9 /* Frameworks */,
 				2F5ED6FD1D5F08FD009E3AF9 /* Resources */,
+				52203E5F8F77E664D57A7D9F /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -231,6 +282,7 @@
 			files = (
 				2F5ED6EE1D5F08FD009E3AF9 /* LaunchScreen.storyboard in Resources */,
 				2F5ED6EB1D5F08FD009E3AF9 /* Assets.xcassets in Resources */,
+				2F5ED7121D5F0AF4009E3AF9 /* Podfile in Resources */,
 				2F5ED6E91D5F08FD009E3AF9 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -250,6 +302,129 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0739A63391EF4A3DFD9C1924 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-MockIPhoneSimulator/Pods-MockIPhoneSimulator-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4EF9C6A09E0344ED1566F12F /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-MockIPhoneSimulatorTests/Pods-MockIPhoneSimulatorTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		52203E5F8F77E664D57A7D9F /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-MockIPhoneSimulatorUITests/Pods-MockIPhoneSimulatorUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		653F8A2D1EFC1B1DFC618462 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		8F501F2739CBB1F175980AA7 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-MockIPhoneSimulatorTests/Pods-MockIPhoneSimulatorTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DA01DF1F58863F4D000DB5B3 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		EA79AEA72C86AC247298E4BA /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		FCB26DD93A188ABD5608711D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-MockIPhoneSimulator/Pods-MockIPhoneSimulator-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		2F5ED6DC1D5F08FD009E3AF9 /* Sources */ = {
@@ -399,6 +574,7 @@
 		};
 		2F5ED7091D5F08FD009E3AF9 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 120459600F277C8A7D59496C /* Pods-MockIPhoneSimulator.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = MockIPhoneSimulator/Info.plist;
@@ -410,6 +586,7 @@
 		};
 		2F5ED70A1D5F08FD009E3AF9 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 24564532CE2FEA59FDB9C0EC /* Pods-MockIPhoneSimulator.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = MockIPhoneSimulator/Info.plist;
@@ -421,6 +598,7 @@
 		};
 		2F5ED70C1D5F08FD009E3AF9 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D176C2F67AA52299740E4F81 /* Pods-MockIPhoneSimulatorTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = MockIPhoneSimulatorTests/Info.plist;
@@ -433,6 +611,7 @@
 		};
 		2F5ED70D1D5F08FD009E3AF9 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F9FFE0058042CBB5879193F9 /* Pods-MockIPhoneSimulatorTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = MockIPhoneSimulatorTests/Info.plist;
@@ -445,6 +624,7 @@
 		};
 		2F5ED70F1D5F08FD009E3AF9 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6D01A5DB356D7401A00BAE1A /* Pods-MockIPhoneSimulatorUITests.debug.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = MockIPhoneSimulatorUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -456,6 +636,7 @@
 		};
 		2F5ED7101D5F08FD009E3AF9 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0EAD8D636ACA8B2AFAF07B43 /* Pods-MockIPhoneSimulatorUITests.release.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = MockIPhoneSimulatorUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -484,6 +665,7 @@
 				2F5ED70A1D5F08FD009E3AF9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2F5ED70B1D5F08FD009E3AF9 /* Build configuration list for PBXNativeTarget "MockIPhoneSimulatorTests" */ = {
 			isa = XCConfigurationList;
@@ -492,6 +674,7 @@
 				2F5ED70D1D5F08FD009E3AF9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2F5ED70E1D5F08FD009E3AF9 /* Build configuration list for PBXNativeTarget "MockIPhoneSimulatorUITests" */ = {
 			isa = XCConfigurationList;
@@ -500,6 +683,7 @@
 				2F5ED7101D5F08FD009E3AF9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
