@@ -82,15 +82,11 @@ class Helper(context: Context) {
                 }
 
                 if (magneticValues != null && accelerometerValues != null) {
-
-                    SensorManager.getRotationMatrix(inR, I, accelerometerValues, magneticValues);
-
-                    //Activityの表示が縦固定の場合。横向きになる場合、修正が必要です
-                    SensorManager.remapCoordinateSystem(inR, SensorManager.AXIS_X, SensorManager.AXIS_Z, outR);
-                    SensorManager.getOrientation(outR, orientationValues);
-
                     val now = System.currentTimeMillis()
+
                     if (minInterval < now - lastUpdate) {
+                        SensorManager.getRotationMatrix(inR, I, accelerometerValues, magneticValues)
+                        SensorManager.getOrientation(inR, orientationValues)
                         listener.onOrientationChanged(orientationValues[0], orientationValues[1], orientationValues[2])
                         lastUpdate = now
                     }

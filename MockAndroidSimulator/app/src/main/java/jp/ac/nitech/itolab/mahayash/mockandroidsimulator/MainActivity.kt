@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity(), Helper.LocationListener, Helper.Compas
     private var helper: Helper? = null
 
     private var currentDegrees: Float = 0F
+    private var lastUpdate: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,6 +155,8 @@ class MainActivity : AppCompatActivity(), Helper.LocationListener, Helper.Compas
     }
 
     fun updateView() {
+        val now = System.currentTimeMillis()
+
         (findViewById(R.id.tvId) as TextView).text = vehicle.id
         (findViewById(R.id.tvLatitude) as TextView).text = vehicle.location.latitude.toString()
         (findViewById(R.id.tvLongitude) as TextView).text = vehicle.location.longitude.toString()
@@ -161,10 +164,13 @@ class MainActivity : AppCompatActivity(), Helper.LocationListener, Helper.Compas
 
         val degree = Math.toDegrees(vehicle.angle.toDouble()).toFloat()
         val anim = RotateAnimation(currentDegrees, -degree, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-        anim.duration = COMPASS_MIN_INTERVAL
+        anim.duration = if (0 < lastUpdate) (now - lastUpdate) else COMPASS_MIN_INTERVAL
+        anim.fillBefore = true
         anim.fillAfter = true
         (findViewById(R.id.ivCompass) as ImageView).startAnimation(anim);
         currentDegrees = -degree
+
+        lastUpdate = now
     }
 
     // --- BEGIN SNIPPET: location-listener
