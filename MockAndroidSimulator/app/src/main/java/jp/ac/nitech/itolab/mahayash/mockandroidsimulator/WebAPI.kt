@@ -57,19 +57,6 @@ class WebAPI {
         }
     }
 
-    interface JsonCallback {
-        fun onResponse(json: JSONObject)
-        fun onFailure(e: IOException?)
-    }
-
-    interface SuccessCallback {
-        fun onSuccess(json: JSONObject)
-    }
-
-    interface FailureCallback {
-        fun onFailure(e: IOException?)
-    }
-
     class Result(request: Request) {
         private var successCallback: ((JSONObject) -> Unit) = {}
         private var failureCallback: ((IOException?) -> Unit) = {}
