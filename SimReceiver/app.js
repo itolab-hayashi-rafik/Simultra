@@ -15,7 +15,13 @@ function Client(socket) {
   this.socket = socket;
   this.websocket = null;
   this.wsConnection = null;
-  this.vehicle = {};
+  this.vehicle = {
+    type: 'veyron',
+    location: {
+      lat: 35.169555,
+      lon: 136.900831
+    }
+  };
   this.state = Client.State.NOT_CONNECTED;
 }
 
