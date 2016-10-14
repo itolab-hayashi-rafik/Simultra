@@ -95,7 +95,8 @@ Client.prototype._initWebsocket = function(callback) {
 Client.prototype.writeData = function(d) {
   var socket = this.socket;
   if(socket.writable){
-    process.stdout.write('[' + this.key + '] - ' + d);
+    // process.stdout.write();
+    console.log('[' + this.key + '] - ' + d);
     socket.write(d);
   } else {
     console.log('[ERROR] socket not writable: ' + JSON.stringify(socket));
