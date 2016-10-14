@@ -34,7 +34,7 @@ Client.prototype._initWebsocket = function(callback) {
     self.vehicle = vehicle;
     console.log('[' + self.key + '] - New vehicle created: ' + JSON.stringify(vehicle));
 
-    var url = wsBaseUrl+'/api/v1/vehicles/' + vehicle.id + '/ws?id=' + id;
+    var url = wsBaseUrl+'/api/v1/vehicles/' + vehicle.id + '/ws?id=' + self.name;
 
     // create a websocket client
     var client = new WebSocketClient();
