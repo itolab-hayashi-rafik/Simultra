@@ -6,7 +6,7 @@ var WebSocketClient = require('websocket').client;
 
 var wsBaseUrl = 'ws://localhost:3000';
 
-var serverMaxConnections = 3;
+var serverMaxConnections = 100;
 
 // ---- Client ----------------------------------------------------------------
 function Client(socket){
@@ -92,9 +92,9 @@ server.on('connection', function(socket){
   var newline = /\r\n|\n/;
   socket.on('data', function(chunk){
     data += chunk.toString();
-    var key = socket.remoteAddress + ':' + socket.remotePort;
     if(newline.test(data)){
       // clients[key].writeData(data);
+      console.log('line: ' + data);
       data = '';
     }
   });
