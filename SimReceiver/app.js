@@ -10,21 +10,27 @@ var serverMaxConnections = 100;
 
 // ---- Client ----------------------------------------------------------------
 function Client(socket) {
+  this.name = undefined;
   this.key = socket.remoteAddress + ':' + socket.remotePort;
   this.socket = socket;
   this.websocket = null;
-  this.vehicle = null;
-  this.isReady = false;
-
-  this._init({});
+  this.vehicle = {};
+  this.state = Client.State.NOT_CONNECTED;
 }
 
-Client.prototype._init = function(vehicle) {
+Client.State = {
+  NOT_CONNECTED: 0,
+  CONNECTING: 1,
+  CONNECTED: 2
+};
+
+Client.prototype._initWebsocket = function(callback) {
   var self = this;
-  var id = "thisId";
+
+  self.state = Client.State.CONNECTING;
 
   // create a new vehicle
-  api.newVehicle(vehicle, function(vehicle) {
+  api.newVehicle(this.vehicle, function(vehicle) {
     self.vehicle = vehicle;
     console.log('[' + self.key + '] - New vehicle created: ' + JSON.stringify(vehicle));
 
@@ -35,22 +41,22 @@ Client.prototype._init = function(vehicle) {
 
     // add the connection failure listener
     client.on('connectFailed', function(error) {
-      self.isReady = false;
+      self.state = Client.State.NOT_CONNECTED;
       console.log('Connect Error: ' + error.toString());
     });
 
     // on connected
     client.on('connect', function(connection) {
-      self.isReady = true;
+      self.state = Client.State.CONNECTED;
       console.log('WebSocket Client Connected');
 
       connection.on('error', function(error) {
-        self.isReady = false;
+        self.state = Client.State.NOT_CONNECTED;
         console.log('WebSocket Connection Error: ' + error);
       });
 
       connection.on('close', function() {
-        self.isReady = false;
+        self.state = Client.State.NOT_CONNECTED;
         console.log('WebSocket Connection Closed');
       });
 
@@ -64,7 +70,7 @@ Client.prototype._init = function(vehicle) {
   });
 };
 
-Client.prototype.writeData = function(d){
+Client.prototype.writeData = function(d) {
   var socket = this.socket;
   if(socket.writable){
     process.stdout.write('[' + this.key + '] - ' + d);
@@ -74,14 +80,60 @@ Client.prototype.writeData = function(d){
   }
 };
 
+Client.prototype.ack = function() {
+  this.writeData("ACK " + this.name);
+};
+
+Client.prototype.wsWriteData = function(d) {
+  if (this.state == Client.State.CONNECTED) {
+    this.websocket.connection.send(d);
+  }
+};
+
+Client.prototype.update = function(mobility) {
+  var vehicle = this.vehicle;
+  var changed = false;
+
+  if ('Latitude' in mobility && 'latitude' in vehicle) {
+    vehicle.latitude = mobility['Latitude'];
+    changed = true;
+  }
+  if ('Longitude' in mobility && 'longitude' in vehicle) {
+    vehicle.longitude = mobility['Longitude'];
+    changed = true;
+  }
+
+  if (changed) {
+    this.wsWriteData(JSON.stringify(vehicle));
+  }
+};
+
 Client.prototype.onReceiveData = function(data) {
-  // console.log('[' + this.key + '] - ' + JSON.stringify(data));
-  console.log(data);
+  var self = this;
+
+  console.log('[' + this.key + '] - ' + JSON.stringify(data));
+
   if ('Mobility' in data) {
     var mobility = data['Mobility'];
+
     if ('Name' in mobility) {
       var name = mobility['Name'];
-      this.writeData("ACK " + name);
+      if (name && this.name !== name) {
+        this.name = name;
+      }
+
+      // init websocket if needed
+      if (this.state == Client.State.NOT_CONNECTED) {
+        this._initWebsocket(function() {
+          self.update(mobility);
+          self.ack();
+        });
+      }
+      // if already initialized, pipe the data to websocket
+      else if (this.state == Client.State.CONNECTED) {
+        self.update(mobility);
+        self.ack();
+      }
     } else {
       console.log('[' + this.key + '] - Mobility.Name not exists');
     }
