@@ -9,7 +9,8 @@ var wsBaseUrl = 'ws://localhost:3000';
 var serverMaxConnections = 100;
 
 // ---- Client ----------------------------------------------------------------
-function Client(socket){
+function Client(socket) {
+  this.key = socket.remoteAddress + ':' + socket.remotePort;
   this.socket = socket;
   this.websocket = null;
   this.vehicle = null;
@@ -65,9 +66,15 @@ Client.prototype._init = function(vehicle) {
 Client.prototype.writeData = function(d){
   var socket = this.socket;
   if(socket.writable){
-    var key = socket.remoteAddress + ':' + socket.remotePort;
-    process.stdout.write('[' + key + '] - ' + d);
+    process.stdout.write('[' + this.key + '] - ' + d);
     socket.write(d);
+  }
+};
+
+Client.prototype.onReceiveData = function(d) {
+  console.log('[' + this.key + '] - ' + JSON.stringify(d));
+  if (d.name) {
+    this.writeData("ACK " + d.name);
   }
 };
 
@@ -92,11 +99,19 @@ server.on('connection', function(socket){
   var newline = /\r\n|\n/;
   socket.on('data', function(chunk){
     data += chunk.toString();
-    if(newline.test(data)){
-      // clients[key].writeData(data);
-      console.log('line: ' + data);
+    try {
+      var json = JSON.parse(data);
       data = '';
+
+      clients[key].onReceiveData(json);
+    } catch (e) {
+      // do nothing
     }
+    // if(newline.test(data)){
+      // clients[key].writeData(data);
+      // console.log('line: ' + data);
+      // data = '';
+    // }
   });
 
   // add end connection listener
