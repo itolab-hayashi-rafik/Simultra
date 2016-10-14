@@ -63,6 +63,8 @@ Client.prototype._initWebsocket = function(callback) {
       connection.on('message', function(msg) {
         console.log('WebSocket message: ' + msg);
       });
+
+      callback();
     });
 
     client.connect(url);
