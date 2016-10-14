@@ -14,6 +14,7 @@ function Client(socket) {
   this.key = socket.remoteAddress + ':' + socket.remotePort;
   this.socket = socket;
   this.websocket = null;
+  this.wsConnection = null;
   this.vehicle = {};
   this.state = Client.State.NOT_CONNECTED;
 }
@@ -48,15 +49,18 @@ Client.prototype._initWebsocket = function(callback) {
     // on connected
     client.on('connect', function(connection) {
       self.state = Client.State.CONNECTED;
+      self.wsConnection = connection;
       console.log('WebSocket Client Connected');
 
       connection.on('error', function(error) {
         self.state = Client.State.NOT_CONNECTED;
+        self.wsConnection = null;
         console.log('WebSocket Connection Error: ' + error);
       });
 
       connection.on('close', function() {
         self.state = Client.State.NOT_CONNECTED;
+        self.wsConnection = null;
         console.log('WebSocket Connection Closed');
       });
 
@@ -88,7 +92,7 @@ Client.prototype.ack = function() {
 
 Client.prototype.wsWriteData = function(d) {
   if (this.state == Client.State.CONNECTED) {
-    this.websocket.connection.send(d);
+    this.wsConnection.send(d);
   }
 };
 
