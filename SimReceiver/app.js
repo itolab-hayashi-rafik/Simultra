@@ -71,10 +71,10 @@ Client.prototype.writeData = function(d){
   }
 };
 
-Client.prototype.onReceiveData = function(d) {
-  console.log('[' + this.key + '] - ' + JSON.stringify(d));
-  if (d.name) {
-    this.writeData("ACK " + d.name);
+Client.prototype.onReceiveData = function(data) {
+  console.log('[' + this.key + '] - ' + JSON.stringify(data));
+  if (data['Mobility']['Name']) {
+    this.writeData("ACK " + d['Mobility']['Name']);
   }
 };
 
