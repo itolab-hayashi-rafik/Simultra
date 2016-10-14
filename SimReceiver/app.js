@@ -68,6 +68,8 @@ Client.prototype.writeData = function(d){
   if(socket.writable){
     process.stdout.write('[' + this.key + '] - ' + d);
     socket.write(d);
+  } else {
+    console.log('[ERROR] socket not writable: ' + JSON.stringify(socket));
   }
 };
 
@@ -75,6 +77,7 @@ Client.prototype.onReceiveData = function(data) {
   // console.log('[' + this.key + '] - ' + JSON.stringify(data));
   console.log(data);
   if (data['Mobility']['Name']) {
+    cosole.log(' * obtained mobility name: ' + data['Mobility']['Name']);
     this.writeData("ACK " + d['Mobility']['Name']);
   } else {
     this.writeData('ACK Name');
