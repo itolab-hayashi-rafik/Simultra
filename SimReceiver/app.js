@@ -94,12 +94,12 @@ Client.prototype.update = function(mobility) {
   var vehicle = this.vehicle;
   var changed = false;
 
-  if ('Latitude' in mobility && 'latitude' in vehicle) {
-    vehicle.latitude = mobility['Latitude'];
+  if ('Latitude' in mobility) {
+    vehicle.location.lat = mobility['Latitude'];
     changed = true;
   }
-  if ('Longitude' in mobility && 'longitude' in vehicle) {
-    vehicle.longitude = mobility['Longitude'];
+  if ('Longitude' in mobility) {
+    vehicle.location.lon = mobility['Longitude'];
     changed = true;
   }
 
