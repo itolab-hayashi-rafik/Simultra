@@ -108,7 +108,7 @@ server.on('connection', function(socket){
 
   // --- start the receiver! ---
   // send something first
-  clients[key].writeData(1);
+  clients[key].writeData("1");
 
 });
 
