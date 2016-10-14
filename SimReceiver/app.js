@@ -72,9 +72,12 @@ Client.prototype.writeData = function(d){
 };
 
 Client.prototype.onReceiveData = function(data) {
-  console.log('[' + this.key + '] - ' + JSON.stringify(data));
+  // console.log('[' + this.key + '] - ' + JSON.stringify(data));
+  console.log(data);
   if (data['Mobility']['Name']) {
     this.writeData("ACK " + d['Mobility']['Name']);
+  } else {
+    this.writeData('ACK Name');
   }
 };
 
