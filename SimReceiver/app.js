@@ -49,29 +49,39 @@ Client.prototype._initWebsocket = function(callback) {
     // add the connection failure listener
     client.on('connectFailed', function(error) {
       self.state = Client.State.NOT_CONNECTED;
-      console.log('Connect Error: ' + error.toString());
+      console.log('[' + self.key + '] - Connect Error: ' + error.toString());
     });
 
     // on connected
     client.on('connect', function(connection) {
       self.state = Client.State.CONNECTED;
       self.wsConnection = connection;
-      console.log('WebSocket Client Connected');
+      console.log('[' + self.key + '] - WebSocket Client Connected');
 
       connection.on('error', function(error) {
         self.state = Client.State.NOT_CONNECTED;
         self.wsConnection = null;
-        console.log('WebSocket Connection Error: ' + error);
+        console.log('[' + self.key + '] - WebSocket Connection Error: ' + error);
       });
 
       connection.on('close', function() {
         self.state = Client.State.NOT_CONNECTED;
         self.wsConnection = null;
-        console.log('WebSocket Connection Closed');
+        console.log('[' + self.key + '] - WebSocket Connection Closed');
       });
 
       connection.on('message', function(msg) {
-        console.log('WebSocket message: ' + msg);
+        if (msg.type === 'utf8') {
+          var data = msg.utf8Data;
+          console.log('[' + self.key + '] - ' + data);
+        } else if (msg.type === 'binary') {
+          var data = msg.binaryData;
+          console.log('[' + self.key + '] - binary data');
+        } else {
+          console.log('[' + self.key + '] - Unknown message type!');
+          console.log('[' + self.key + '] - typeof msg = '+(typeof msg));
+          console.log('[' + self.key + '] - Object.keys(msg) = '+(Object.keys(msg)));
+        }
       });
 
       callback();
