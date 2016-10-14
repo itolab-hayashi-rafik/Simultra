@@ -76,11 +76,16 @@ Client.prototype.writeData = function(d){
 Client.prototype.onReceiveData = function(data) {
   // console.log('[' + this.key + '] - ' + JSON.stringify(data));
   console.log(data);
-  if (data['Mobility']['Name']) {
-    cosole.log(' * obtained mobility name: ' + data['Mobility']['Name']);
-    this.writeData("ACK " + d['Mobility']['Name']);
+  if ('Mobility' in data) {
+    var mobility = data['Mobility'];
+    if ('Name' in mobility) {
+      var name = mobility['Name'];
+      this.writeData("ACK " + name);
+    } else {
+      console.log('[' + this.key + '] - Mobility.Name not exists');
+    }
   } else {
-    this.writeData('ACK Name');
+    console.log('[' + this.key + '] - Mobility not exists');
   }
 };
 
