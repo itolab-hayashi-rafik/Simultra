@@ -34,6 +34,6 @@ function updateVehicle(callback) {
 // ------------------------------------------------------------
 
 module.exports = {
-  newVehicle,
-  updateVehicle
+  newVehicle: newVehicle,
+  updateVehicle: updateVehicle
 };
