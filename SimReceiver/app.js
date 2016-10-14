@@ -67,7 +67,7 @@ Client.prototype.writeData = function(d){
   if(socket.writable){
     var key = socket.remoteAddress + ':' + socket.remotePort;
     process.stdout.write('[' + key + '] - ' + d);
-    socket.write('[R]' + d);
+    socket.write(d);
   }
 };
 
@@ -105,6 +105,10 @@ server.on('connection', function(socket){
     console.log('Connection End(' + status + ') - ' + key);
     delete clients[key];
   });
+
+  // --- start the receiver! ---
+  // send something first
+  clients[key].writeData(1);
 
 });
 
