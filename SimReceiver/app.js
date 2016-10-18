@@ -186,6 +186,7 @@ server.on('connection', function(socket){
   var data = '';
   socket.on('data', function(chunk){
     data += chunk.toString();
+    console.log('[' + this.key + '] (in:RAW) - ' + chunk.toString());
     try {
       var json = JSON.parse(data);
       data = '';
@@ -205,7 +206,7 @@ server.on('connection', function(socket){
 
   // --- start the receiver! ---
   // send something first
-  clients[key].writeData("ACK");
+  clients[key].writeData("1");
 
 });
 
