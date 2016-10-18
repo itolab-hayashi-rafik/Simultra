@@ -183,7 +183,6 @@ server.on('connection', function(socket){
 
   // add on data input listener
   var data = '';
-  var newline = /\r\n|\n/;
   socket.on('data', function(chunk){
     data += chunk.toString();
     try {
@@ -194,11 +193,6 @@ server.on('connection', function(socket){
     } catch (e) {
       // do nothing
     }
-    // if(newline.test(data)){
-      // clients[key].writeData(data);
-      // console.log('line: ' + data);
-      // data = '';
-    // }
   });
 
   // add end connection listener
