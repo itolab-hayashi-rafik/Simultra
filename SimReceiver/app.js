@@ -99,7 +99,7 @@ Client.prototype.writeData = function(d) {
     console.log('[' + this.key + '] - ' + d);
     socket.write(d);
   } else {
-    console.log('[ERROR] socket not writable: ' + JSON.stringify(socket));
+    console.log('[ERROR] socket not writable: ' + socket);
   }
 };
 
