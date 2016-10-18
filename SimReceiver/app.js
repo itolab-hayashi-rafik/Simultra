@@ -96,7 +96,7 @@ Client.prototype.writeData = function(d) {
   var socket = this.socket;
   if(socket.writable){
     // process.stdout.write();
-    console.log('[' + this.key + '] - ' + d);
+    console.log('[' + this.key + '] (out) - ' + d);
     socket.write(d);
   } else {
     console.log('[ERROR] socket not writable: ' + socket);
@@ -110,6 +110,7 @@ Client.prototype.ack = function() {
 Client.prototype.wsWriteData = function(d) {
   if (this.state == Client.State.CONNECTED) {
     this.wsConnection.send(d);
+    console.log('[' + this.key + '] (wsout) - ' + d);
   }
 };
 
@@ -134,7 +135,7 @@ Client.prototype.update = function(mobility) {
 Client.prototype.onReceiveData = function(data) {
   var self = this;
 
-  console.log('[' + this.key + '] - ' + JSON.stringify(data));
+  console.log('[' + this.key + '] (in) - ' + JSON.stringify(data));
 
   if ('Mobility' in data) {
     var mobility = data['Mobility'];
@@ -158,10 +159,10 @@ Client.prototype.onReceiveData = function(data) {
         self.ack();
       }
     } else {
-      console.log('[' + this.key + '] - Mobility.Name not exists');
+      console.log('[' + this.key + '] (in) - Mobility.Name not exists');
     }
   } else {
-    console.log('[' + this.key + '] - Mobility not exists');
+    console.log('[' + this.key + '] (in) - Mobility not exists');
   }
 };
 
@@ -204,7 +205,7 @@ server.on('connection', function(socket){
 
   // --- start the receiver! ---
   // send something first
-  clients[key].writeData("1");
+  clients[key].writeData("ACK");
 
 });
 
