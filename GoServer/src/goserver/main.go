@@ -7,15 +7,13 @@ import (
 	. "./infra"
 	. "./models"
 	"math"
-	"os"
-	"log"
 )
 
 var (
 	err error
 
 	// controller
-	simController *SimController
+	simController = NewSimController("localhost:8033")
 	// vehicles
 	vehicleManager = GetVehicleManager()
 	// pedestrians
@@ -23,14 +21,6 @@ var (
 )
 
 func main() {
-
-	// setup the SimController
-	simController, err = NewSimController("localhost:8033")
-	if err != nil {
-		log.Printf("Error: %v", err.Error())
-		os.Exit(1)
-	}
-
 
 	// setup gin http server
 	r := gin.Default()

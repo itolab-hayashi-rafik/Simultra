@@ -2,7 +2,6 @@ package infra
 
 import (
 	"net"
-	"errors"
 	"encoding/json"
 	"strings"
 )
@@ -30,52 +29,32 @@ type payload struct {
 type SimController struct {
 	// address of the remote host
 	remoteAddr string
-
-	// tcp connection
-	connection *net.TCPConn
 }
 
-func NewSimController(remoteAddr string) (*SimController, error) {
+func NewSimController(remoteAddr string) *SimController {
 	// instantiate
 	s := &SimController{
 		remoteAddr: remoteAddr,
-		connection: nil,
 	}
 
-	err := s.connect()
-	return s, err
+	return s
 }
 
-func (s *SimController) connect() error {
+func (s *SimController) connect() (*net.TCPConn, error) {
 	// connect to the remote
 	tcpAddr, err := net.ResolveTCPAddr("tcp", s.remoteAddr)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	s.connection, err = net.DialTCP("tcp", nil, tcpAddr)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *SimController) disconnect() error {
-	// disconnect from the remote
-	if (s.connection == nil) {
-		return errors.New("Connection not established")
-	}
-
-	s.connection.Close()
-
-	return nil
+	return net.DialTCP("tcp", nil, tcpAddr)
 }
 
 func (s *SimController) StartSimulation() error {
-	if (s.connection == nil) {
-		return errors.New("Not connected")
+	conn, err := s.connect()
+	if (err != nil) {
+		return err
 	}
+	defer conn.Close()
 
 	// prepare data to send
 	payload := &payload{
@@ -90,14 +69,14 @@ func (s *SimController) StartSimulation() error {
 
 	// send data
 	println("write to server = ", string(outdata))
-	_, err = s.connection.Write([]byte(outdata))
+	_, err = conn.Write([]byte(outdata))
 	if err != nil {
 		return err
 	}
 
 	// read reply
 	reply := make([]byte, 1024)
-	_, err = s.connection.Read(reply)
+	_, err = conn.Read(reply)
 	if err != nil {
 		return err
 	}
@@ -106,9 +85,11 @@ func (s *SimController) StartSimulation() error {
 }
 
 func (s *SimController) CheckState() (State, error) {
-	if (s.connection == nil) {
-		return SIMULATOR_STATE_UNKNOWN, errors.New("Not connected")
+	conn, err := s.connect()
+	if (err != nil) {
+		return SIMULATOR_STATE_UNKNOWN, err
 	}
+	defer conn.Close()
 
 	// prepare data to send
 	payload := &payload{
@@ -123,14 +104,14 @@ func (s *SimController) CheckState() (State, error) {
 
 	// send data
 	println("write to server = ", string(outdata))
-	_, err = s.connection.Write([]byte(outdata))
+	_, err = conn.Write([]byte(outdata))
 	if err != nil {
 		return SIMULATOR_STATE_UNKNOWN, err
 	}
 
 	// read reply
 	reply := make([]byte, 1024)
-	_, err = s.connection.Read(reply)
+	_, err = conn.Read(reply)
 	if err != nil {
 		return SIMULATOR_STATE_UNKNOWN, err
 	}
@@ -147,9 +128,11 @@ func (s *SimController) CheckState() (State, error) {
 }
 
 func (s *SimController) StopSimulation() error {
-	if (s.connection == nil) {
-		return errors.New("Not connected")
+	conn, err := s.connect()
+	if (err != nil) {
+		return err
 	}
+	defer conn.Close()
 
 	// prepare data to send
 	payload := &payload{
@@ -164,14 +147,14 @@ func (s *SimController) StopSimulation() error {
 
 	// send data
 	println("write to server = ", string(outdata))
-	_, err = s.connection.Write([]byte(outdata))
+	_, err = conn.Write([]byte(outdata))
 	if err != nil {
 		return err
 	}
 
 	// read reply
 	reply := make([]byte, 1024)
-	_, err = s.connection.Read(reply)
+	_, err = conn.Read(reply)
 	if err != nil {
 		return err
 	}
