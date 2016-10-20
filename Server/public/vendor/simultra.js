@@ -1433,7 +1433,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _setup() {
 	
 	      // Buildings from Mapzen
-	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+	      // var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/buildings/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
 	        interactive: false,
 	        maxLOD: 16,
 	        style: function style(feature) {
@@ -1523,7 +1524,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var self = this;
 	
 	      // Landuses from Mapzen
-	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/landuse,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+	      // var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/landuse,roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/landuse,roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
 	        interactive: false,
 	        maxLOD: 18,
 	        style: function style(feature) {
@@ -1628,7 +1630,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var self = this;
 	
 	      // Roads from Mapzen
-	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+	      // var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
 	        interactive: false,
 	        maxLOD: 18,
 	        style: function style(feature) {
