@@ -68,6 +68,8 @@ func (s *SimController) disconnect() error {
 	}
 
 	s.connection.Close()
+
+	return nil
 }
 
 func (s *SimController) StartSimulation() error {
@@ -105,7 +107,7 @@ func (s *SimController) StartSimulation() error {
 
 func (s *SimController) CheckState() (State, error) {
 	if (s.connection == nil) {
-		return errors.New("Not connected")
+		return SIMULATOR_STATE_UNKNOWN, errors.New("Not connected")
 	}
 
 	// prepare data to send
@@ -116,28 +118,28 @@ func (s *SimController) CheckState() (State, error) {
 	// payload to json string
 	outdata, err := json.Marshal(payload)
 	if err != nil {
-		return nil, err
+		return SIMULATOR_STATE_UNKNOWN, err
 	}
 
 	// send data
 	println("write to server = ", string(outdata))
 	_, err = s.connection.Write([]byte(outdata))
 	if err != nil {
-		return nil, err
+		return SIMULATOR_STATE_UNKNOWN, err
 	}
 
 	// read reply
 	reply := make([]byte, 1024)
-	res, err := s.connection.Read(reply)
+	_, err = s.connection.Read(reply)
 	if err != nil {
-		return nil, err
+		return SIMULATOR_STATE_UNKNOWN, err
 	}
 
-	res = strings.ToLower(strings.Trim(res, ""))
+	str := strings.ToLower(strings.Trim(string(reply), ""))
 	var state State = SIMULATOR_STATE_UNKNOWN
-	if (res == "0") {
+	if (str == "0") {
 		state = SIMULATOR_STATE_NOT_RUNNING
-	} else if (res == "1") {
+	} else if (str == "1") {
 		state = SIMULATOR_STATE_RUNNING
 	}
 

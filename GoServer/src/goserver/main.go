@@ -9,14 +9,13 @@ import (
 	"math"
 	"os"
 	"log"
-	"strings"
 )
 
 var (
 	err error
 
 	// controller
-	simController SimController
+	simController *SimController
 	// vehicles
 	vehicleManager = GetVehicleManager()
 	// pedestrians
