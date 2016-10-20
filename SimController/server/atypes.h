@@ -6,6 +6,7 @@ typedef enum command
 {
     INI = 0,
     START_SIMULATION,
+    CHECK_STATE,
     STOP_SIMULATION,
 } command_t;
 

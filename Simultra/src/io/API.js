@@ -4,6 +4,10 @@
 import WebClient from './WebClient';
 
 // --- API endpoint definitions
+const START_SIMULATION = '/api/v1/start';
+const IS_RUNNING = '/api/v1/isRunning';
+const STOP_SIMULATION = '/api/v1/stop';
+
 const GET_VEHICLES = '/api/v1/vehicles';
 const UPDATE_VEHICLES = '/api/v1/vehicles';
 const GET_VEHICLE = function(vid) { return '/api/v1/vehicles/' + vid; };
@@ -22,6 +26,33 @@ class API extends WebClient {
     super();
     this.baseUrl = baseUrl;
     this.wsBaseUrl = baseUrl.replace(/^https?:\/\//, 'ws://');
+  }
+
+  // --- Controller
+  startSimulation(map, type, options) {
+    return this._ajax({
+      url: this.baseUrl + START_SIMULATION,
+      method: 'post',
+      data: {
+        map: map,
+        type: type,
+        options: options
+      }
+    });
+  }
+
+  isRunning() {
+    return this._ajax({
+      url: this.baseUrl + IS_RUNNING,
+      method: 'get'
+    });
+  }
+
+  stopSimulation() {
+    return this._ajax({
+      url: this.baseUrl + STOP_SIMULATION,
+      method: 'post'
+    });
   }
 
   // --- Vehicles

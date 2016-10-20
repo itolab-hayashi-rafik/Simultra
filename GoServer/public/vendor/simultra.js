@@ -285,6 +285,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function isRunning() {
 	      return this._isRunning;
 	    }
+	
+	    /**
+	     * Controls the remote to start the simulation
+	     * @param map
+	     * @param type
+	     * @param options
+	     */
+	
+	  }, {
+	    key: 'startSimulation',
+	    value: function startSimulation(map, type, options) {
+	      return this._api.startSimulation(map, type, options);
+	    }
+	
+	    /**
+	     * Controls the remote to stop the simulation
+	     */
+	
+	  }, {
+	    key: 'stopSimulation',
+	    value: function stopSimulation() {
+	      return this._api.stopSimulation();
+	    }
 	  }]);
 	
 	  return Simultra;
@@ -2059,6 +2082,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// --- API endpoint definitions
+	var START_SIMULATION = '/api/v1/start';
+	var STOP_SIMULATION = '/api/v1/stop';
+	
 	var GET_VEHICLES = '/api/v1/vehicles';
 	var UPDATE_VEHICLES = '/api/v1/vehicles';
 	var GET_VEHICLE = function GET_VEHICLE(vid) {
@@ -2093,10 +2119,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _this;
 	  }
 	
-	  // --- Vehicles
+	  // --- Controller
 	
 	
 	  _createClass(API, [{
+	    key: 'startSimulation',
+	    value: function startSimulation(map, type, options) {
+	      return this._ajax({
+	        url: this.baseUrl + START_SIMULATION,
+	        method: 'post',
+	        data: {
+	          map: map,
+	          type: type,
+	          options: options
+	        }
+	      });
+	    }
+	  }, {
+	    key: 'stopSimulation',
+	    value: function stopSimulation() {
+	      return this._ajax({
+	        url: this.baseUrl + STOP_SIMULATION,
+	        method: 'post'
+	      });
+	    }
+	
+	    // --- Vehicles
+	
+	  }, {
 	    key: 'getVehicles',
 	    value: function getVehicles() {
 	      return this._ajax({

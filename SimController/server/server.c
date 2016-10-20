@@ -25,6 +25,9 @@
 node_t* my_hosts; // dynamic list containing my nodes, to be populated using ADD.......
 int my_hosts_number = -1;
 
+// FIXME: dirty implementation; using global variables
+int is_running = 0; // identifies if the simulation is running
+
 //===================================================================================================
 void* sending (void* destination_node)
 {
@@ -136,12 +139,20 @@ void *new_connection_handler(void *socket_desc)
 	    {
 		debug("START_SIMULATION Command received.");
 		// FIXME: implement this command
+		sprintf(Response, "ok");
 		break;
+	    }
+	    case CHECK_STATE:
+	    {
+	    debug("CHECK_STATE Command received.");
+	    // FIXME: implement this command
+	    sprintf(Response, (is_running != 0) ? "1" : "0");
 	    }
 	    case STOP_SIMULATION:
 	    {
 		debug("STOP_SIMULATION Command received.");
 		// FIXME: implement this command
+		sprintf(Response, "ok");
 		break;
 	    }
 	    default:

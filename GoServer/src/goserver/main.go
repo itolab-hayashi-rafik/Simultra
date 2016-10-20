@@ -4,11 +4,14 @@ import (
 	"strconv"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	. "./infra"
 	. "./models"
 	"math"
 )
 
 var (
+	// controller
+	simController = NewSimController("localhost:8033")
 	// vehicles
 	vehicleManager = GetVehicleManager()
 	// pedestrians
@@ -69,6 +72,33 @@ func main() {
 	{
 		v1 := api.Group("/v1")
 		{
+			// ---------------------------------------------------------------
+			// Controller
+			// ---------------------------------------------------------------
+			// start the simulation
+			v1.POST("/start", func(c *gin.Context) {
+				err := simController.StartSimulation()
+				if (err != nil) {
+					c.JSON(500, err)
+				} else {
+					c.JSON(200, "")
+				}
+			})
+
+			// returns if the simulation is running
+			v1.GET("/isRunning", func(c *gin.Context) {
+				// FIXME: implement this
+				c.JSON(200, "")
+			})
+
+			// stop the simulation
+			v1.POST("/stop", func(c *gin.Context) {
+				// FIXME: implement this
+				c.JSON(200, "")
+			})
+
+
+
 			// ---------------------------------------------------------------
 			// Vehicles
 			// ---------------------------------------------------------------

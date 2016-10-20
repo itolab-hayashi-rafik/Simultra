@@ -155,6 +155,31 @@ class Simultra extends EventEmitter {
   isRunning() {
     return this._isRunning;
   }
+
+  /**
+   * Controls the remote to start the simulation
+   * @param map
+   * @param type
+   * @param options
+   */
+  startSimulation(map, type, options) {
+    return this._api.startSimulation(map, type, options);
+  }
+
+  /**
+   * Returns if the simulation is running
+   * @returns {*}
+   */
+  isSimulationRunning() {
+    return this._api.isRunning();
+  }
+
+  /**
+   * Controls the remote to stop the simulation
+   */
+  stopSimulation() {
+    return this._api.stopSimulation();
+  }
 }
 
 export default Simultra;
