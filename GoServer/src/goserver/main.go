@@ -9,6 +9,7 @@ import (
 	"math"
 	"os"
 	"log"
+	"strings"
 )
 
 var (
@@ -93,20 +94,34 @@ func main() {
 				if (err != nil) {
 					c.JSON(500, err)
 				} else {
-					c.JSON(200, "")
+					c.JSON(200, struct {}{})
 				}
 			})
 
 			// returns if the simulation is running
 			v1.GET("/isRunning", func(c *gin.Context) {
-				// FIXME: implement this
-				c.JSON(200, "")
+				state, err := simController.CheckState()
+				if (err != nil) {
+					c.JSON(500, err)
+				} else {
+					var isRunning bool = false
+					if (state == SIMULATOR_STATE_RUNNING) {
+						isRunning = true
+					}
+					c.JSON(200, struct {
+						isRunning bool
+					}{isRunning: isRunning})
+				}
 			})
 
 			// stop the simulation
 			v1.POST("/stop", func(c *gin.Context) {
-				// FIXME: implement this
-				c.JSON(200, "")
+				err := simController.StopSimulation()
+				if (err != nil) {
+					c.JSON(500, err)
+				} else {
+					c.JSON(200, struct {}{})
+				}
 			})
 
 

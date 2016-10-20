@@ -4,6 +4,7 @@ import (
 	"net"
 	"errors"
 	"encoding/json"
+	"strings"
 )
 
 type Indexing int
@@ -12,6 +13,13 @@ const (
 	COMMAND_START_SIMULATION
 	COMMAND_CHECK_STATE
 	COMMAND_STOP_SIMULATION
+)
+
+type State int
+const (
+	SIMULATOR_STATE_UNKNOWN State = iota
+	SIMULATOR_STATE_RUNNING
+	SIMULATOR_STATE_NOT_RUNNING
 )
 
 type payload struct {
@@ -95,7 +103,7 @@ func (s *SimController) StartSimulation() error {
 	return nil
 }
 
-func (s *SimController) CheckState() (string, error) {
+func (s *SimController) CheckState() (State, error) {
 	if (s.connection == nil) {
 		return errors.New("Not connected")
 	}
@@ -125,7 +133,15 @@ func (s *SimController) CheckState() (string, error) {
 		return nil, err
 	}
 
-	return res, nil
+	res = strings.ToLower(strings.Trim(res, ""))
+	var state State = SIMULATOR_STATE_UNKNOWN
+	if (res == "0") {
+		state = SIMULATOR_STATE_NOT_RUNNING
+	} else if (res == "1") {
+		state = SIMULATOR_STATE_RUNNING
+	}
+
+	return state, nil
 }
 
 func (s *SimController) StopSimulation() error {
