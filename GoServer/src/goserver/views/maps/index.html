@@ -4,59 +4,161 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <title>Simultra</title>
-    <link rel="stylesheet" href="/stylesheets/maps/main.css">
+    <!-- Material Design fonts -->
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="/vendor/bootstrap-material-design.min.css">
+    <link rel="stylesheet" href="/vendor/ripples.min.css">
+    <!-- simultra -->
     <link rel="stylesheet" href="/vendor/vizicities.css">
     <link rel="stylesheet" href="/vendor/simultra.css">
+    <link rel="stylesheet" href="/stylesheets/maps/main.css">
 </head>
 <body>
-<div id="world"></div>
-<script src="/vendor/three.min.js"></script>
-<script src="/vendor/stats.min.js"></script>
-<script src="/vendor/threex.rendererstats.js"></script>
-<script src="/vendor/TweenMax.min.js"></script>
-<script src="/vendor/operative.min.js"></script>
-<script src="/vendor/vizicities.min.js"></script>
-<script src="/vendor/jquery-3.0.0.min.js"></script>
-<script src="/vendor/simultra.js"></script>
-<script type="text/javascript">
-    // FIXME: something is wrong with the Simultra compilation. it's not UMD...
-    window.Simultra = window.Simultra.default;
+    <!-- the map -->
+    <div id="world"></div>
 
-    if (typeof Simultra === 'function') {
-        simultra = new Simultra(location.protocol + '//' + location.host, null, {
-            debug: {{.debug}},
-            renderer: "{{.renderer}}",
-            renderBuilding: !{{.test}},
-        });
-        {{if .dynamic}}
-        simultra.start();
-        {{end}}
+    <!-- controller -->
+    <div id="controller">
+        <div id="eyecatch">
+            <img src="" />
+            <div id="heading" class="dark">
+                <h1>Simultra</h1>
+            </div>
+        </div>
 
-        {{if .test}}
-        <!-- beginning of test -->
-        // add cars
-        var veyrons = [];
-        for (var i = 0; i < {{.n}}; i++) {
-            veyrons.push(
-                    simultra._vehicleLayer._addVehicle({
-                        type: 'veyron',
-                        location: {lat: 35.156324 + (0.0003*~~(i/{{.sn}})), lon: 136.923108 + 0.0003*(i%{{.sn}})},
-                        velocity: 40 / 3600 * 1000,
-                        angle: 0.0,
-                        wheel: 30*Math.PI/180.0
-                    })
-            );
+        <div id="content">
+            <form id="simlationSettings" class="form-horizontal">
+                <fieldset>
+                    <legend>Simulation Settings:</legend>
+                    <div class="form-group">
+                        <label for="selectMap" class="col-md-2 control-label">Map</label>
+
+                        <div class="col-md-10">
+                            <select id="selectMap" class="form-control">
+                                <option>Nagoya</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="selectType" class="col-md-2 control-label">Type</label>
+
+                        <div class="col-md-10">
+                            <select id="selectType" class="form-control">
+                                <option>Vehicles</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!--<div class="form-group" style="margin-top: 0;">
+                        <label for="inputEmail" class="col-md-2 control-label">Type</label>
+
+                        <div class="col-md-10">
+                            <input type="email" class="form-control" id="inputEmail" placeholder="Email">
+                        </div>
+                    </div>-->
+                    <div class="form-group">
+                        <label for="selectOptions" class="col-md-2 control-label">Options</label>
+
+                        <div class="col-md-10">
+                            <select id="selectOptions" multiple="" class="form-control">
+                                <option>Option1</option>
+                                <option>Option2</option>
+                                <option>Option3</option>
+                                <option>Option4</option>
+                                <option>Option5</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-left: 0; margin-right: 0;">
+                        <div class="pull-right">
+                            <!--<button type="button" class="btn btn-default">Cancel</button>-->
+                            <button type="button" id="run" class="btn btn-primary btn-raised">Run</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="/vendor/jquery-3.0.0.min.js"></script>
+    <!-- bootstrap -->
+    <script src="/vendor/bootstrap.min.js"></script>
+    <script src="/vendor/ripples.min.js"></script>
+    <script src="/vendor/material.min.js"></script>
+    <!-- simultra -->
+    <script src="/vendor/three.min.js"></script>
+    <script src="/vendor/stats.min.js"></script>
+    <script src="/vendor/threex.rendererstats.js"></script>
+    <script src="/vendor/TweenMax.min.js"></script>
+    <script src="/vendor/operative.min.js"></script>
+    <script src="/vendor/vizicities.min.js"></script>
+    <script src="/vendor/jquery-3.0.0.min.js"></script>
+    <script src="/vendor/simultra.js"></script>
+    <script type="text/javascript">
+        // FIXME: something is wrong with the Simultra compilation. it's not UMD...
+        window.Simultra = window.Simultra.default;
+
+        if (typeof Simultra === 'function') {
+            simultra = new Simultra(location.protocol + '//' + location.host, null, {
+                debug: {{.debug}},
+                renderer: "{{.renderer}}",
+                renderBuilding: !{{.test}},
+            });
+            {{if .dynamic}}
+            simultra.start();
+            {{end}}
+
+            {{if .test}}
+            <!-- beginning of test -->
+            // add cars
+            var veyrons = [];
+            for (var i = 0; i < {{.n}}; i++) {
+                veyrons.push(
+                        simultra._vehicleLayer._addVehicle({
+                            type: 'veyron',
+                            location: {lat: 35.156324 + (0.0003*~~(i/{{.sn}})), lon: 136.923108 + 0.0003*(i%{{.sn}})},
+                            velocity: 40 / 3600 * 1000,
+                            angle: 0.0,
+                            wheel: 30*Math.PI/180.0
+                        })
+                );
+            }
+
+            // sets the vehicles to move
+            simultra._vehicleLayer._viziLayer.on('loadCompleted', function() {
+                veyrons.forEach(function(veyron, id) {
+                    simultra._vehicleLayer._viziLayer.setVelocity(id, veyron.data.velocity, 0, 0, veyron.data.wheel);
+                });
+            });
+            <!-- end of test -->
+            {{end}}
         }
 
-        // sets the vehicles to move
-        simultra._vehicleLayer._viziLayer.on('loadCompleted', function() {
-            veyrons.forEach(function(veyron, id) {
-                simultra._vehicleLayer._viziLayer.setVelocity(id, veyron.data.velocity, 0, 0, veyron.data.wheel);
+        // TODO: The Controller
+        (function($) {
+
+            /**
+             * Sets up Simulation Settings Form
+             */
+            function setupSimulationSettings() {
+                $('form#simulationSettings').ready(function() {
+                    // run button listener
+                    $(this).find('button#run').on('click', function() {
+                        console.log('run!');
+                    });
+                });
+            }
+
+            /**
+             * onLoad
+             */
+            $(document).ready(function() {
+                setupSimulationSettings();
             });
-        });
-        <!-- end of test -->
-        {{end}}
-    }
-</script>
+        })($);
+    </script>
 </body>
 </html>
