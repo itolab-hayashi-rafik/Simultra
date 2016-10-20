@@ -7,6 +7,8 @@ import (
 	. "./infra"
 	. "./models"
 	"math"
+	"log"
+	"io/ioutil"
 )
 
 var (
@@ -77,7 +79,14 @@ func main() {
 			// ---------------------------------------------------------------
 			// start the simulation
 			v1.POST("/start", func(c *gin.Context) {
-				err := simController.StartSimulation()
+				byteData, err := ioutil.ReadAll(c.Request.Body)
+				if (err != nil) {
+					c.JSON(500, err)
+				}
+				data := string(byteData)
+				log.Print("data = " + data)
+
+				err = simController.StartSimulation(data)
 				if (err != nil) {
 					c.JSON(500, err)
 				} else {

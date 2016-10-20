@@ -30,14 +30,14 @@
         </div>
 
         <div id="content">
-            <form id="simlationSettings" class="form-horizontal">
+            <form id="simulationSettings" class="form-horizontal">
                 <fieldset>
                     <legend>Simulation Settings:</legend>
                     <div class="form-group">
                         <label for="selectMap" class="col-md-2 control-label">Map</label>
 
                         <div class="col-md-10">
-                            <select id="selectMap" class="form-control">
+                            <select name="map" id="selectMap" class="form-control">
                                 <option>Nagoya</option>
                             </select>
                         </div>
@@ -46,7 +46,7 @@
                         <label for="selectType" class="col-md-2 control-label">Type</label>
 
                         <div class="col-md-10">
-                            <select id="selectType" class="form-control">
+                            <select name="type" id="selectType" class="form-control">
                                 <option>Vehicles</option>
                             </select>
                         </div>
@@ -62,7 +62,7 @@
                         <label for="selectOptions" class="col-md-2 control-label">Options</label>
 
                         <div class="col-md-10">
-                            <select id="selectOptions" multiple="" class="form-control">
+                            <select name="options" id="selectOptions" multiple="" class="form-control">
                                 <option>Option1</option>
                                 <option>Option2</option>
                                 <option>Option3</option>
@@ -145,33 +145,44 @@
              */
             function setupSimulationSettings() {
                 $('form#simulationSettings').ready(function() {
-                    var form = this;
+                    var $form = $('form#simulationSettings');
 
                     // retrieve and update the simulation state
-                    var updateStates = (function(form) {
+                    var updateStates = (function($form) {
                         return function() {
                             // retrieve the simulator status
                             simultra.isSimulationRunning()
                                     .then(function (data) {
                                         if (data.isRunning) {
-                                            $(form).find('button#stop').prop('disabled', false);
-                                            $(form).find('button#run').prop('disabled', true);
+                                            $form.find('button#stop').prop('disabled', false);
+                                            $form.find('button#run').prop('disabled', true);
                                         } else {
-                                            $(form).find('button#stop').prop('disabled', true);
-                                            $(form).find('button#run').prop('disabled', false);
+                                            $form.find('button#stop').prop('disabled', true);
+                                            $form.find('button#run').prop('disabled', false);
                                         }
                                     })
                         }
-                    })(form);
+                    })($form);
 
                     // stop button listener
-                    $(this).find('button#stop').on('click', function() {
+                    $form.find('button#stop').on('click', function() {
                         simultra.stopSimulation().then(function() { updateStates(); });
                     });
 
                     // run button listener
-                    $(this).find('button#run').on('click', function() {
-                        simultra.startSimulation().then(function() { updateStates(); });
+                    $form.find('button#run').on('click', function() {
+                        var data = {};
+                        $form.serializeArray().forEach(function(obj) {
+                            if (obj.name === 'options') {
+                                if (!(obj.name in data)) {
+                                    data[obj.name] = [];
+                                }
+                                data[obj.name].push(obj.value);
+                            } else {
+                                data[obj.name] = obj.value;
+                            }
+                        });
+                        simultra.startSimulation(data['map'], data['type'], data['options']).then(function() { updateStates(); });
                     });
 
                     updateStates();

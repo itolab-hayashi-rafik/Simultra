@@ -49,7 +49,7 @@ func (s *SimController) connect() (*net.TCPConn, error) {
 	return net.DialTCP("tcp", nil, tcpAddr)
 }
 
-func (s *SimController) StartSimulation() error {
+func (s *SimController) StartSimulation(data string) error {
 	conn, err := s.connect()
 	if (err != nil) {
 		return err
@@ -59,6 +59,7 @@ func (s *SimController) StartSimulation() error {
 	// prepare data to send
 	payload := &payload{
 		Command: int(COMMAND_START_SIMULATION),
+		Data: data,
 	}
 
 	// payload to json string

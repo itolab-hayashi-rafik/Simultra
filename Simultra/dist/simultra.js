@@ -2140,11 +2140,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this._ajax({
 	        url: this.baseUrl + START_SIMULATION,
 	        method: 'post',
-	        data: {
+	        data: JSON.stringify({
 	          map: map,
 	          type: type,
 	          options: options
-	        }
+	        })
 	      });
 	    }
 	  }, {
