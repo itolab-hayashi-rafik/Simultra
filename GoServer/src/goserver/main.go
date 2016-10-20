@@ -10,8 +10,6 @@ import (
 )
 
 var (
-	err error
-
 	// controller
 	simController = NewSimController("localhost:8033")
 	// vehicles
@@ -98,8 +96,8 @@ func main() {
 						isRunning = true
 					}
 					c.JSON(200, struct {
-						isRunning bool
-					}{isRunning: isRunning})
+						IsRunning bool `json:"isRunning"`
+					}{IsRunning: isRunning})
 				}
 			})
 

@@ -68,18 +68,19 @@ func (s *SimController) StartSimulation() error {
 	}
 
 	// send data
-	println("write to server = ", string(outdata))
 	_, err = conn.Write([]byte(outdata))
 	if err != nil {
 		return err
 	}
 
 	// read reply
-	reply := make([]byte, 1024)
-	_, err = conn.Read(reply)
+	buf := make([]byte, 1024)
+	recv, err := conn.Read(buf)
 	if err != nil {
 		return err
 	}
+
+	_ = string(buf[:recv])
 
 	return nil
 }
@@ -103,24 +104,24 @@ func (s *SimController) CheckState() (State, error) {
 	}
 
 	// send data
-	println("write to server = ", string(outdata))
 	_, err = conn.Write([]byte(outdata))
 	if err != nil {
 		return SIMULATOR_STATE_UNKNOWN, err
 	}
 
 	// read reply
-	reply := make([]byte, 1024)
-	_, err = conn.Read(reply)
+	buf := make([]byte, 1024)
+	recv, err := conn.Read(buf)
 	if err != nil {
 		return SIMULATOR_STATE_UNKNOWN, err
 	}
 
-	str := strings.ToLower(strings.Trim(string(reply), ""))
+	reply := string(buf[:recv])
+	reply = strings.ToLower(strings.Trim(reply, ""))
 	var state State = SIMULATOR_STATE_UNKNOWN
-	if (str == "0") {
+	if (reply == "0") {
 		state = SIMULATOR_STATE_NOT_RUNNING
-	} else if (str == "1") {
+	} else if (reply == "1") {
 		state = SIMULATOR_STATE_RUNNING
 	}
 
@@ -146,18 +147,19 @@ func (s *SimController) StopSimulation() error {
 	}
 
 	// send data
-	println("write to server = ", string(outdata))
 	_, err = conn.Write([]byte(outdata))
 	if err != nil {
 		return err
 	}
 
 	// read reply
-	reply := make([]byte, 1024)
-	_, err = conn.Read(reply)
+	buf := make([]byte, 1024)
+	recv, err := conn.Read(buf)
 	if err != nil {
 		return err
 	}
+
+	_ = string(buf[:recv])
 
 	return nil
 }

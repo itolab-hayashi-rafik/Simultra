@@ -120,15 +120,10 @@ void *new_connection_handler(void *socket_desc)
 	// extract the fields from json,
 	printf("received: %s\n", client_message);
 	payload_t payload = {0, 0};
-	parse_payload(client_message, & payload);
+	parse_payload(client_message, &payload);
 
         // build a new message, the response.
-        char *Response = malloc(  // TODO JSONDATA add here ...
-				    sizeof(char) *
- 				   (strlen(payload.data) +
-				   sizeof(payload.command)+80)
-				   
-				   ); // TODO !
+        char *Response = malloc(sizeof(char) * (strlen(payload.data) + sizeof(payload.command)+80)); // TODO !
 
 	debug("Running command %d", payload.command);
 	
@@ -138,6 +133,7 @@ void *new_connection_handler(void *socket_desc)
 	    case START_SIMULATION:
 	    {
 		debug("START_SIMULATION Command received.");
+		is_running = 1;
 		// FIXME: implement this command
 		sprintf(Response, "ok");
 		break;
@@ -145,12 +141,13 @@ void *new_connection_handler(void *socket_desc)
 	    case CHECK_STATE:
 	    {
 	    debug("CHECK_STATE Command received.");
-	    // FIXME: implement this command
 	    sprintf(Response, (is_running != 0) ? "1" : "0");
+	    break;
 	    }
 	    case STOP_SIMULATION:
 	    {
 		debug("STOP_SIMULATION Command received.");
+		is_running = 0;
 		// FIXME: implement this command
 		sprintf(Response, "ok");
 		break;
@@ -162,9 +159,13 @@ void *new_connection_handler(void *socket_desc)
 		break;
 	    }
 	}
+	    // debug
+	    printf("read_size = %d\n", read_size);
+	    printf("writing --- %s\n", Response);
+	    printf("strlen = %d\n", (int) strlen(Response));
 	    
         // send back
-        write(sock , Response , read_size + strlen(Response));
+        write(sock , Response , (int) strlen(Response));
         
         debug("___________________________________________________________________________________________________");
   

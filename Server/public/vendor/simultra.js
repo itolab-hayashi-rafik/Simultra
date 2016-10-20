@@ -300,6 +300,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    /**
+	     * Returns if the simulation is running
+	     * @returns {*}
+	     */
+	
+	  }, {
+	    key: 'isSimulationRunning',
+	    value: function isSimulationRunning() {
+	      return this._api.isRunning();
+	    }
+	
+	    /**
 	     * Controls the remote to stop the simulation
 	     */
 	
@@ -2083,6 +2094,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// --- API endpoint definitions
 	var START_SIMULATION = '/api/v1/start';
+	var IS_RUNNING = '/api/v1/isRunning';
 	var STOP_SIMULATION = '/api/v1/stop';
 	
 	var GET_VEHICLES = '/api/v1/vehicles';
@@ -2133,6 +2145,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	          type: type,
 	          options: options
 	        }
+	      });
+	    }
+	  }, {
+	    key: 'isRunning',
+	    value: function isRunning() {
+	      return this._ajax({
+	        url: this.baseUrl + IS_RUNNING,
+	        method: 'get'
 	      });
 	    }
 	  }, {
