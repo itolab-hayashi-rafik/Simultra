@@ -27,8 +27,15 @@ type SimController struct {
 	connection *net.TCPConn
 }
 
-func NewSimController(remoteAddr string) SimController {
+func NewSimController(remoteAddr string) (*SimController, error) {
+	// instantiate
+	s := &SimController{
+		remoteAddr: remoteAddr,
+		connection: nil,
+	}
 
+	err := s.connect()
+	return s, err
 }
 
 func (s *SimController) connect() error {
