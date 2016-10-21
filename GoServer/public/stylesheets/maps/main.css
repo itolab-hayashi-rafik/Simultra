@@ -61,3 +61,13 @@
     font-size: 14px;
     margin-bottom: 0;
 }
+
+
+
+#world {
+
+}
+
+#world .label.vehicle {
+    background: transparent;
+}
