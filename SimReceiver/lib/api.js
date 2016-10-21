@@ -13,27 +13,42 @@ function newVehicle(vehicle, callback) {
     .post(baseUrl+'/api/v1/vehicles/new')
     .send(vehicle)
     .end(function(err, res) {
-      console.log('created');
-      setTimeout(function() {
-        callback(res.body);
-      }, 0);
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('created');
+        setTimeout(function() {
+          if (!(body in res)) {
+            console.error('Cannot be created');
+          }
+          callback(body in res ? res.body : null);
+        }, 0);
+      }
     });
 }
 
-function updateVehicle(callback) {
-  // put request
+function deleteVehicle(id, callback) {
+  // delete
+  console.log('deleting');
   request
-    .put(baseUrl+'/api/v1/vehicles/'+vehicle.id)
-    .send(vehicle)
+    .delete(baseUrl+'/api/v1/vehicles/' + id)
     .end(function(err, res) {
-      setTimeout(function() {
-        callback(res.body);
-      }, 0);
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('deleted');
+        setTimeout(function() {
+          if (!(body in res)) {
+            console.error('Cannot be deleted');
+          }
+          callback(body in res ? res.body : null);
+        }, 0);
+      }
     });
 }
 // ------------------------------------------------------------
 
 module.exports = {
   newVehicle: newVehicle,
-  updateVehicle: updateVehicle
+  deleteVehicle: deleteVehicle
 };

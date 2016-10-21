@@ -1,12 +1,16 @@
 var net = require('net');
 var readline = require('readline');
-var Sim = require('./lib/sim');
+var Utils = require('./lib/utils');
 var api = require('./lib/api');
 var WebSocketClient = require('websocket').client;
 
 var wsBaseUrl = 'ws://localhost:3000';
 
 var serverMaxConnections = 100;
+
+// obtain ip address
+var ipAddrs = Utils.getLocalAddress();
+var ip = ipAddrs.ipv4.length > 0 ? ipAddrs.ipv4[0].address : null;
 
 // ---- Client ----------------------------------------------------------------
 function Client(socket) {
@@ -141,7 +145,7 @@ Client.prototype.onReceiveData = function(data) {
     var mobility = data['Mobility'];
 
     if ('Name' in mobility) {
-      var name = mobility['Name'];
+      var name = mobility['Name'] + '(' + ip + ')';
       if (name && this.name !== name) {
         this.name = name;
       }
@@ -163,6 +167,22 @@ Client.prototype.onReceiveData = function(data) {
     }
   } else {
     console.log('[' + this.key + '] (in) - Mobility not exists');
+  }
+};
+
+Client.prototype.onDisconnected = function() {
+  // close websocket if needed
+  if (this.state == Client.State.CONNECTED && this.wsConnection) {
+    this.wsConnection.close();
+    this.wsConnection = null;
+    this.state = Client.State.NOT_CONNECTED;
+  }
+
+  // delete the vehicle if needed
+  if (this.vehicle && this.vehicle.id) {
+    api.deleteVehicle(this.vehicle.id, function(vehicle) {
+      console.log('deleted the vehicle ' + vehicle);
+    });
   }
 };
 
@@ -201,6 +221,11 @@ server.on('connection', function(socket){
   socket.on('end', function(){
     var status = server.connections + '/' + server.maxConnections;
     console.log('Connection End(' + status + ') - ' + key);
+    try {
+      clients[key].onDisconnected();
+    } catch (e) {
+      // do nothing
+    }
     delete clients[key];
   });
 
