@@ -19873,7 +19873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // [DEBUG] arrow
 	      var from = new THREE.Vector3(0, 0, 0);
-	      var to = new THREE.Vector3(0, 0, 100);
+	      var to = new THREE.Vector3(50, 0, 0);
 	      var direction = to.clone().sub(from);
 	      var length = direction.length();
 	      var arrowHelper = new THREE.ArrowHelper(direction.normalize(), from, length, 0xff0000);
