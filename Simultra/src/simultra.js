@@ -132,11 +132,13 @@ class Simultra extends EventEmitter {
    * @param lat latitude
    * @param lon longitude
    */
-  flyToLatLon(lat, lon) {
+  flyToLatLon(latLon) {
     // this._world.setView([lat, lon]); // this does not work
-    if (!('_flyTween' in this._control) || this._control._flyTween == null || !this._control._flyTween.isActive()) {
-      this._control.flyToLatLon(VIZI.latLon(lat, lon), 1); // FIXME: find a way to move without the animation
-    }
+    // if (!('_flyTween' in this._control) || this._control._flyTween == null || !this._control._flyTween.isActive()) {
+    //   this._control.flyToLatLon(latLon, 1); // FIXME: find a way to move without the animation
+    // }
+    var point = this._world.latLonToPoint(latLon);
+    this.flyToPoint(point);
   }
 
   /**
@@ -144,7 +146,11 @@ class Simultra extends EventEmitter {
    * @param point
    */
   flyToPoint(point) {
-    this._control.flyToPoint(point, 0.00000001);
+    // this._control.flyToPoint(point, 0.00000001);
+    var flyTarget = new THREE.Vector3(point.x, 0, point.y);
+    var diff = new THREE.Vector3().subVectors(this._control._controls.target, flyTarget);
+    this._control._controls.panLeft(diff.x, this._control._controls.object.matrix);
+    this._control._controls.panUp(diff.z, this._control._controls.object.matrix);
   }
 
   /**
@@ -207,7 +213,7 @@ class Simultra extends EventEmitter {
     if (this._options.followVehicles) {
       var latLon = this._vehicleLayer.getCentroid();
       if (latLon != null) {
-        this.flyToLatLon(latLon.lat, latLon.lon);
+        this.flyToLatLon(latLon);
       }
     }
   }

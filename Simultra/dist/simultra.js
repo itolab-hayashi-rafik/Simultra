@@ -253,11 +253,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  }, {
 	    key: 'flyToLatLon',
-	    value: function flyToLatLon(lat, lon) {
+	    value: function flyToLatLon(latLon) {
 	      // this._world.setView([lat, lon]); // this does not work
-	      if (!('_flyTween' in this._control) || this._control._flyTween == null || !this._control._flyTween.isActive()) {
-	        this._control.flyToLatLon(_vizi2.default.latLon(lat, lon), 1); // FIXME: find a way to move without the animation
-	      }
+	      // if (!('_flyTween' in this._control) || this._control._flyTween == null || !this._control._flyTween.isActive()) {
+	      //   this._control.flyToLatLon(latLon, 1); // FIXME: find a way to move without the animation
+	      // }
+	      var point = this._world.latLonToPoint(latLon);
+	      this.flyToPoint(point);
 	    }
 	
 	    /**
@@ -268,7 +270,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'flyToPoint',
 	    value: function flyToPoint(point) {
-	      this._control.flyToPoint(point, 0.00000001);
+	      // this._control.flyToPoint(point, 0.00000001);
+	      var flyTarget = new THREE.Vector3(point.x, 0, point.y);
+	      var diff = new THREE.Vector3().subVectors(this._control._controls.target, flyTarget);
+	      this._control._controls.panLeft(diff.x, this._control._controls.object.matrix);
+	      this._control._controls.panUp(diff.z, this._control._controls.object.matrix);
 	    }
 	
 	    /**
@@ -352,7 +358,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this._options.followVehicles) {
 	        var latLon = this._vehicleLayer.getCentroid();
 	        if (latLon != null) {
-	          this.flyToLatLon(latLon.lat, latLon.lon);
+	          this.flyToLatLon(latLon);
 	        }
 	      }
 	    }
