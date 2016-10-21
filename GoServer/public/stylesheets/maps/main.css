@@ -71,5 +71,5 @@
 #world .label.vehicle {
     background: transparent;
     color: #222;
-    display: none;
+    visibility: collapse;
 }
