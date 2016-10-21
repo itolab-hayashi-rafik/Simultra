@@ -18,10 +18,10 @@ function newVehicle(vehicle, callback) {
       } else {
         console.log('created');
         setTimeout(function() {
-          if (!(body in res)) {
+          if (!('body' in res)) {
             console.error('Cannot be created');
           }
-          callback(body in res ? res.body : null);
+          callback('body' in res ? res.body : null);
         }, 0);
       }
     });
@@ -38,10 +38,10 @@ function deleteVehicle(id, callback) {
       } else {
         console.log('deleted');
         setTimeout(function() {
-          if (!(body in res)) {
+          if (!('body' in res)) {
             console.error('Cannot be deleted');
           }
-          callback(body in res ? res.body : null);
+          callback('body' in res ? res.body : null);
         }, 0);
       }
     });
