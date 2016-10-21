@@ -134,7 +134,9 @@ class Simultra extends EventEmitter {
    */
   flyToLatLon(lat, lon) {
     // this._world.setView([lat, lon]); // this does not work
-    this._control.flyToLatLon(VIZI.latLon(lat, lon), 0.00000001); // FIXME: find a way to move without the animation
+    if (!('_flyTween' in this._control) || this._control._flyTween == null || !this._control._flyTween.isActive()) {
+      this._control.flyToLatLon(VIZI.latLon(lat, lon), 1); // FIXME: find a way to move without the animation
+    }
   }
 
   /**

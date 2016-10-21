@@ -5725,6 +5725,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Animation time in seconds
 	      var animationTime = duration || 2;
 	
+	      var self = this;
+	
 	      this._flyTarget = new _three2['default'].Vector3(point.x, 0, point.y);
 	
 	      // Calculate delta from current position to fly target
@@ -5764,7 +5766,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 	        onComplete: function onComplete(tween) {
 	          // console.log(`Arrived at flyTarget`);
-	          this._flyTarget = null;
+	          self._flyTarget = null;
 	        },
 	        onUpdateParams: ['{self}'],
 	        onCompleteParams: ['{self}'],

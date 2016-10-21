@@ -255,7 +255,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'flyToLatLon',
 	    value: function flyToLatLon(lat, lon) {
 	      // this._world.setView([lat, lon]); // this does not work
-	      this._control.flyToLatLon(_vizi2.default.latLon(lat, lon), 0.00000001);
+	      if (!('_flyTween' in this._control) || this._control._flyTween == null || !this._control._flyTween.isActive()) {
+	        this._control.flyToLatLon(_vizi2.default.latLon(lat, lon), 1); // FIXME: find a way to move without the animation
+	      }
 	    }
 	
 	    /**
@@ -309,13 +311,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Controls the remote to start the simulation
 	     * @param map
 	     * @param type
-	     * @param options
+	     * @param scenario
 	     */
 	
 	  }, {
 	    key: 'startSimulation',
-	    value: function startSimulation(map, type, options) {
-	      return this._api.startSimulation(map, type, options);
+	    value: function startSimulation(map, type, scenario) {
+	      return this._api.startSimulation(map, type, scenario);
 	    }
 	
 	    /**
@@ -2171,14 +2173,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  _createClass(API, [{
 	    key: 'startSimulation',
-	    value: function startSimulation(map, type, options) {
+	    value: function startSimulation(map, type, scenario) {
 	      return this._ajax({
 	        url: this.baseUrl + START_SIMULATION,
 	        method: 'post',
 	        data: JSON.stringify({
 	          map: map,
 	          type: type,
-	          options: options
+	          scenario: scenario
 	        })
 	      });
 	    }
