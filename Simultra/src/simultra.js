@@ -26,7 +26,8 @@ class Simultra extends EventEmitter {
       renderFootway: true,
       renderBuilding: true,
       renderVehicle: true,
-      renderPedestrian: true
+      renderPedestrian: true,
+      followVehicles: true
     };
     this._options = extend({}, defaultOptions, options);
 
@@ -55,7 +56,8 @@ class Simultra extends EventEmitter {
     camera.position.set(-150, 175, 125);
 
     // Add controls
-    VIZI.Controls.orbit().addTo(world);
+    var control = VIZI.Controls.orbit().addTo(world);
+    this._control = control;
 
     // add callbacks
     world.on('preUpdate', function(delta) {
@@ -118,6 +120,11 @@ class Simultra extends EventEmitter {
         this._rendererStats.update(this._world._engine._renderer);
       }
     }
+
+    // follow the car
+    if (this._options.followVehicles) {
+      this._updateCameraPosition();
+    }
   }
 
   /**
@@ -126,7 +133,8 @@ class Simultra extends EventEmitter {
    * @param lon longitude
    */
   setView(lat, lon) {
-    this._world.setView([lat, lon]);
+    // this._world.setView([lat, lon]); // this does not work
+    this._control.flyToLatLon(VIZI.latLon(lat, lon), 0.0001);
   }
 
   /**
@@ -179,6 +187,19 @@ class Simultra extends EventEmitter {
    */
   stopSimulation() {
     return this._api.stopSimulation();
+  }
+
+  /**
+   * update the camera position to follow the vehicles
+   * @private
+   */
+  _updateCameraPosition() {
+    if (this._options.followVehicles) {
+      var location = this._vehicleLayer.getCentroid();
+      if (location != null) {
+        this.setView(location.lat, location.lon);
+      }
+    }
   }
 }
 

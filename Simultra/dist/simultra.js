@@ -138,7 +138,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      renderFootway: true,
 	      renderBuilding: true,
 	      renderVehicle: true,
-	      renderPedestrian: true
+	      renderPedestrian: true,
+	      followVehicles: true
 	    };
 	    _this._options = (0, _extend2.default)({}, defaultOptions, options);
 	
@@ -170,7 +171,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      camera.position.set(-150, 175, 125);
 	
 	      // Add controls
-	      _vizi2.default.Controls.orbit().addTo(world);
+	      var control = _vizi2.default.Controls.orbit().addTo(world);
+	      this._control = control;
 	
 	      // add callbacks
 	      world.on('preUpdate', function (delta) {
@@ -236,6 +238,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this._rendererStats.update(this._world._engine._renderer);
 	        }
 	      }
+	
+	      // follow the car
+	      if (this._options.followVehicles) {
+	        this._updateCameraPosition();
+	      }
 	    }
 	
 	    /**
@@ -247,7 +254,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setView',
 	    value: function setView(lat, lon) {
-	      this._world.setView([lat, lon]);
+	      // this._world.setView([lat, lon]); // this does not work
+	      this._control.flyToLatLon(_vizi2.default.latLon(lat, lon), 0.0001);
 	    }
 	
 	    /**
@@ -318,6 +326,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'stopSimulation',
 	    value: function stopSimulation() {
 	      return this._api.stopSimulation();
+	    }
+	
+	    /**
+	     * update the camera position to follow the vehicles
+	     * @private
+	     */
+	
+	  }, {
+	    key: '_updateCameraPosition',
+	    value: function _updateCameraPosition() {
+	      if (this._options.followVehicles) {
+	        var location = this._vehicleLayer.getCentroid();
+	        if (location != null) {
+	          this.setView(location.lat, location.lon);
+	        }
+	      }
 	    }
 	  }]);
 	
@@ -1470,7 +1494,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
 	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/buildings/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
 	        interactive: false,
-	        maxLOD: 16,
+	        maxLOD: 14,
 	        style: function style(feature) {
 	          return _BuildingUtils2.default.style(feature, {
 	            height: 1,
@@ -2582,7 +2606,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        object: object,
 	        worker: worker
 	      };
-	      this._vehicles[vehicle.id] = entry;
+	      // this._vehicles[vehicle.id] = entry;
+	      this._vehicles.push(entry);
 	
 	      // start the worker
 	      if (this._isRunning) {
@@ -2715,6 +2740,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	          viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
 	        };
 	      }(this);
+	    }
+	
+	    /**
+	     * Returns the centroid of vehicles
+	     */
+	
+	  }, {
+	    key: 'getCentroid',
+	    value: function getCentroid() {
+	      if (this._vehicles.length > 0) {
+	        // FIXME: calculate the centroid of all vehicles
+	        var location = this._vehicles[0].data.location;
+	        return location; // {x: 35.xxx, y: 140.xxx}
+	      } else {
+	        return null;
+	      }
 	    }
 	  }]);
 	

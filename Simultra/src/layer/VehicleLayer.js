@@ -204,7 +204,8 @@ class VehicleLayer extends Layer {
       object: object,
       worker: worker
     };
-    this._vehicles[vehicle.id] = entry;
+    // this._vehicles[vehicle.id] = entry;
+    this._vehicles.push(entry);
 
     // start the worker
     if (this._isRunning) {
@@ -331,6 +332,19 @@ class VehicleLayer extends Layer {
         viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
       };
     })(this);
+  }
+
+  /**
+   * Returns the centroid of vehicles
+   */
+  getCentroid() {
+    if (this._vehicles.length > 0) {
+      // FIXME: calculate the centroid of all vehicles
+      var location = this._vehicles[0].data.location;
+      return location; // {x: 35.xxx, y: 140.xxx}
+    } else {
+      return null;
+    }
   }
 
 }
