@@ -115,7 +115,9 @@
             simultra = new Simultra(location.protocol + '//' + location.host, null, {
                 debug: {{.debug}},
                 renderer: "{{.renderer}}",
-                renderBuilding: !{{.test}},
+//                renderBuilding: !{{.test}},
+                renderBuilding: false,
+                renderFootway: false,
             });
             {{if .dynamic}}
             simultra.start();
