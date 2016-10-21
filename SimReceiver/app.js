@@ -130,6 +130,10 @@ Client.prototype.update = function(mobility) {
     vehicle.location.lon = mobility['Longitude'];
     changed = true;
   }
+  if ('Angle' in mobility) {
+    vehicle.angle = mobility['Angle'];
+    changed = true;
+  }
 
   if (changed) {
     this.wsWriteData(JSON.stringify(vehicle));
