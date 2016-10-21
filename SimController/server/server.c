@@ -135,7 +135,50 @@ void *new_connection_handler(void *socket_desc)
 		debug("START_SIMULATION Command received.");
 		is_running = 1;
 		// FIXME: implement this command
-		sprintf(Response, "ok");
+
+		// parse the "data" property in payload
+		if (payload.data == null) {
+		    sprintf(Response, "ng");
+		}
+		else
+		{
+		    cJSON *json=cJSON_Parse(payload.data);
+		    if (!json)
+		    {
+		        sprintf(Response, "ng");
+		    }
+		    else
+		    {
+		        cJSON *item = json;
+
+                for ( i = 0 ; i < cJSON_GetArraySize(item) ; i++ )
+                {
+                    cJSON* subitem = cJSON_GetArrayItem(item, i);
+                    if (!strcmp(subitem->string, "map"))
+                    {
+                        out = cJSON_Print(subitem);
+                        sscanf(out, "%d", &payload->command);
+                    }
+                    else if (!strcmp(subitem->string, "type"))
+                    {
+                        out = cJSON_Print(subitem);
+                        payload->data = malloc(strlen(out) + 1);
+                        sscanf(out, "%s", payload->data);
+                    }
+                    else if (!strcmp(subitem->string, "options"))
+                    {
+                        out = cJSON_Print(subitem);
+                        payload->data = malloc(strlen(out) + 1);
+                        sscanf(out, "%s", payload->data);
+                    }
+                }
+
+		        // free memory
+		        cJSON_Delete(json);
+
+		        sprintf(Response, "ok");
+		    }
+		}
 		break;
 	    }
 	    case CHECK_STATE:

@@ -7,7 +7,6 @@ import (
 	. "./infra"
 	. "./models"
 	"math"
-	"log"
 	"io/ioutil"
 )
 
@@ -84,7 +83,6 @@ func main() {
 					c.JSON(500, err)
 				}
 				data := string(byteData)
-				log.Print("data = " + data)
 
 				err = simController.StartSimulation(data)
 				if (err != nil) {
