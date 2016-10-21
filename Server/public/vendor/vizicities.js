@@ -18771,6 +18771,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }, {
+	    key: 'getPedestrian',
+	    value: function getPedestrian(id) {
+	      if (id in this._entries) {
+	        return this._entries[id];
+	      }
+	      return null;
+	    }
+	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
 	      // Run common destruction logic from parent
@@ -21850,6 +21858,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // vehicle.mesh = mesh;
 	        // vehicle.setLocation(vehicle.latlon.lat, vehicle.latlon.lon, vehicle.angle);
 	      }
+	    }
+	  }, {
+	    key: 'getVehicle',
+	    value: function getVehicle(id) {
+	      if (id in this._entries) {
+	        return this._entries[id];
+	      }
+	      return null;
 	    }
 	  }, {
 	    key: '_setVelocity',

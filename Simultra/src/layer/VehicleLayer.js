@@ -322,6 +322,11 @@ class VehicleLayer extends Layer {
 
         var viziLayer = that._getViziLayer();
 
+        // update the object location in simultra
+        if (vehicle.id in that._vehicles) {
+          that._vehicles[vehicle.id].data = vehicle;
+        }
+
         // update the object in vizi layer
         if (prevSender !== sender) {
           viziLayer.setLabelClass(vehicle.id, 'label vehicle');
@@ -340,8 +345,15 @@ class VehicleLayer extends Layer {
   getCentroid() {
     if (this._vehicles.length > 0) {
       // FIXME: calculate the centroid of all vehicles
-      var location = this._vehicles[0].data.location;
-      return location; // {x: 35.xxx, y: 140.xxx}
+      // var location = this._vehicles[0].object.latlon;
+      if (this._vehicles[0].object.vehicle && this._vehicles[0].object.vehicle.root) {
+        var position = this._vehicles[0].object.vehicle.root.position;
+        var point = new VIZI.Point(position.x, position.z);
+        var latLon = this._getViziWorld().pointToLatLon(point);
+        return latLon; // {lat: 35.xxx, lon: 140.xxx}
+      } else {
+        return null;
+      }
     } else {
       return null;
     }

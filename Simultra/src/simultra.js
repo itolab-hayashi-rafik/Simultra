@@ -132,9 +132,17 @@ class Simultra extends EventEmitter {
    * @param lat latitude
    * @param lon longitude
    */
-  setView(lat, lon) {
+  flyToLatLon(lat, lon) {
     // this._world.setView([lat, lon]); // this does not work
     this._control.flyToLatLon(VIZI.latLon(lat, lon), 0.0001);
+  }
+
+  /**
+   * Flyies to the point
+   * @param point
+   */
+  flyToPoint(point) {
+    this._control.flyToPoint(point, 0.0001);
   }
 
   /**
@@ -195,9 +203,9 @@ class Simultra extends EventEmitter {
    */
   _updateCameraPosition() {
     if (this._options.followVehicles) {
-      var location = this._vehicleLayer.getCentroid();
-      if (location != null) {
-        this.setView(location.lat, location.lon);
+      var latLon = this._vehicleLayer.getCentroid();
+      if (latLon != null) {
+        this.flyToLatLon(latLon.lat, latLon.lon);
       }
     }
   }
