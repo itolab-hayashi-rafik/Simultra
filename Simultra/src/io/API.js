@@ -29,14 +29,14 @@ class API extends WebClient {
   }
 
   // --- Controller
-  startSimulation(map, type, options) {
+  startSimulation(map, type, scenario) {
     return this._ajax({
       url: this.baseUrl + START_SIMULATION,
       method: 'post',
       data: JSON.stringify({
         map: map,
         type: type,
-        options: options
+        scenario: scenario
       })
     });
   }

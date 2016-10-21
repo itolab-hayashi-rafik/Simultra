@@ -255,7 +255,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'flyToLatLon',
 	    value: function flyToLatLon(lat, lon) {
 	      // this._world.setView([lat, lon]); // this does not work
-	      this._control.flyToLatLon(_vizi2.default.latLon(lat, lon), 0.0001);
+	      this._control.flyToLatLon(_vizi2.default.latLon(lat, lon), 0.00000001);
 	    }
 	
 	    /**
@@ -266,7 +266,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'flyToPoint',
 	    value: function flyToPoint(point) {
-	      this._control.flyToPoint(point, 0.0001);
+	      this._control.flyToPoint(point, 0.00000001);
 	    }
 	
 	    /**

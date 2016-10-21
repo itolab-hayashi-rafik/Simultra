@@ -134,7 +134,7 @@ class Simultra extends EventEmitter {
    */
   flyToLatLon(lat, lon) {
     // this._world.setView([lat, lon]); // this does not work
-    this._control.flyToLatLon(VIZI.latLon(lat, lon), 0.0001);
+    this._control.flyToLatLon(VIZI.latLon(lat, lon), 0.00000001); // FIXME: find a way to move without the animation
   }
 
   /**
@@ -142,7 +142,7 @@ class Simultra extends EventEmitter {
    * @param point
    */
   flyToPoint(point) {
-    this._control.flyToPoint(point, 0.0001);
+    this._control.flyToPoint(point, 0.00000001);
   }
 
   /**
@@ -176,10 +176,10 @@ class Simultra extends EventEmitter {
    * Controls the remote to start the simulation
    * @param map
    * @param type
-   * @param options
+   * @param scenario
    */
-  startSimulation(map, type, options) {
-    return this._api.startSimulation(map, type, options);
+  startSimulation(map, type, scenario) {
+    return this._api.startSimulation(map, type, scenario);
   }
 
   /**

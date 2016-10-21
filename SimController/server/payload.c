@@ -80,6 +80,63 @@ void set_payload(payload_t payload, char** result)
 }
 
 
+/***************************************************************************************************************
+ * input: payload as string
+ * output: parse the payload string to JSON, then render back to text, and print.
+ ************************************************************************************************/
+ void parse_start_argument(char *text, start_argument_t* argument)
+ {
+    char* buf;
+    cJSON *json=cJSON_Parse(text);
+
+    printf("A\n");
+
+
+    int i;
+    if (!json)
+    {
+        printf("Error before: <%s>\n",cJSON_GetErrorPtr());
+    }
+    else
+    {
+        cJSON *item = json;
+
+        for ( i = 0 ; i < cJSON_GetArraySize(item) ; i++ )
+        {
+            cJSON* subitem = cJSON_GetArrayItem(item, i);
+            if (!strcmp(subitem->string, "map"))
+            {
+                printf("B\n");
+                buf = cJSON_Print(subitem);
+                argument->map = malloc(strlen(buf) + 1);
+                sscanf(buf, "%s", argument->map);
+            }
+            else if (!strcmp(subitem->string, "type"))
+            {
+                printf("C\n");
+                buf = cJSON_Print(subitem);
+                argument->type = malloc(strlen(buf) + 1);
+                sscanf(buf, "%s", argument->type);
+            }
+            else if (!strcmp(subitem->string, "scenario"))
+            {
+                printf("D\n");
+                buf = cJSON_Print(subitem);
+                argument->scenario = malloc(strlen(buf) + 1);
+                sscanf(buf, "%s", argument->scenario);
+            }
+        }
+
+    printf("E\n");
+        printf("F\n");
+
+        // free memory
+        free(buf);
+        cJSON_Delete(json);
+    }
+ }
+
+
 /****************************************************
 int main (int argc, const char * argv[])
 {

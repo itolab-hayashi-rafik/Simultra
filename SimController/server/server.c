@@ -129,56 +129,19 @@ void *new_connection_handler(void *socket_desc)
 	
 	switch (payload.command)
 	{
-
 	    case START_SIMULATION:
 	    {
 		debug("START_SIMULATION Command received.");
 		is_running = 1;
-		// FIXME: implement this command
 
 		// parse the "data" property in payload
-		if (payload.data == null) {
-		    sprintf(Response, "ng");
-		}
-		else
-		{
-		    cJSON *json=cJSON_Parse(payload.data);
-		    if (!json)
-		    {
-		        sprintf(Response, "ng");
-		    }
-		    else
-		    {
-		        cJSON *item = json;
+        start_argument_t argument = { 0, 0, 0 };
+        printf("{{{{{");
+        parse_start_argument(payload.data, &argument);
+printf("}}}}}");
+        // FIXME implement this
 
-                for ( i = 0 ; i < cJSON_GetArraySize(item) ; i++ )
-                {
-                    cJSON* subitem = cJSON_GetArrayItem(item, i);
-                    if (!strcmp(subitem->string, "map"))
-                    {
-                        out = cJSON_Print(subitem);
-                        sscanf(out, "%d", &payload->command);
-                    }
-                    else if (!strcmp(subitem->string, "type"))
-                    {
-                        out = cJSON_Print(subitem);
-                        payload->data = malloc(strlen(out) + 1);
-                        sscanf(out, "%s", payload->data);
-                    }
-                    else if (!strcmp(subitem->string, "options"))
-                    {
-                        out = cJSON_Print(subitem);
-                        payload->data = malloc(strlen(out) + 1);
-                        sscanf(out, "%s", payload->data);
-                    }
-                }
-
-		        // free memory
-		        cJSON_Delete(json);
-
-		        sprintf(Response, "ok");
-		    }
-		}
+        sprintf(Response, "ok");
 		break;
 	    }
 	    case CHECK_STATE:

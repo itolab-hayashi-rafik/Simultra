@@ -41,11 +41,23 @@
     padding: 25px 20px;
 }
 
-#controller #content #simlationSettings {
+#controller #content #control {
+    height: 70px;
+}
+
+#controller #content #control #state {
+    padding-top: 15px;
+}
+
+#controller #content #control #state p {
+    font-size: 18px;
+}
+
+#controller #content #simulationSettings {
     margin: 0;
 }
 
-#controller #content #simlationSettings legend {
-    font-size: 18px;
+#controller #content #simulationSettings legend {
+    font-size: 14px;
     margin-bottom: 0;
 }

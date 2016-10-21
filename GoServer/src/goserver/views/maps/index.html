@@ -30,6 +30,15 @@
         </div>
 
         <div id="content">
+            <div id="control">
+                <div id="state" class="pull-left">
+                    <p>Simulator is <span id="state_span"></span></p>
+                </div>
+                <div class="pull-right">
+                    <a id="followVehicles" class="btn btn-default btn-fab"><i class="material-icons">lock open</i></a>
+                </div>
+            </div>
+
             <form id="simulationSettings" class="form-horizontal">
                 <fieldset>
                     <legend>Simulation Settings:</legend>
@@ -63,13 +72,12 @@
                         </div>
                     </div>-->
                     <div class="form-group">
-                        <label for="selectOptions" class="col-md-2 control-label">Senario</label>
+                        <label for="selectScenario" class="col-md-2 control-label">Scenario</label>
 
                         <div class="col-md-10">
-                            <select name="options" id="selectOptions" class="form-control">
-                                <option>Senario1</option>
-                                <option>Senario2</option>
-                                <option>Senario3</option>
+                            <select name="scenario" id="selectScenario" class="form-control">
+                                <option name="simx_scenario">simx_scenario</option>
+                                <option name="simxx_scenario">simxx_scenario</option>
                             </select>
                         </div>
                     </div>
@@ -142,12 +150,40 @@
         // TODO: The Controller
         (function($) {
 
+            function setupControl() {
+                $('#control').ready(function() {
+                    var $control = $('#control');
+
+                    // retrieve and update the simulation state
+                    var updateControl = (function($control) {
+                        console.log('!!');
+                        return function() {
+                            // state
+                            if (simultra._options.followVehicles) {
+                                $control.find('a#followVehicles').addClass('btn-primary');
+                            } else {
+                                $control.find('a#followVehicles').removeClass('btn-primary');
+                            }
+                        }
+                    })($control);
+
+                    // followVehicles button
+                    $control.find('a#followVehicles').on('click', function() {
+                        simultra._options.followVehicles = !simultra._options.followVehicles;
+                        updateControl();
+                    });
+
+                    updateControl();
+                });
+            }
+
             /**
              * Sets up Simulation Settings Form
              */
             function setupSimulationSettings() {
                 $('form#simulationSettings').ready(function() {
                     var $form = $('form#simulationSettings');
+                    var $control = $('#control');
 
                     // retrieve and update the simulation state
                     var updateStates = (function($form) {
@@ -158,9 +194,13 @@
                                         if (data.isRunning) {
                                             $form.find('button#stop').prop('disabled', false);
                                             $form.find('button#run').prop('disabled', true);
+
+                                            $control.find('span#state_span').text("RUNNING");
                                         } else {
                                             $form.find('button#stop').prop('disabled', true);
                                             $form.find('button#run').prop('disabled', false);
+
+                                            $control.find('span#state_span').text("not running");
                                         }
                                     })
                         }
@@ -184,7 +224,7 @@
                                 data[obj.name] = obj.value;
                             }
                         });
-                        simultra.startSimulation(data['map'], data['type'], data['options']).then(function() { updateStates(); });
+                        simultra.startSimulation(data['map'], data['type'], data['scenario']).then(function() { updateStates(); });
                     });
 
                     updateStates();
@@ -195,6 +235,7 @@
              * onLoad
              */
             $(document).ready(function() {
+                setupControl();
                 setupSimulationSettings();
             });
         })($);
