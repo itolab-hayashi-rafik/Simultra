@@ -185,7 +185,7 @@ Client.prototype.onDisconnected = function() {
   // delete the vehicle if needed
   if (this.vehicle && this.vehicle.id) {
     api.deleteVehicle(this.vehicle.id, function(vehicle) {
-      console.log('deleted the vehicle ' + vehicle);
+      console.log('deleted the vehicle ' + JSON.stringify(vehicle));
     });
   }
 };
