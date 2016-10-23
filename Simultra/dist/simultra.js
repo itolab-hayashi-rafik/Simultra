@@ -2258,6 +2258,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function wsVehicle(vid) {
 	      return new WebSocket(this.wsBaseUrl + WS_VEHICLE(vid));
 	    }
+	  }, {
+	    key: 'wsAllVehicles',
+	    value: function wsAllVehicles() {
+	      return this.wsVehicle('all');
+	    }
 	    // ---
 	
 	    // --- Pedestrians
@@ -2296,6 +2301,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'wsPedestrian',
 	    value: function wsPedestrian(pid) {
 	      return new WebSocket(this.wsBaseUrl + WS_PEDESTRIAN(pid));
+	    }
+	  }, {
+	    key: 'wsAllPedestrians',
+	    value: function wsAllPedestrians() {
+	      return this.wsPedestrian('all');
 	    }
 	    // ---
 	
@@ -2393,6 +2403,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+	
 	var _vizi = __webpack_require__(1);
 	
 	var _vizi2 = _interopRequireDefault(_vizi);
@@ -2474,6 +2486,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // set the instance property
 	      this._setViziLayer(viziLayer);
 	    }
+	  }, {
+	    key: '_onAdd',
+	    value: function _onAdd(simultra) {
+	      _get(Object.getPrototypeOf(VehicleLayer.prototype), '_onAdd', this).call(this, simultra);
+	
+	      // create the worker thread for websocket
+	      this._worker = (0, _operative2.default)(this._createWorker(), _WorkerUtils2.default.getDependencies());
+	    }
+	  }, {
+	    key: '_onRemove',
+	    value: function _onRemove() {
+	      _get(Object.getPrototypeOf(VehicleLayer.prototype), '_onRemove', this).call(this);
+	
+	      // destroy the worker
+	      this._worker = null;
+	    }
 	
 	    /**
 	     * Starts updating the view
@@ -2486,12 +2514,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var self = this;
 	
-	      // start all of the workers
-	      this._vehicles.forEach(function (vehicle, id) {
-	        if (vehicle.worker) {
-	          vehicle.worker.start(id, self._createWorkerCallback());
-	        }
-	      });
+	      // start the worker
+	      this._worker.start(this._createWorkerCallback());
 	
 	      // start vehicle manager
 	      var ws = this._api.wsVehicles();
@@ -2526,11 +2550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      // terminate all of the workers
-	      this._vehicles.forEach(function (vehicle) {
-	        if (vehicle.worker) {
-	          vehicle.worker.stop();
-	        }
-	      });
+	      this._worker.stop();
 	    }
 	  }, {
 	    key: '_onMessage',
@@ -2630,22 +2650,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // add vehicle to the vizi layer
 	      var object = viziLayer.addVehicle(vehicle.type, new _vizi2.default.LatLon(vehicle.location.lat, vehicle.location.lon), vehicle.angle);
 	
-	      // create a new updating thread
-	      var worker = (0, _operative2.default)(this._createWorker(), _WorkerUtils2.default.getDependencies());
-	
 	      // add entry to dictionary
 	      var entry = {
 	        data: vehicle,
-	        object: object,
-	        worker: worker
+	        object: object
 	      };
 	      // this._vehicles[vehicle.id] = entry;
 	      this._vehicles.push(entry);
-	
-	      // start the worker
-	      if (this._isRunning) {
-	        worker.start(vehicle.id, this._createWorkerCallback());
-	      }
 	
 	      console.log('added vehicle: ' + JSON.stringify(vehicle));
 	      return entry;
@@ -2706,15 +2717,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return {
 	        _baseUrl: baseUrl,
 	        _api: null,
-	        _id: null,
 	        _socket: null,
 	        _callback: null,
 	        _isRunning: false,
 	
 	        /** start updating the vehicle */
-	        start: function start(id, callback) {
+	        start: function start(callback) {
 	          this._api = new SimWorker.API(this._baseUrl);
-	          this._id = id;
 	          this._callback = callback;
 	          this._isRunning = true;
 	
@@ -2727,7 +2736,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _update: function _update() {
 	          var self = this;
 	
-	          var socket = this._api.wsVehicle(this._id);
+	          var socket = this._api.wsAllVehicles();
 	          socket.onclose = function (event) {
 	            self._isRunning = false;
 	            console.log('closed vehicle ' + self._id);

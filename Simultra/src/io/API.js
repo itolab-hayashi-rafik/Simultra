@@ -85,6 +85,10 @@ class API extends WebClient {
   wsVehicle(vid) {
     return new WebSocket(this.wsBaseUrl + WS_VEHICLE(vid));
   }
+
+  wsAllVehicles() {
+    return this.wsVehicle('all');
+  }
   // ---
 
   // --- Pedestrians
@@ -116,6 +120,10 @@ class API extends WebClient {
 
   wsPedestrian(pid) {
     return new WebSocket(this.wsBaseUrl + WS_PEDESTRIAN(pid));
+  }
+
+  wsAllPedestrians() {
+    return this.wsPedestrian('all');
   }
   // ---
 

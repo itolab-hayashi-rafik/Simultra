@@ -51,6 +51,20 @@ class VehicleLayer extends Layer {
 
   }
 
+  _onAdd(simultra) {
+    super._onAdd(simultra);
+
+    // create the worker thread for websocket
+    this._worker = operative(this._createWorker(), WorkerUtils.getDependencies());
+  }
+
+  _onRemove() {
+    super._onRemove();
+
+    // destroy the worker
+    this._worker = null;
+  }
+
   /**
    * Starts updating the view
    */
@@ -59,12 +73,8 @@ class VehicleLayer extends Layer {
 
     var self = this;
 
-    // start all of the workers
-    this._vehicles.forEach((vehicle,id) => {
-      if (vehicle.worker) {
-        vehicle.worker.start(id, self._createWorkerCallback());
-      }
-    });
+    // start the worker
+    this._worker.start(this._createWorkerCallback());
 
     // start vehicle manager
     var ws = this._api.wsVehicles();
@@ -94,11 +104,7 @@ class VehicleLayer extends Layer {
     }
 
     // terminate all of the workers
-    this._vehicles.forEach(vehicle => {
-      if (vehicle.worker) {
-        vehicle.worker.stop();
-      }
-    });
+    this._worker.stop();
   }
 
   _onMessage(data) {
@@ -195,22 +201,13 @@ class VehicleLayer extends Layer {
       vehicle.angle
     );
 
-    // create a new updating thread
-    var worker = operative(this._createWorker(), WorkerUtils.getDependencies());
-
     // add entry to dictionary
     var entry = {
       data: vehicle,
-      object: object,
-      worker: worker
+      object: object
     };
     // this._vehicles[vehicle.id] = entry;
     this._vehicles.push(entry);
-
-    // start the worker
-    if (this._isRunning) {
-      worker.start(vehicle.id, this._createWorkerCallback());
-    }
 
     console.log('added vehicle: ' + JSON.stringify(vehicle));
     return entry;
@@ -268,15 +265,13 @@ class VehicleLayer extends Layer {
     return {
       _baseUrl: baseUrl,
       _api: null,
-      _id: null,
       _socket: null,
       _callback: null,
       _isRunning: false,
 
       /** start updating the vehicle */
-      start: function(id, callback) {
+      start: function(callback) {
         this._api = new SimWorker.API(this._baseUrl);
-        this._id = id;
         this._callback = callback;
         this._isRunning = true;
 
@@ -287,7 +282,7 @@ class VehicleLayer extends Layer {
       _update: function() {
         var self = this;
 
-        var socket = this._api.wsVehicle(this._id);
+        var socket = this._api.wsAllVehicles();
         socket.onclose = function(event) {
           self._isRunning = false;
           console.log('closed vehicle ' + self._id);

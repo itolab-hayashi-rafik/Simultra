@@ -151,7 +151,8 @@ Client.prototype.onReceiveData = function(data) {
     var mobility = data['Mobility'];
 
     if ('Name' in mobility) {
-      var name = mobility['Name'] + ' (' + ip + ')';
+      // var name = mobility['Name'] + ' (' + ip + ')';
+      var name = ip;
       if (name && this.name !== name) {
         this.name = name;
       }

@@ -102,6 +102,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// --- API endpoint definitions
+	var START_SIMULATION = '/api/v1/start';
+	var IS_RUNNING = '/api/v1/isRunning';
+	var STOP_SIMULATION = '/api/v1/stop';
+	
 	var GET_VEHICLES = '/api/v1/vehicles';
 	var UPDATE_VEHICLES = '/api/v1/vehicles';
 	var GET_VEHICLE = function GET_VEHICLE(vid) {
@@ -136,10 +140,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _this;
 	  }
 	
-	  // --- Vehicles
+	  // --- Controller
 	
 	
 	  _createClass(API, [{
+	    key: 'startSimulation',
+	    value: function startSimulation(map, type, scenario) {
+	      return this._ajax({
+	        url: this.baseUrl + START_SIMULATION,
+	        method: 'post',
+	        data: JSON.stringify({
+	          map: map,
+	          type: type,
+	          scenario: scenario
+	        })
+	      });
+	    }
+	  }, {
+	    key: 'isRunning',
+	    value: function isRunning() {
+	      return this._ajax({
+	        url: this.baseUrl + IS_RUNNING,
+	        method: 'get'
+	      });
+	    }
+	  }, {
+	    key: 'stopSimulation',
+	    value: function stopSimulation() {
+	      return this._ajax({
+	        url: this.baseUrl + STOP_SIMULATION,
+	        method: 'post'
+	      });
+	    }
+	
+	    // --- Vehicles
+	
+	  }, {
 	    key: 'getVehicles',
 	    value: function getVehicles() {
 	      return this._ajax({
@@ -173,6 +209,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'wsVehicle',
 	    value: function wsVehicle(vid) {
 	      return new WebSocket(this.wsBaseUrl + WS_VEHICLE(vid));
+	    }
+	  }, {
+	    key: 'wsAllVehicles',
+	    value: function wsAllVehicles() {
+	      return this.wsVehicle('all');
 	    }
 	    // ---
 	
@@ -212,6 +253,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'wsPedestrian',
 	    value: function wsPedestrian(pid) {
 	      return new WebSocket(this.wsBaseUrl + WS_PEDESTRIAN(pid));
+	    }
+	  }, {
+	    key: 'wsAllPedestrians',
+	    value: function wsAllPedestrians() {
+	      return this.wsPedestrian('all');
 	    }
 	    // ---
 	
