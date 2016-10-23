@@ -2791,7 +2791,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          // var angle = Math.acos(cos);
 	          // console.log('vehicle ' + vehicle.id + ': cos = ' + cos + ', angle = ' + angle);
 	          var angle = vehicle.angle * Math.PI / 180.;
-	          angle += 90 * Math.PI / 180.; // TODO: temporary fix, adding 90 degrees to the original angle!!
+	          angle += -90 * Math.PI / 180.; // TODO: temporary fix, adding -90 degrees to the original angle!!
 	
 	          // update the object in vizi layer
 	          if (prevSender !== sender) {
