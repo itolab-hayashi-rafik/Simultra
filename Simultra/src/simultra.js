@@ -27,7 +27,7 @@ class Simultra extends EventEmitter {
       renderBuilding: true,
       renderVehicle: true,
       renderPedestrian: true,
-      followVehicles: true
+      followVehicles: false
     };
     this._options = extend({}, defaultOptions, options);
 
@@ -127,6 +127,18 @@ class Simultra extends EventEmitter {
     }
   }
 
+  lookAtLatLon(latLon) {
+    var point = this._world.latLonToPoint(latLon);
+    this.moveToPoint(point);
+  }
+
+  lookAtPoint(point) {
+    var camera = this._world.getCamera();
+    var moveTarget = new THREE.Vector3(point.x, 0, point.y);
+    // camera.lookAt(moveTarget); // TODO: this does not work. OrbitControl.js overrides this function!!
+    this._control._controls.target = moveTarget;
+  }
+
   /**
    * Sets the center coordinate of the view
    * @param lat latitude
@@ -213,7 +225,7 @@ class Simultra extends EventEmitter {
     if (this._options.followVehicles) {
       var latLon = this._vehicleLayer.getCentroid();
       if (latLon != null) {
-        this.flyToLatLon(latLon);
+        this.lookAtLatLon(latLon);
       }
     }
   }

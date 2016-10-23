@@ -139,7 +139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      renderBuilding: true,
 	      renderVehicle: true,
 	      renderPedestrian: true,
-	      followVehicles: true
+	      followVehicles: false
 	    };
 	    _this._options = (0, _extend2.default)({}, defaultOptions, options);
 	
@@ -243,6 +243,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this._options.followVehicles) {
 	        this._updateCameraPosition();
 	      }
+	    }
+	  }, {
+	    key: 'lookAtLatLon',
+	    value: function lookAtLatLon(latLon) {
+	      var point = this._world.latLonToPoint(latLon);
+	      this.moveToPoint(point);
+	    }
+	  }, {
+	    key: 'lookAtPoint',
+	    value: function lookAtPoint(point) {
+	      var camera = this._world.getCamera();
+	      var moveTarget = new THREE.Vector3(point.x, 0, point.y);
+	      // camera.lookAt(moveTarget); // TODO: this does not work. OrbitControl.js overrides this function!!
+	      this._control._controls.target = moveTarget;
 	    }
 	
 	    /**
@@ -358,7 +372,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this._options.followVehicles) {
 	        var latLon = this._vehicleLayer.getCentroid();
 	        if (latLon != null) {
-	          this.flyToLatLon(latLon);
+	          this.lookAtLatLon(latLon);
 	        }
 	      }
 	    }
