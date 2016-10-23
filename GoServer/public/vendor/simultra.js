@@ -248,7 +248,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'lookAtLatLon',
 	    value: function lookAtLatLon(latLon) {
 	      var point = this._world.latLonToPoint(latLon);
-	      this.moveToPoint(point);
+	      this.lookAtPoint(point);
 	    }
 	  }, {
 	    key: 'lookAtPoint',
