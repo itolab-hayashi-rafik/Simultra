@@ -41,6 +41,21 @@ func main() {
 				"path": "/api/v1/vehicles/"+id+"/ws",
 			})
 		})
+
+		wsdebug.GET("/pedestrians", func(c *gin.Context) {
+			r.LoadHTMLGlob("views/wsdebug/*.html")
+			c.HTML(200, "index.html", gin.H{
+				"path": "/api/v1/pedestrians-ws",
+			})
+		})
+
+		wsdebug.GET("/pedestrians/:id", func(c *gin.Context) {
+			id := c.Param("id")
+			r.LoadHTMLGlob("views/wsdebug/*.html")
+			c.HTML(200, "index.html", gin.H{
+				"path": "/api/v1/pedestrians/"+id+"/ws",
+			})
+		})
 	}
 
 	maps := r.Group("/maps")
