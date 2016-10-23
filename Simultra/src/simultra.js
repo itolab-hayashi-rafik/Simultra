@@ -133,10 +133,39 @@ class Simultra extends EventEmitter {
   }
 
   lookAtPoint(point) {
-    var camera = this._world.getCamera();
-    var moveTarget = new THREE.Vector3(point.x, 0, point.y);
     // camera.lookAt(moveTarget); // TODO: this does not work. OrbitControl.js overrides this function!!
-    this._control._controls.target = moveTarget;
+
+    // camera ref
+    var camera = this._world.getCamera();
+    var target = this._control._controls.target;
+
+    // target to move to
+    var moveTarget = new THREE.Vector3(point.x, 0, point.y);
+
+    // apply!
+    target.copy(moveTarget);
+  }
+
+  moveToLatLon(latLon) {
+    var point = this._world.latLonToPoint(latLon);
+    this.moveToPoint(point);
+  }
+
+  moveToPoint(point) {
+    // camera ref
+    var camera = this._world.getCamera();
+    var target = this._control._controls.target;
+
+    // camera offset
+    var offset = new THREE.Vector3();
+    offset.copy(camera.position).sub(target);
+
+    // target to move to
+    var moveTarget = new THREE.Vector3(point.x, 0, point.y);
+
+    // apply!
+    target.copy(moveTarget);
+    camera.position.copy(target).add(offset);
   }
 
   /**
@@ -216,7 +245,7 @@ class Simultra extends EventEmitter {
     if (this._options.followVehicles) {
       var latLon = this._vehicleLayer.getCentroid();
       if (latLon != null) {
-        this.lookAtLatLon(latLon);
+        this.moveToLatLon(latLon);
       }
     }
   }

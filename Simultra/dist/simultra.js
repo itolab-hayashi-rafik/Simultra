@@ -128,7 +128,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function Simultra(baseUrl, defaultCoords, options) {
 	    _classCallCheck(this, Simultra);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Simultra).call(this));
+	    var _this = _possibleConstructorReturn(this, (Simultra.__proto__ || Object.getPrototypeOf(Simultra)).call(this));
 	
 	    var defaultOptions = {
 	      debug: true,
@@ -253,10 +253,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'lookAtPoint',
 	    value: function lookAtPoint(point) {
-	      var camera = this._world.getCamera();
-	      var moveTarget = new THREE.Vector3(point.x, 0, point.y);
 	      // camera.lookAt(moveTarget); // TODO: this does not work. OrbitControl.js overrides this function!!
-	      this._control._controls.target = moveTarget;
+	
+	      // camera ref
+	      var camera = this._world.getCamera();
+	      var target = this._control._controls.target;
+	
+	      // target to move to
+	      var moveTarget = new THREE.Vector3(point.x, 0, point.y);
+	
+	      // apply!
+	      target.copy(moveTarget);
+	    }
+	  }, {
+	    key: 'moveToLatLon',
+	    value: function moveToLatLon(latLon) {
+	      var point = this._world.latLonToPoint(latLon);
+	      this.moveToPoint(point);
+	    }
+	  }, {
+	    key: 'moveToPoint',
+	    value: function moveToPoint(point) {
+	      // camera ref
+	      var camera = this._world.getCamera();
+	      var target = this._control._controls.target;
+	
+	      // camera offset
+	      var offset = new THREE.Vector3();
+	      offset.copy(camera.position).sub(target);
+	
+	      // target to move to
+	      var moveTarget = new THREE.Vector3(point.x, 0, point.y);
+	
+	      // apply!
+	      target.copy(moveTarget);
+	      camera.position.copy(target).add(offset);
 	    }
 	
 	    /**
@@ -363,7 +394,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this._options.followVehicles) {
 	        var latLon = this._vehicleLayer.getCentroid();
 	        if (latLon != null) {
-	          this.lookAtLatLon(latLon);
+	          this.moveToLatLon(latLon);
 	        }
 	      }
 	    }
@@ -827,7 +858,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BasemapLayer).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, (BasemapLayer.__proto__ || Object.getPrototypeOf(BasemapLayer)).call(this, _options));
 	
 	    _this._setup();
 	    return _this;
@@ -881,7 +912,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Base Layer class
 	 */
-	
 	var Layer = function (_EventEmitter) {
 	  _inherits(Layer, _EventEmitter);
 	
@@ -889,8 +919,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, Layer);
 	
 	    // delegate layer
-	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Layer).call(this));
+	    var _this = _possibleConstructorReturn(this, (Layer.__proto__ || Object.getPrototypeOf(Layer)).call(this));
 	
 	    _this._viziLayer = null;
 	    _this._options = options;
@@ -992,8 +1021,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Utility
 	 */
-	
-	
 	var Util = {};
 	
 	Util.BuildingUtils = _BuildingUtils2.default;
@@ -1026,8 +1053,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Building Utilities
 	 */
-	
-	
 	var BuildingUtils = function () {
 	
 	  /**
@@ -1084,8 +1109,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Footway Utilities
 	 */
-	
-	
 	var FootwayUtils = function () {
 	
 	  /**
@@ -1504,7 +1527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BuildingLayer).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, (BuildingLayer.__proto__ || Object.getPrototypeOf(BuildingLayer)).call(this, _options));
 	
 	    _this._setup();
 	    return _this;
@@ -1593,7 +1616,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(FootwayLayer).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, (FootwayLayer.__proto__ || Object.getPrototypeOf(FootwayLayer)).call(this, _options));
 	
 	    _this._setup();
 	    return _this;
@@ -1699,7 +1722,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HighwayLayer).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, (HighwayLayer.__proto__ || Object.getPrototypeOf(HighwayLayer)).call(this, _options));
 	
 	    _this._setup();
 	    return _this;
@@ -1823,7 +1846,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PedestrianLayer).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, (PedestrianLayer.__proto__ || Object.getPrototypeOf(PedestrianLayer)).call(this, _options));
 	
 	    _this._pedestrians = [];
 	
@@ -1859,7 +1882,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onAdd',
 	    value: function _onAdd(simultra) {
-	      _get(Object.getPrototypeOf(PedestrianLayer.prototype), '_onAdd', this).call(this, simultra);
+	      _get(PedestrianLayer.prototype.__proto__ || Object.getPrototypeOf(PedestrianLayer.prototype), '_onAdd', this).call(this, simultra);
 	
 	      // create the worker thread for websocket
 	      this._worker = operative(this._createWorker(), _WorkerUtils2.default.getDependencies());
@@ -1867,7 +1890,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onRemove',
 	    value: function _onRemove() {
-	      _get(Object.getPrototypeOf(PedestrianLayer.prototype), '_onRemove', this).call(this);
+	      _get(PedestrianLayer.prototype.__proto__ || Object.getPrototypeOf(PedestrianLayer.prototype), '_onRemove', this).call(this);
 	
 	      // destroy the worker
 	      this._worker = null;
@@ -2171,7 +2194,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function API(baseUrl) {
 	    _classCallCheck(this, API);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(API).call(this));
+	    var _this = _possibleConstructorReturn(this, (API.__proto__ || Object.getPrototypeOf(API)).call(this));
 	
 	    _this.baseUrl = baseUrl;
 	    _this.wsBaseUrl = baseUrl.replace(/^https?:\/\//, 'ws://');
@@ -2441,7 +2464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(VehicleLayer).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, (VehicleLayer.__proto__ || Object.getPrototypeOf(VehicleLayer)).call(this, _options));
 	
 	    _this._vehicles = [];
 	
@@ -2479,7 +2502,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onAdd',
 	    value: function _onAdd(simultra) {
-	      _get(Object.getPrototypeOf(VehicleLayer.prototype), '_onAdd', this).call(this, simultra);
+	      _get(VehicleLayer.prototype.__proto__ || Object.getPrototypeOf(VehicleLayer.prototype), '_onAdd', this).call(this, simultra);
 	
 	      // create the worker thread for websocket
 	      this._worker = (0, _operative2.default)(this._createWorker(), _WorkerUtils2.default.getDependencies());
@@ -2487,7 +2510,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onRemove',
 	    value: function _onRemove() {
-	      _get(Object.getPrototypeOf(VehicleLayer.prototype), '_onRemove', this).call(this);
+	      _get(VehicleLayer.prototype.__proto__ || Object.getPrototypeOf(VehicleLayer.prototype), '_onRemove', this).call(this);
 	
 	      // destroy the worker
 	      this._worker = null;
