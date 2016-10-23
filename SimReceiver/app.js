@@ -131,7 +131,9 @@ Client.prototype.update = function(mobility) {
     changed = true;
   }
   if ('Angle' in mobility) {
-    vehicle.angle = mobility['Angle'];
+    var angle = mobility['Angle'] * Math.PI / 180.; // convert degrees to radians
+    angle += -90 * Math.PI / 180.; // TODO: temporary fix, adding -90 degrees to the original angle!!
+    vehicle.angle = angle;
     changed = true;
   }
 

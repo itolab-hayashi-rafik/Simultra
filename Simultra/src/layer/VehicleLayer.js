@@ -317,14 +317,6 @@ class VehicleLayer extends Layer {
     return (function(that) {
       var prevSender = '';
 
-      // ---
-      // // save two locations l_(t-1) and l_(t) for the angle calculation
-      // var coords = [VIZI.point(0, 0), VIZI.point(0, 0)];
-      // var latLon = VIZI.latLon(0, 0);
-      // var refVec = new THREE.Vector2(1, 0);
-      // var traceVec = new THREE.Vector2(0, 0);
-      // ---
-
       return function(msg) {
         var sender = msg.sender;
         var vehicle = msg.data;
@@ -336,30 +328,13 @@ class VehicleLayer extends Layer {
           that._vehicles[vehicle.id].data = vehicle;
         }
 
-        // // calculate the point in the world coordinate
-        // latLon.lat = vehicle.location.lat;
-        // latLon.lon = vehicle.location.lon;
-        // var point = that._getViziWorld().latLonToPoint(latLon);
-        // coords[0] = coords[1];
-        // coords[1] = point;
-        // console.log('vehicle ' + vehicle.id + ': coords = ' + JSON.stringify(coords));
-        //
-        // // calculate the angle
-        // traceVec.subVectors(coords[1], coords[0]);
-        // var cos = traceVec.dot(refVec) / (traceVec.length() * refVec.length());
-        // var angle = Math.acos(cos);
-        // console.log('vehicle ' + vehicle.id + ': cos = ' + cos + ', angle = ' + angle);
-        var angle = vehicle.angle * Math.PI / 180.;
-        angle += -90 * Math.PI / 180.; // TODO: temporary fix, adding -90 degrees to the original angle!!
-
         // update the object in vizi layer
         if (prevSender !== sender) {
           viziLayer.setLabelClass(vehicle.id, 'label vehicle');
           viziLayer.setLabelText(vehicle.id, sender);
           prevSender = sender;
         }
-        // viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, -vehicle.angle);
-        viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, -angle);
+        viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, -vehicle.angle);
         viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
       };
     })(this);
