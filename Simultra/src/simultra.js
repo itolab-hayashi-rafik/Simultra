@@ -3,6 +3,7 @@ import EventEmitter from 'eventemitter3';
 import extend from 'extend';
 import Stats from 'stats';
 import THREEx from 'threex';
+import TweenLite from 'TweenLite';
 
 import BasemapLayer from './layer/BasemapLayer';
 import BuildingLayer from './layer/BuildingLayer';
@@ -16,7 +17,7 @@ import Util from './util/index';
 
 class Simultra extends EventEmitter {
   constructor(baseUrl, defaultCoords, options) {
-    super();
+    super(); console.log(TweenLite);
 
     var defaultOptions = {
       debug: true,
@@ -144,22 +145,32 @@ class Simultra extends EventEmitter {
   }
 
   lookAtLatLon(latLon) {
-    var point = this._world.latLonToPoint(latLon);
-    this.lookAtPoint(point);
+    if (latLon) {
+      var point = this._world.latLonToPoint(latLon);
+      this.lookAtPoint(point);
+    }
+
+    var point = this.lookAtPoint();
+    return this._world.pointToLatLon(point);
   }
 
   lookAtPoint(point) {
-    // camera.lookAt(moveTarget); // TODO: this does not work. OrbitControl.js overrides this function!!
+    if (point) {
+      // camera.lookAt(moveTarget); // TODO: this does not work. OrbitControl.js overrides this function!!
 
-    // camera ref
-    var camera = this._world.getCamera();
+      // camera ref
+      var camera = this._world.getCamera();
+      var target = this._control._controls.target;
+
+      // target to move to
+      var moveTarget = new THREE.Vector3(point.x, 0, point.y);
+
+      // apply!
+      target.copy(moveTarget);
+    }
+
     var target = this._control._controls.target;
-
-    // target to move to
-    var moveTarget = new THREE.Vector3(point.x, 0, point.y);
-
-    // apply!
-    target.copy(moveTarget);
+    return new VIZI.Point(target.x, target.z);
   }
 
   moveToLatLon(latLon) {
@@ -278,11 +289,46 @@ class Simultra extends EventEmitter {
    *
    * @param object an object that has either a function or property named "latLon" that returns VIZI.LatLon location or "point" that returns VIZI.point position
    */
-  focusOn(object) {
+  focusOn(object, animate) {
+    animate = animate || true;
+
     if (object != null && !('latLon' in object) && !('point' in object)) {
       throw new Error('object needs to have a property or function named "latLon" that returns VIZI.LatLon location or "point" that returns VIZI.Point position');
     }
-    this._focusedObject = object;
+
+    if (animate) {
+      (function(self, object) {
+        var counter = { a: 0.0 };
+        var focusedOn = {
+          latLon: self.lookAtLatLon(),
+          point: self.lookAtPoint()
+        };
+
+        TweenLite.to(counter, 1, {
+          a: 1.0,
+          onUpdate: function() {
+            console.log('updating');
+            var focusOn = {
+              latLon: !('latLon' in object) ? null : (typeof object.latLon === 'function') ? object.latLon() : object.latLon,
+              point: !('point' in object) ? null : (typeof object.point === 'function') ? object.point() : object.point
+            };
+
+            if (focusOn.latLon != null) {
+              self._focusedObject = { latLon: new VIZI.LatLon(focusedOn.latLon.lat * (1.0 - counter.a) + focusOn.latLon.lat * counter.a, focusedOn.latLon.lon * (1.0 - counter.a) + focusOn.latLon.lon * counter.a) };
+            } else if (focusOn.point != null) {
+              self._focusedObject = { point: new VIZI.Point(focusedOn.point.x * (1.0 - counter.a) + focusOn.point.x * counter.a, focusedOn.point.y * (1.0 - counter.a) + focusOn.point.y * counter.a) };
+            }
+          },
+          onComplete: function() {
+            console.log('completed');
+            self._focusedObject = object;
+          },
+          ease: Circ.easeInOut
+        });
+      })(this, object);
+    } else {
+      this._focusedObject = object;
+    }
   }
 
   /**

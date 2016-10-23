@@ -85,7 +85,11 @@ function build() {
         // Proxy the global Stats variable to require('stats')
         'stats': 'Stats',
         // Proxy the global THREEx variable to require('THREEx')
-        'threex': 'THREEx'
+        'threex': 'THREEx',
+        // Proxy the global THREE variable to require('TweenLite')
+        'TweenLite': 'TweenLite',
+        // Proxy the global THREE variable to require('TweenMax')
+        'TweenMax': 'TweenMax',
       },
       module: {
         loaders: [
