@@ -51,6 +51,20 @@ class VehicleLayer extends Layer {
 
   }
 
+  _onAdd(simultra) {
+    super._onAdd(simultra);
+
+    // create the worker thread for websocket
+    this._worker = operative(this._createWorker(), WorkerUtils.getDependencies());
+  }
+
+  _onRemove() {
+    super._onRemove();
+
+    // destroy the worker
+    this._worker = null;
+  }
+
   /**
    * Starts updating the view
    */
@@ -59,12 +73,8 @@ class VehicleLayer extends Layer {
 
     var self = this;
 
-    // start all of the workers
-    this._vehicles.forEach((vehicle,id) => {
-      if (vehicle.worker) {
-        vehicle.worker.start(id, self._createWorkerCallback());
-      }
-    });
+    // start the worker
+    this._worker.start(this._createWorkerCallback());
 
     // start vehicle manager
     var ws = this._api.wsVehicles();
@@ -94,11 +104,7 @@ class VehicleLayer extends Layer {
     }
 
     // terminate all of the workers
-    this._vehicles.forEach(vehicle => {
-      if (vehicle.worker) {
-        vehicle.worker.stop();
-      }
-    });
+    this._worker.stop();
   }
 
   _onMessage(data) {
@@ -106,7 +112,7 @@ class VehicleLayer extends Layer {
     if (data === 'creation') {
       setTimeout(function() { self._update(); }, 0);
     } else if (data === 'deletion') {
-      setTImeout(function() { self._update(); }, 0);
+      setTimeout(function() { self._update(); }, 0);
     } else {
       console.error('unknown message ' + data);
     }
@@ -195,21 +201,13 @@ class VehicleLayer extends Layer {
       vehicle.angle
     );
 
-    // create a new updating thread
-    var worker = operative(this._createWorker(), WorkerUtils.getDependencies());
-
     // add entry to dictionary
     var entry = {
       data: vehicle,
-      object: object,
-      worker: worker
+      object: object
     };
-    this._vehicles[vehicle.id] = entry;
-
-    // start the worker
-    if (this._isRunning) {
-      worker.start(vehicle.id, this._createWorkerCallback());
-    }
+    // this._vehicles[vehicle.id] = entry;
+    this._vehicles.push(entry);
 
     console.log('added vehicle: ' + JSON.stringify(vehicle));
     return entry;
@@ -267,15 +265,13 @@ class VehicleLayer extends Layer {
     return {
       _baseUrl: baseUrl,
       _api: null,
-      _id: null,
       _socket: null,
       _callback: null,
       _isRunning: false,
 
       /** start updating the vehicle */
-      start: function(id, callback) {
+      start: function(callback) {
         this._api = new SimWorker.API(this._baseUrl);
-        this._id = id;
         this._callback = callback;
         this._isRunning = true;
 
@@ -286,10 +282,10 @@ class VehicleLayer extends Layer {
       _update: function() {
         var self = this;
 
-        var socket = this._api.wsVehicle(this._id);
+        var socket = this._api.wsAllVehicles();
         socket.onclose = function(event) {
           self._isRunning = false;
-          console.log('closed vehicle ' + self._id);
+          console.log('closed vehicle websocket');
         };
         socket.onmessage = function(event) {
           // here, "event" is an instance of MessageEvent, which cannot be serialized to send to the UI thread,
@@ -300,7 +296,7 @@ class VehicleLayer extends Layer {
           }
         };
         socket.onopen = function() {
-          console.log('opened vehicle ' + self._id);
+          console.log('opened vehicle websocket');
         };
         self._socket = socket;
       },
@@ -315,11 +311,17 @@ class VehicleLayer extends Layer {
   _createWorkerCallback() {
     return (function(that) {
       var prevSender = '';
+
       return function(msg) {
         var sender = msg.sender;
         var vehicle = msg.data;
 
         var viziLayer = that._getViziLayer();
+
+        // update the object location in simultra
+        if (vehicle.id in that._vehicles) {
+          that._vehicles[vehicle.id].data = vehicle;
+        }
 
         // update the object in vizi layer
         if (prevSender !== sender) {
@@ -331,6 +333,26 @@ class VehicleLayer extends Layer {
         viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
       };
     })(this);
+  }
+
+  /**
+   * Returns the centroid of vehicles
+   */
+  getCentroid() {
+    if (this._vehicles.length > 0) {
+      // FIXME: calculate the centroid of all vehicles
+      // var location = this._vehicles[0].object.latlon;
+      if (this._vehicles[0].object.vehicle && this._vehicles[0].object.vehicle.root) {
+        var position = this._vehicles[0].object.vehicle.root.position;
+        var point = new VIZI.Point(position.x, position.z);
+        var latLon = this._getViziWorld().pointToLatLon(point);
+        return latLon; // {lat: 35.xxx, lon: 140.xxx}
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 
 }

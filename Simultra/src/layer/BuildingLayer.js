@@ -20,9 +20,10 @@ class BuildingLayer extends Layer {
   _setup() {
 
     // Buildings from Mapzen
-    var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+    // var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+    var viziLayer = VIZI.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/buildings/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
       interactive: false,
-      maxLOD: 16,
+      maxLOD: 14,
       style: function(feature) {
         return BuildingUtils.style(feature, {
           height: 1,

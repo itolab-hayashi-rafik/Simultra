@@ -138,7 +138,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      renderFootway: true,
 	      renderBuilding: true,
 	      renderVehicle: true,
-	      renderPedestrian: true
+	      renderPedestrian: true,
+	      followVehicles: false
 	    };
 	    _this._options = (0, _extend2.default)({}, defaultOptions, options);
 	
@@ -170,7 +171,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      camera.position.set(-150, 175, 125);
 	
 	      // Add controls
-	      _vizi2.default.Controls.orbit().addTo(world);
+	      var control = _vizi2.default.Controls.orbit().addTo(world);
+	      this._control = control;
 	
 	      // add callbacks
 	      world.on('preUpdate', function (delta) {
@@ -236,6 +238,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this._rendererStats.update(this._world._engine._renderer);
 	        }
 	      }
+	
+	      // follow the car
+	      if (this._options.followVehicles) {
+	        this._updateCameraPosition();
+	      }
+	    }
+	  }, {
+	    key: 'lookAtLatLon',
+	    value: function lookAtLatLon(latLon) {
+	      var point = this._world.latLonToPoint(latLon);
+	      this.lookAtPoint(point);
+	    }
+	  }, {
+	    key: 'lookAtPoint',
+	    value: function lookAtPoint(point) {
+	      var camera = this._world.getCamera();
+	      var moveTarget = new THREE.Vector3(point.x, 0, point.y);
+	      // camera.lookAt(moveTarget); // TODO: this does not work. OrbitControl.js overrides this function!!
+	      this._control._controls.target = moveTarget;
 	    }
 	
 	    /**
@@ -245,9 +266,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	
 	  }, {
-	    key: 'setView',
-	    value: function setView(lat, lon) {
-	      this._world.setView([lat, lon]);
+	    key: 'flyToLatLon',
+	    value: function flyToLatLon(latLon, time, zoom) {
+	      this._control.flyToLatLon(latLon, time, zoom);
+	    }
+	
+	    /**
+	     * Flyies to the point
+	     * @param point
+	     */
+	
+	  }, {
+	    key: 'flyToPoint',
+	    value: function flyToPoint(point, time, zoom) {
+	      this._control.flyToPoint(point, time, zoom);
 	    }
 	
 	    /**
@@ -284,6 +316,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'isRunning',
 	    value: function isRunning() {
 	      return this._isRunning;
+	    }
+	
+	    /**
+	     * Controls the remote to start the simulation
+	     * @param map
+	     * @param type
+	     * @param scenario
+	     */
+	
+	  }, {
+	    key: 'startSimulation',
+	    value: function startSimulation(map, type, scenario) {
+	      return this._api.startSimulation(map, type, scenario);
+	    }
+	
+	    /**
+	     * Returns if the simulation is running
+	     * @returns {*}
+	     */
+	
+	  }, {
+	    key: 'isSimulationRunning',
+	    value: function isSimulationRunning() {
+	      return this._api.isRunning();
+	    }
+	
+	    /**
+	     * Controls the remote to stop the simulation
+	     */
+	
+	  }, {
+	    key: 'stopSimulation',
+	    value: function stopSimulation() {
+	      return this._api.stopSimulation();
+	    }
+	
+	    /**
+	     * update the camera position to follow the vehicles
+	     * @private
+	     */
+	
+	  }, {
+	    key: '_updateCameraPosition',
+	    value: function _updateCameraPosition() {
+	      if (this._options.followVehicles) {
+	        var latLon = this._vehicleLayer.getCentroid();
+	        if (latLon != null) {
+	          this.lookAtLatLon(latLon);
+	        }
+	      }
 	    }
 	  }]);
 	
@@ -1433,9 +1515,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _setup() {
 	
 	      // Buildings from Mapzen
-	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+	      // var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/buildings/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
 	        interactive: false,
-	        maxLOD: 16,
+	        maxLOD: 14,
 	        style: function style(feature) {
 	          return _BuildingUtils2.default.style(feature, {
 	            height: 1,
@@ -1523,7 +1606,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var self = this;
 	
 	      // Landuses from Mapzen
-	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/landuse,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+	      // var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/landuse,roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/landuse,roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
 	        interactive: false,
 	        maxLOD: 18,
 	        style: function style(feature) {
@@ -1628,7 +1712,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var self = this;
 	
 	      // Roads from Mapzen
-	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://vector.mapzen.com/osm/roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+	      // var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
 	        interactive: false,
 	        maxLOD: 18,
 	        style: function style(feature) {
@@ -1693,6 +1778,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
 	var _vizi = __webpack_require__(1);
 	
@@ -1769,6 +1856,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // set the instance property
 	      this._setViziLayer(viziLayer);
 	    }
+	  }, {
+	    key: '_onAdd',
+	    value: function _onAdd(simultra) {
+	      _get(Object.getPrototypeOf(PedestrianLayer.prototype), '_onAdd', this).call(this, simultra);
+	
+	      // create the worker thread for websocket
+	      this._worker = operative(this._createWorker(), _WorkerUtils2.default.getDependencies());
+	    }
+	  }, {
+	    key: '_onRemove',
+	    value: function _onRemove() {
+	      _get(Object.getPrototypeOf(PedestrianLayer.prototype), '_onRemove', this).call(this);
+	
+	      // destroy the worker
+	      this._worker = null;
+	    }
 	
 	    /**
 	     * Starts updating the view
@@ -1782,11 +1885,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var self = this;
 	
 	      // start all of the workers
-	      this._pedestrians.forEach(function (pedestrian, id) {
-	        if (pedestrian.worker) {
-	          pedestrian.worker.start(id, self._createWorkerCallback());
-	        }
-	      });
+	      this._worker.start(this._createWorkerCallback());
 	
 	      // start pedestrian manager
 	      var ws = this._api.wsPedestrians();
@@ -1821,11 +1920,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      // terminate all of the workers
-	      this._pedestrians.forEach(function (pedestrian) {
-	        if (pedestrian.worker) {
-	          pedestrian.worker.stop();
-	        }
-	      });
+	      this._worker.stop();
 	    }
 	  }, {
 	    key: '_onMessage',
@@ -1836,7 +1931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          self._update();
 	        }, 0);
 	      } else if (data === 'deletion') {
-	        setTImeout(function () {
+	        setTimeout(function () {
 	          self._update();
 	        }, 0);
 	      } else {
@@ -1926,21 +2021,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // add pedestrian to the vizi layer
 	      var object = viziLayer.addPedestrian(pedestrian.type, new _vizi2.default.LatLon(pedestrian.location.lat, pedestrian.location.lon), pedestrian.angle);
 	
-	      // create a new updating thread
-	      var worker = operative(this._createWorker(), _WorkerUtils2.default.getDependencies());
-	
 	      // add entry to dictionary
 	      var entry = {
 	        data: pedestrian,
-	        object: object,
-	        worker: worker
+	        object: object
 	      };
 	      this._pedestrians[pedestrian.id] = entry;
-	
-	      // start the worker
-	      if (this._isRunning) {
-	        worker.start(pedestrian.id, this._createWorkerCallback());
-	      }
 	
 	      console.log('added pedestrian: ' + JSON.stringify(pedestrian));
 	      return entry;
@@ -1955,14 +2041,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return {
 	        _baseUrl: baseUrl,
 	        _api: null,
-	        _id: null,
 	        _callback: null,
 	        _isRunning: false,
 	
 	        /** start updating the pedestrian */
-	        start: function start(id, callback) {
+	        start: function start(callback) {
 	          this._api = new SimWorker.API(this._baseUrl);
-	          this._id = id;
 	          this._callback = callback;
 	          this._isRunning = true;
 	
@@ -1975,10 +2059,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _update: function _update() {
 	          var self = this;
 	
-	          var socket = this._api.wsPedestrian(this._id);
+	          var socket = this._api.wsAllPedestrians();
 	          socket.onclose = function (event) {
 	            self._isRunning = false;
-	            console.log('closed pedestrian ' + self._id);
+	            console.log('closed pedestrian websocket');
 	          };
 	          socket.onmessage = function (event) {
 	            // here, "event" is an instance of MessageEvent, which cannot be serialized to send to the UI thread,
@@ -1989,7 +2073,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	          };
 	          socket.onopen = function () {
-	            console.log('opened pedestrian ' + self._id);
+	            console.log('opened pedestrian websocket');
 	          };
 	        },
 	
@@ -2056,6 +2140,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// --- API endpoint definitions
+	var START_SIMULATION = '/api/v1/start';
+	var IS_RUNNING = '/api/v1/isRunning';
+	var STOP_SIMULATION = '/api/v1/stop';
+	
 	var GET_VEHICLES = '/api/v1/vehicles';
 	var UPDATE_VEHICLES = '/api/v1/vehicles';
 	var GET_VEHICLE = function GET_VEHICLE(vid) {
@@ -2090,10 +2178,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _this;
 	  }
 	
-	  // --- Vehicles
+	  // --- Controller
 	
 	
 	  _createClass(API, [{
+	    key: 'startSimulation',
+	    value: function startSimulation(map, type, scenario) {
+	      return this._ajax({
+	        url: this.baseUrl + START_SIMULATION,
+	        method: 'post',
+	        data: JSON.stringify({
+	          map: map,
+	          type: type,
+	          scenario: scenario
+	        })
+	      });
+	    }
+	  }, {
+	    key: 'isRunning',
+	    value: function isRunning() {
+	      return this._ajax({
+	        url: this.baseUrl + IS_RUNNING,
+	        method: 'get'
+	      });
+	    }
+	  }, {
+	    key: 'stopSimulation',
+	    value: function stopSimulation() {
+	      return this._ajax({
+	        url: this.baseUrl + STOP_SIMULATION,
+	        method: 'post'
+	      });
+	    }
+	
+	    // --- Vehicles
+	
+	  }, {
 	    key: 'getVehicles',
 	    value: function getVehicles() {
 	      return this._ajax({
@@ -2127,6 +2247,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'wsVehicle',
 	    value: function wsVehicle(vid) {
 	      return new WebSocket(this.wsBaseUrl + WS_VEHICLE(vid));
+	    }
+	  }, {
+	    key: 'wsAllVehicles',
+	    value: function wsAllVehicles() {
+	      return this.wsVehicle('all');
 	    }
 	    // ---
 	
@@ -2166,6 +2291,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'wsPedestrian',
 	    value: function wsPedestrian(pid) {
 	      return new WebSocket(this.wsBaseUrl + WS_PEDESTRIAN(pid));
+	    }
+	  }, {
+	    key: 'wsAllPedestrians',
+	    value: function wsAllPedestrians() {
+	      return this.wsPedestrian('all');
 	    }
 	    // ---
 	
@@ -2263,6 +2393,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+	
 	var _vizi = __webpack_require__(1);
 	
 	var _vizi2 = _interopRequireDefault(_vizi);
@@ -2344,6 +2476,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // set the instance property
 	      this._setViziLayer(viziLayer);
 	    }
+	  }, {
+	    key: '_onAdd',
+	    value: function _onAdd(simultra) {
+	      _get(Object.getPrototypeOf(VehicleLayer.prototype), '_onAdd', this).call(this, simultra);
+	
+	      // create the worker thread for websocket
+	      this._worker = (0, _operative2.default)(this._createWorker(), _WorkerUtils2.default.getDependencies());
+	    }
+	  }, {
+	    key: '_onRemove',
+	    value: function _onRemove() {
+	      _get(Object.getPrototypeOf(VehicleLayer.prototype), '_onRemove', this).call(this);
+	
+	      // destroy the worker
+	      this._worker = null;
+	    }
 	
 	    /**
 	     * Starts updating the view
@@ -2356,12 +2504,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var self = this;
 	
-	      // start all of the workers
-	      this._vehicles.forEach(function (vehicle, id) {
-	        if (vehicle.worker) {
-	          vehicle.worker.start(id, self._createWorkerCallback());
-	        }
-	      });
+	      // start the worker
+	      this._worker.start(this._createWorkerCallback());
 	
 	      // start vehicle manager
 	      var ws = this._api.wsVehicles();
@@ -2396,11 +2540,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      // terminate all of the workers
-	      this._vehicles.forEach(function (vehicle) {
-	        if (vehicle.worker) {
-	          vehicle.worker.stop();
-	        }
-	      });
+	      this._worker.stop();
 	    }
 	  }, {
 	    key: '_onMessage',
@@ -2411,7 +2551,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          self._update();
 	        }, 0);
 	      } else if (data === 'deletion') {
-	        setTImeout(function () {
+	        setTimeout(function () {
 	          self._update();
 	        }, 0);
 	      } else {
@@ -2500,21 +2640,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // add vehicle to the vizi layer
 	      var object = viziLayer.addVehicle(vehicle.type, new _vizi2.default.LatLon(vehicle.location.lat, vehicle.location.lon), vehicle.angle);
 	
-	      // create a new updating thread
-	      var worker = (0, _operative2.default)(this._createWorker(), _WorkerUtils2.default.getDependencies());
-	
 	      // add entry to dictionary
 	      var entry = {
 	        data: vehicle,
-	        object: object,
-	        worker: worker
+	        object: object
 	      };
-	      this._vehicles[vehicle.id] = entry;
-	
-	      // start the worker
-	      if (this._isRunning) {
-	        worker.start(vehicle.id, this._createWorkerCallback());
-	      }
+	      // this._vehicles[vehicle.id] = entry;
+	      this._vehicles.push(entry);
 	
 	      console.log('added vehicle: ' + JSON.stringify(vehicle));
 	      return entry;
@@ -2575,15 +2707,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return {
 	        _baseUrl: baseUrl,
 	        _api: null,
-	        _id: null,
 	        _socket: null,
 	        _callback: null,
 	        _isRunning: false,
 	
 	        /** start updating the vehicle */
-	        start: function start(id, callback) {
+	        start: function start(callback) {
 	          this._api = new SimWorker.API(this._baseUrl);
-	          this._id = id;
 	          this._callback = callback;
 	          this._isRunning = true;
 	
@@ -2596,10 +2726,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _update: function _update() {
 	          var self = this;
 	
-	          var socket = this._api.wsVehicle(this._id);
+	          var socket = this._api.wsAllVehicles();
 	          socket.onclose = function (event) {
 	            self._isRunning = false;
-	            console.log('closed vehicle ' + self._id);
+	            console.log('closed vehicle websocket');
 	          };
 	          socket.onmessage = function (event) {
 	            // here, "event" is an instance of MessageEvent, which cannot be serialized to send to the UI thread,
@@ -2610,7 +2740,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	          };
 	          socket.onopen = function () {
-	            console.log('opened vehicle ' + self._id);
+	            console.log('opened vehicle websocket');
 	          };
 	          self._socket = socket;
 	        },
@@ -2626,11 +2756,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _createWorkerCallback() {
 	      return function (that) {
 	        var prevSender = '';
+	
 	        return function (msg) {
 	          var sender = msg.sender;
 	          var vehicle = msg.data;
 	
 	          var viziLayer = that._getViziLayer();
+	
+	          // update the object location in simultra
+	          if (vehicle.id in that._vehicles) {
+	            that._vehicles[vehicle.id].data = vehicle;
+	          }
 	
 	          // update the object in vizi layer
 	          if (prevSender !== sender) {
@@ -2642,6 +2778,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	          viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
 	        };
 	      }(this);
+	    }
+	
+	    /**
+	     * Returns the centroid of vehicles
+	     */
+	
+	  }, {
+	    key: 'getCentroid',
+	    value: function getCentroid() {
+	      if (this._vehicles.length > 0) {
+	        // FIXME: calculate the centroid of all vehicles
+	        // var location = this._vehicles[0].object.latlon;
+	        if (this._vehicles[0].object.vehicle && this._vehicles[0].object.vehicle.root) {
+	          var position = this._vehicles[0].object.vehicle.root.position;
+	          var point = new _vizi2.default.Point(position.x, position.z);
+	          var latLon = this._getViziWorld().pointToLatLon(point);
+	          return latLon; // {lat: 35.xxx, lon: 140.xxx}
+	        } else {
+	          return null;
+	        }
+	      } else {
+	        return null;
+	      }
 	    }
 	  }]);
 	

@@ -21,7 +21,8 @@ class FootwayLayer extends Layer {
     var self = this;
 
     // Landuses from Mapzen
-    var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/landuse,roads/{z}/{x}/{y}.topojson?api_key=vector-tiles-NT5Emiw', {
+    // var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/landuse,roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+    var viziLayer = VIZI.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/landuse,roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
       interactive: false,
       maxLOD: 18,
       style: function(feature) {

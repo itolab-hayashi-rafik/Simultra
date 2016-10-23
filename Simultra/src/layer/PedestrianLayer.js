@@ -48,6 +48,20 @@ class PedestrianLayer extends Layer {
 
   }
 
+  _onAdd(simultra) {
+    super._onAdd(simultra);
+
+    // create the worker thread for websocket
+    this._worker = operative(this._createWorker(), WorkerUtils.getDependencies());
+  }
+
+  _onRemove() {
+    super._onRemove();
+
+    // destroy the worker
+    this._worker = null;
+  }
+
   /**
    * Starts updating the view
    */
@@ -57,11 +71,7 @@ class PedestrianLayer extends Layer {
     var self = this;
 
     // start all of the workers
-    this._pedestrians.forEach((pedestrian,id) => {
-      if (pedestrian.worker) {
-        pedestrian.worker.start(id, self._createWorkerCallback());
-      }
-    });
+    this._worker.start(this._createWorkerCallback());
 
     // start pedestrian manager
     var ws = this._api.wsPedestrians();
@@ -91,11 +101,7 @@ class PedestrianLayer extends Layer {
     }
 
     // terminate all of the workers
-    this._pedestrians.forEach(pedestrian => {
-      if (pedestrian.worker) {
-        pedestrian.worker.stop();
-      }
-    });
+    this._worker.stop();
   }
 
   _onMessage(data) {
@@ -103,7 +109,7 @@ class PedestrianLayer extends Layer {
     if (data === 'creation') {
       setTimeout(function() { self._update(); }, 0);
     } else if (data === 'deletion') {
-      setTImeout(function() { self._update(); }, 0);
+      setTimeout(function() { self._update(); }, 0);
     } else {
       console.error('unknown message ' + data);
     }
@@ -193,21 +199,12 @@ class PedestrianLayer extends Layer {
       pedestrian.angle
     );
 
-    // create a new updating thread
-    var worker = operative(this._createWorker(), WorkerUtils.getDependencies());
-
     // add entry to dictionary
     var entry = {
       data: pedestrian,
-      object: object,
-      worker: worker
+      object: object
     };
     this._pedestrians[pedestrian.id] = entry;
-
-    // start the worker
-    if (this._isRunning) {
-      worker.start(pedestrian.id, this._createWorkerCallback());
-    }
 
     console.log('added pedestrian: ' + JSON.stringify(pedestrian));
     return entry;
@@ -219,14 +216,12 @@ class PedestrianLayer extends Layer {
     return {
       _baseUrl: baseUrl,
       _api: null,
-      _id: null,
       _callback: null,
       _isRunning: false,
 
       /** start updating the pedestrian */
-      start: function(id, callback) {
+      start: function(callback) {
         this._api = new SimWorker.API(this._baseUrl);
-        this._id = id;
         this._callback = callback;
         this._isRunning = true;
 
@@ -237,10 +232,10 @@ class PedestrianLayer extends Layer {
       _update: function() {
         var self = this;
 
-        var socket = this._api.wsPedestrian(this._id);
+        var socket = this._api.wsAllPedestrians();
         socket.onclose = function(event) {
           self._isRunning = false;
-          console.log('closed pedestrian ' + self._id);
+          console.log('closed pedestrian websocket');
         };
         socket.onmessage = function(event) {
           // here, "event" is an instance of MessageEvent, which cannot be serialized to send to the UI thread,
@@ -251,7 +246,7 @@ class PedestrianLayer extends Layer {
           }
         };
         socket.onopen = function() {
-          console.log('opened pedestrian ' + self._id);
+          console.log('opened pedestrian websocket');
         };
       },
 

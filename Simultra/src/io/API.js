@@ -4,6 +4,10 @@
 import WebClient from './WebClient';
 
 // --- API endpoint definitions
+const START_SIMULATION = '/api/v1/start';
+const IS_RUNNING = '/api/v1/isRunning';
+const STOP_SIMULATION = '/api/v1/stop';
+
 const GET_VEHICLES = '/api/v1/vehicles';
 const UPDATE_VEHICLES = '/api/v1/vehicles';
 const GET_VEHICLE = function(vid) { return '/api/v1/vehicles/' + vid; };
@@ -22,6 +26,33 @@ class API extends WebClient {
     super();
     this.baseUrl = baseUrl;
     this.wsBaseUrl = baseUrl.replace(/^https?:\/\//, 'ws://');
+  }
+
+  // --- Controller
+  startSimulation(map, type, scenario) {
+    return this._ajax({
+      url: this.baseUrl + START_SIMULATION,
+      method: 'post',
+      data: JSON.stringify({
+        map: map,
+        type: type,
+        scenario: scenario
+      })
+    });
+  }
+
+  isRunning() {
+    return this._ajax({
+      url: this.baseUrl + IS_RUNNING,
+      method: 'get'
+    });
+  }
+
+  stopSimulation() {
+    return this._ajax({
+      url: this.baseUrl + STOP_SIMULATION,
+      method: 'post'
+    });
   }
 
   // --- Vehicles
@@ -54,6 +85,10 @@ class API extends WebClient {
   wsVehicle(vid) {
     return new WebSocket(this.wsBaseUrl + WS_VEHICLE(vid));
   }
+
+  wsAllVehicles() {
+    return this.wsVehicle('all');
+  }
   // ---
 
   // --- Pedestrians
@@ -85,6 +120,10 @@ class API extends WebClient {
 
   wsPedestrian(pid) {
     return new WebSocket(this.wsBaseUrl + WS_PEDESTRIAN(pid));
+  }
+
+  wsAllPedestrians() {
+    return this.wsPedestrian('all');
   }
   // ---
 

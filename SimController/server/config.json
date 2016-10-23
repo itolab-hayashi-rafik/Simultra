@@ -1,0 +1,29 @@
+[
+{
+                "Listener" : 8033
+},
+{
+                "Name":	"Vehicle0",
+                "IP":	"127.0.0.1",
+                "Port":	8044,
+                "Delay": 1,
+                "Command": "ACK",
+                "Data": "None"
+},
+{
+                "Name":	"Vehicle1",
+                "IP":	"127.0.0.1",
+                "Port":	80455,
+                "Delay": 1,
+                "Command": "ACK",
+                "Data": "None"
+},
+{
+                "Name":	"Vehicle2",
+                "IP":	"127.0.0.1",
+                "Port":	8066,
+                "Delay": 1,
+                "Command": "ACK",
+                "Data": "None"
+}
+]

@@ -26,7 +26,8 @@ class Simultra extends EventEmitter {
       renderFootway: true,
       renderBuilding: true,
       renderVehicle: true,
-      renderPedestrian: true
+      renderPedestrian: true,
+      followVehicles: false
     };
     this._options = extend({}, defaultOptions, options);
 
@@ -55,7 +56,8 @@ class Simultra extends EventEmitter {
     camera.position.set(-150, 175, 125);
 
     // Add controls
-    VIZI.Controls.orbit().addTo(world);
+    var control = VIZI.Controls.orbit().addTo(world);
+    this._control = control;
 
     // add callbacks
     world.on('preUpdate', function(delta) {
@@ -118,6 +120,23 @@ class Simultra extends EventEmitter {
         this._rendererStats.update(this._world._engine._renderer);
       }
     }
+
+    // follow the car
+    if (this._options.followVehicles) {
+      this._updateCameraPosition();
+    }
+  }
+
+  lookAtLatLon(latLon) {
+    var point = this._world.latLonToPoint(latLon);
+    this.lookAtPoint(point);
+  }
+
+  lookAtPoint(point) {
+    var camera = this._world.getCamera();
+    var moveTarget = new THREE.Vector3(point.x, 0, point.y);
+    // camera.lookAt(moveTarget); // TODO: this does not work. OrbitControl.js overrides this function!!
+    this._control._controls.target = moveTarget;
   }
 
   /**
@@ -125,8 +144,16 @@ class Simultra extends EventEmitter {
    * @param lat latitude
    * @param lon longitude
    */
-  setView(lat, lon) {
-    this._world.setView([lat, lon]);
+  flyToLatLon(latLon, time, zoom) {
+    this._control.flyToLatLon(latLon, time, zoom);
+  }
+
+  /**
+   * Flyies to the point
+   * @param point
+   */
+  flyToPoint(point, time, zoom) {
+    this._control.flyToPoint(point, time, zoom);
   }
 
   /**
@@ -154,6 +181,44 @@ class Simultra extends EventEmitter {
    */
   isRunning() {
     return this._isRunning;
+  }
+
+  /**
+   * Controls the remote to start the simulation
+   * @param map
+   * @param type
+   * @param scenario
+   */
+  startSimulation(map, type, scenario) {
+    return this._api.startSimulation(map, type, scenario);
+  }
+
+  /**
+   * Returns if the simulation is running
+   * @returns {*}
+   */
+  isSimulationRunning() {
+    return this._api.isRunning();
+  }
+
+  /**
+   * Controls the remote to stop the simulation
+   */
+  stopSimulation() {
+    return this._api.stopSimulation();
+  }
+
+  /**
+   * update the camera position to follow the vehicles
+   * @private
+   */
+  _updateCameraPosition() {
+    if (this._options.followVehicles) {
+      var latLon = this._vehicleLayer.getCentroid();
+      if (latLon != null) {
+        this.lookAtLatLon(latLon);
+      }
+    }
   }
 }
 

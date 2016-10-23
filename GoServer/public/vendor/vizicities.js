@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("THREE"), require("TweenLite"));
+		module.exports = factory(require("THREE"), require("TweenLite"), require("operative"));
 	else if(typeof define === 'function' && define.amd)
-		define(["THREE", "TweenLite"], factory);
+		define(["THREE", "TweenLite", "operative"], factory);
 	else if(typeof exports === 'object')
-		exports["VIZI"] = factory(require("THREE"), require("TweenLite"));
+		exports["VIZI"] = factory(require("THREE"), require("TweenLite"), require("operative"));
 	else
-		root["VIZI"] = factory(root["THREE"], root["TweenLite"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_10__, __WEBPACK_EXTERNAL_MODULE_41__) {
+		root["VIZI"] = factory(root["THREE"], root["TweenLite"], root["operative"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_10__, __WEBPACK_EXTERNAL_MODULE_41__, __WEBPACK_EXTERNAL_MODULE_85__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -116,7 +116,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _layerObjectPedestrianLayer2 = _interopRequireDefault(_layerObjectPedestrianLayer);
 	
-	var _layerObjectVehicleLayer = __webpack_require__(89);
+	var _layerObjectVehicleLayer = __webpack_require__(92);
 	
 	var _layerObjectVehicleLayer2 = _interopRequireDefault(_layerObjectVehicleLayer);
 	
@@ -132,7 +132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilIndex = __webpack_require__(92);
+	var _utilIndex = __webpack_require__(95);
 	
 	var _utilIndex2 = _interopRequireDefault(_utilIndex);
 	
@@ -3365,6 +3365,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = function (container) {
 	  var camera = new _three2['default'].PerspectiveCamera(45, 1, 1, 2000000);
+	  // var camera = new THREE.PerspectiveCamera(45, 1, 1, 10000);
 	  camera.position.y = 4000;
 	  camera.position.z = 4000;
 	
@@ -5724,6 +5725,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Animation time in seconds
 	      var animationTime = duration || 2;
 	
+	      var self = this;
+	
 	      this._flyTarget = new _three2['default'].Vector3(point.x, 0, point.y);
 	
 	      // Calculate delta from current position to fly target
@@ -5763,7 +5766,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 	        onComplete: function onComplete(tween) {
 	          // console.log(`Arrived at flyTarget`);
-	          this._flyTarget = null;
+	          self._flyTarget = null;
 	        },
 	        onUpdateParams: ['{self}'],
 	        onCompleteParams: ['{self}'],
@@ -13429,7 +13432,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // this._mesh.add(mesh);
 	
 	      this._ready = true;
-	      // console.timeEnd(this._tile); // for debug
+	      console.timeEnd(this._tile);
 	    }
 	  }, {
 	    key: '_abortRequest',
@@ -18146,13 +18149,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _setBufferAttributes() {
 	      var _this2 = this;
 	
-	      var width = 0;
 	      var height = 0;
 	
-	      // Convert width into world units
-	      if (this._options.style.pointWidth) {
-	        width = this._world.metresToWorld(this._options.style.pointWidth, this._pointScale);
-	      }
 	      // Convert height into world units
 	      if (this._options.style.pointHeight) {
 	        height = this._world.metresToWorld(this._options.style.pointHeight, this._pointScale);
@@ -18169,8 +18167,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Debug geometry for points is a thin bar
 	        //
 	        // TODO: Allow point geometry to be customised / overridden
-	        var geometryWidth = this._world.metresToWorld(width, this._pointScale);
-	        var geometryHeight = this._world.metresToWorld(height, this._pointScale);
+	        var geometryWidth = this._world.metresToWorld(25, this._pointScale);
+	        var geometryHeight = this._world.metresToWorld(200, this._pointScale);
 	        var _geometry = new _three2['default'].BoxGeometry(geometryWidth, geometryHeight, geometryWidth);
 	
 	        // Shift geometry up so it sits on the ground
@@ -18615,15 +18613,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _ModelRepository = __webpack_require__(85);
+	var _ModelRepository = __webpack_require__(88);
 	
 	var _ModelRepository2 = _interopRequireDefault(_ModelRepository);
 	
-	var _PedestrianModel = __webpack_require__(86);
+	var _PedestrianModel = __webpack_require__(89);
 	
 	var _PedestrianModel2 = _interopRequireDefault(_PedestrianModel);
 	
-	var _Pedestrian = __webpack_require__(88);
+	var _Pedestrian = __webpack_require__(91);
 	
 	var _Pedestrian2 = _interopRequireDefault(_Pedestrian);
 	
@@ -18775,6 +18773,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }, {
+	    key: 'getPedestrian',
+	    value: function getPedestrian(id) {
+	      if (id in this._entries) {
+	        return this._entries[id];
+	      }
+	      return null;
+	    }
+	  }, {
 	    key: 'destroy',
 	    value: function destroy() {
 	      // Run common destruction logic from parent
@@ -18875,6 +18881,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var defaults = {
 	      output: true,
+	      dynamic: true, // indicates if each object needs to be updated in every frame update
 	      // simulation:
 	      enableGpuComputation: false,
 	      simWidth: 2
@@ -18938,7 +18945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      simObject.id = total - 1;
 	
 	      // enable cpu update if necessary
-	      simObject.updatePosition = !this._options.enableGpuComputation;
+	      simObject.updatePosition = this._options.dynamic && !this._options.enableGpuComputation;
 	
 	      // add Object3D to the layer
 	      _get(Object.getPrototypeOf(SimObjectLayer.prototype), 'add', this).call(this, simObject.root);
@@ -19277,6 +19284,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // update the text
 	        simObject.setLabelText(text);
+	      }
+	    }
+	
+	    /**
+	     * Sets the label offset
+	     *
+	     * @param {Number} id id
+	     * @param {Number} x x
+	     * @param {Number} y y
+	     * @param {Number} z z
+	     */
+	  }, {
+	    key: 'setLabelOffset',
+	    value: function setLabelOffset(id, x, y, z) {
+	      // if the object exists
+	      if (id in this._simObjects) {
+	        var simObject = this._simObjects[id];
+	
+	        // update the offset
+	        simObject.setLabelOffset(x, y, z);
 	      }
 	    }
 	  }, {
@@ -19724,13 +19751,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 80 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
 	
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
@@ -19740,6 +19769,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Created by masayuki on 20/07/2016.
 	 */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
 	
 	var SimObject = (function () {
 	  function SimObject() {
@@ -19756,6 +19789,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // 2D Object
 	    this.label = undefined;
+	    this.labelOffset = new _three2['default'].Vector3();
 	
 	    // --- construct
 	    this._createSimObject();
@@ -19793,7 +19827,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'setPosition',
 	    value: function setPosition(x, y, z) {
 	      this.root.position.set(x, y, z);
-	      this.label.position.copy(this.root.position);
+	      this.label.position.copy(this.root.position).add(this.labelOffset);
 	    }
 	
 	    /**
@@ -19838,6 +19872,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    /**
+	     * sets the label offset
+	     *
+	     * @param {Number} x x
+	     * @param {Number} y y
+	     * @param {Number} z z
+	     */
+	  }, {
+	    key: 'setLabelOffset',
+	    value: function setLabelOffset(x, y, z) {
+	      this.labelOffset.set(x, y, z);
+	    }
+	
+	    /**
 	     * update the object
 	     * @param {Number} delta
 	     */
@@ -19851,7 +19898,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.updatePosition) {
 	        this.root.position.x += Math.cos(-this.angle) * forwardDelta;
 	        this.root.position.z += Math.sin(-this.angle) * forwardDelta;
-	        this.label.position.copy(this.root.position);
+	        this.label.position.copy(this.root.position).add(this.labelOffset);
 	
 	        this.root.rotation.y = this.angle;
 	      }
@@ -19864,11 +19911,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // construct this object
 	
 	      // root
-	      this.root = new THREE.Object3D();
+	      this.root = new _three2['default'].Object3D();
+	
+	      // [DEBUG] arrow
+	      var from = new _three2['default'].Vector3(0, 0, 0);
+	      var to = new _three2['default'].Vector3(50, 0, 0);
+	      var direction = to.clone().sub(from);
+	      var length = direction.length();
+	      var arrowHelper = new _three2['default'].ArrowHelper(direction.normalize(), from, length, 0xff0000);
+	      this.root.add(arrowHelper);
 	
 	      // label
 	      var text = document.createElement('div');
-	      this.label = new THREE.CSS2DObject(text);
+	      this.label = new _three2['default'].CSS2DObject(text);
+	    }
+	  }, {
+	    key: '_adjustLabelOffset',
+	    value: function _adjustLabelOffset() {
+	      var bbox = new _three2['default'].Box3().setFromObject(this.root);
+	      this.setLabelOffset(0, bbox.max.y + 1, 0);
 	    }
 	
 	    // ---
@@ -20058,6 +20119,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
+	var _operative = __webpack_require__(85);
+	
+	var _operative2 = _interopRequireDefault(_operative);
+	
+	var _vendorSimplifyModifier = __webpack_require__(86);
+	
+	var _vendorSimplifyModifier2 = _interopRequireDefault(_vendorSimplifyModifier);
+	
+	var _WorkerUtils = __webpack_require__(87);
+	
+	var _WorkerUtils2 = _interopRequireDefault(_WorkerUtils);
+	
 	var ObjectUtils = (function () {
 	
 	  // Create UV from geometry's faces
@@ -20083,8 +20156,68 @@ return /******/ (function(modules) { // webpackBootstrap
 	    geometry.uvsNeedUpdate = true;
 	  };
 	
+	  var objectToGeometry = function objectToGeometry(geometry) {
+	    var newGeo = new _three2['default'].Geometry();
+	
+	    for (i = 0; i < geometry.vertices.length; i++) {
+	      var v = geometry.vertices[i];
+	      newGeo.vertices.push(new _three2['default'].Vector3(v.x, v.y, v.z));
+	    }
+	    for (i = 0; i < geometry.faces.length; i++) {
+	      var f = geometry.faces[i];
+	      newGeo.faces.push(new _three2['default'].Face3(f.a, f.b, f.c, f.normal, f.color, f.materialIndex));
+	    }
+	
+	    return newGeo;
+	  };
+	
+	  // Reduce vertices and simplify a geometry
+	  var simplifyGeometry = function simplifyGeometry(geometry, reduceCount, callback) {
+	
+	    reduceCount = reduceCount | geometry.vertices.length * 0.5;
+	    var func = (0, _operative2['default'])(function (geometry, reduceCount, cb) {
+	      // NOTE these codes run on a webworker thread, so all of the variables outside this scope are unavailable.
+	
+	      // hack
+	      console.assert = function (b) {
+	        if (!b) {
+	          throw new Error('assertion failed');
+	        }
+	      };
+	
+	      // deferred
+	      var d = this.deferred();
+	
+	      // convert "[Object object]" to "[THREE.Geometry]"
+	      geometry = VIZI.Util.ObjectUtils.objectToGeometry(geometry);
+	
+	      // modify the geometry
+	      var modifier = new VIZI.Util.ObjectUtils.SimplifyModifier();
+	      var geometry = modifier.modify(geometry, reduceCount | 0);
+	
+	      // return to the main thread
+	      cb(geometry);
+	    }, _WorkerUtils2['default'].getDependencies());
+	
+	    // call the webworker procedure from the main thread
+	    func(geometry, reduceCount, function (geometry) {
+	      // callback called on the main thread
+	
+	      // convert "[Object object]" to "[THREE.Geometry]"
+	      geometry = objectToGeometry(geometry);
+	
+	      // callback to the function caller
+	      if (callback) {
+	        callback(geometry);
+	      }
+	    });
+	  };
+	
 	  return {
-	    createUV: createUV
+	    createUV: createUV,
+	    objectToGeometry: objectToGeometry,
+	    simplifyGeometry: simplifyGeometry,
+	    SimplifyModifier: _vendorSimplifyModifier2['default']
 	  };
 	})();
 	
@@ -20093,6 +20226,521 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 85 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_85__;
+
+/***/ },
+/* 86 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	// jscs:disable
+	/* eslint-disable */
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	/*
+	 *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
+	 *
+	 *	Simplification Geometry Modifier
+	 *    - based on code and technique
+	 *	  - by Stan Melax in 1998
+	 *	  - Progressive Mesh type Polygon Reduction Algorithm
+	 *    - http://www.melax.com/polychop/
+	 */
+	
+	var SimplifyModifier = function SimplifyModifier() {};
+	
+	(function () {
+	
+	  var cb = new _three2['default'].Vector3(),
+	      ab = new _three2['default'].Vector3();
+	
+	  function pushIfUnique(array, object) {
+	
+	    if (array.indexOf(object) === -1) array.push(object);
+	  }
+	
+	  function removeFromArray(array, object) {
+	
+	    var k = array.indexOf(object);
+	    if (k > -1) array.splice(k, 1);
+	  }
+	
+	  function computeEdgeCollapseCost(u, v) {
+	
+	    // if we collapse edge uv by moving u to v then how
+	    // much different will the model change, i.e. the "error".
+	
+	    var edgelength = v.position.distanceTo(u.position);
+	    var curvature = 0;
+	
+	    var sideFaces = [];
+	    var i,
+	        uFaces = u.faces,
+	        il = u.faces.length,
+	        face,
+	        sideFace;
+	
+	    // find the "sides" triangles that are on the edge uv
+	    for (i = 0; i < il; i++) {
+	
+	      face = u.faces[i];
+	
+	      if (face.hasVertex(v)) {
+	
+	        sideFaces.push(face);
+	      }
+	    }
+	
+	    // use the triangle facing most away from the sides
+	    // to determine our curvature term
+	    for (i = 0; i < il; i++) {
+	
+	      var minCurvature = 1;
+	      face = u.faces[i];
+	
+	      for (var j = 0; j < sideFaces.length; j++) {
+	
+	        sideFace = sideFaces[j];
+	        // use dot product of face normals.
+	        var dotProd = face.normal.dot(sideFace.normal);
+	        minCurvature = Math.min(minCurvature, (1.001 - dotProd) / 2);
+	      }
+	
+	      curvature = Math.max(curvature, minCurvature);
+	    }
+	
+	    // crude approach in attempt to preserve borders
+	    // though it seems not to be totally correct
+	    var borders = 0;
+	    if (sideFaces.length < 2) {
+	
+	      // we add some arbitrary cost for borders,
+	      // borders += 10;
+	      curvature = 1;
+	    }
+	
+	    var amt = edgelength * curvature + borders;
+	
+	    return amt;
+	  }
+	
+	  function computeEdgeCostAtVertex(v) {
+	    // compute the edge collapse cost for all edges that start
+	    // from vertex v.  Since we are only interested in reducing
+	    // the object by selecting the min cost edge at each step, we
+	    // only cache the cost of the least cost edge at this vertex
+	    // (in member variable collapse) as well as the value of the
+	    // cost (in member variable collapseCost).
+	
+	    if (v.neighbors.length === 0) {
+	
+	      // collapse if no neighbors.
+	      v.collapseNeighbor = null;
+	      v.collapseCost = -0.01;
+	
+	      return;
+	    }
+	
+	    v.collapseCost = 100000;
+	    v.collapseNeighbor = null;
+	
+	    // search all neighboring edges for "least cost" edge
+	    for (var i = 0; i < v.neighbors.length; i++) {
+	
+	      var collapseCost = computeEdgeCollapseCost(v, v.neighbors[i]);
+	
+	      if (!v.collapseNeighbor) {
+	        v.collapseNeighbor = v.neighbors[i];
+	        v.collapseCost = collapseCost;
+	        v.minCost = collapseCost;
+	        v.totalCost = 0;
+	        v.costCount = 0;
+	      }
+	
+	      v.costCount++;
+	      v.totalCost += collapseCost;
+	
+	      if (collapseCost < v.minCost) {
+	
+	        v.collapseNeighbor = v.neighbors[i];
+	        v.minCost = collapseCost;
+	      }
+	    }
+	
+	    // we average the cost of collapsing at this vertex
+	    v.collapseCost = v.totalCost / v.costCount;
+	    // v.collapseCost = v.minCost;
+	  }
+	
+	  function removeVertex(v, vertices) {
+	
+	    console.assert(v.faces.length === 0);
+	
+	    while (v.neighbors.length) {
+	
+	      var n = v.neighbors.pop();
+	      removeFromArray(n.neighbors, v);
+	    }
+	
+	    removeFromArray(vertices, v);
+	  }
+	
+	  function removeFace(f, faces) {
+	
+	    removeFromArray(faces, f);
+	
+	    if (f.v1) removeFromArray(f.v1.faces, f);
+	    if (f.v2) removeFromArray(f.v2.faces, f);
+	    if (f.v3) removeFromArray(f.v3.faces, f);
+	
+	    // TODO optimize this!
+	    var vs = [this.v1, this.v2, this.v3];
+	    var v1, v2;
+	
+	    for (var i = 0; i < 3; i++) {
+	      v1 = vs[i];
+	      v2 = vs[(i + 1) % 3];
+	
+	      if (!v1 || !v2) continue;
+	      v1.removeIfNonNeighbor(v2);
+	      v2.removeIfNonNeighbor(v1);
+	    }
+	  }
+	
+	  function collapse(vertices, faces, u, v) {
+	    // u and v are pointers to vertices of an edge
+	
+	    // Collapse the edge uv by moving vertex u onto v
+	
+	    if (!v) {
+	
+	      // u is a vertex all by itself so just delete it..
+	      removeVertex(u, vertices);
+	      return;
+	    }
+	
+	    var i;
+	    var tmpVertices = [];
+	
+	    for (i = 0; i < u.neighbors.length; i++) {
+	
+	      tmpVertices.push(u.neighbors[i]);
+	    }
+	
+	    // delete triangles on edge uv:
+	    for (i = u.faces.length - 1; i >= 0; i--) {
+	
+	      if (u.faces[i].hasVertex(v)) {
+	
+	        removeFace(u.faces[i], faces);
+	      }
+	    }
+	
+	    // update remaining triangles to have v instead of u
+	    for (i = u.faces.length - 1; i >= 0; i--) {
+	
+	      u.faces[i].replaceVertex(u, v);
+	    }
+	
+	    removeVertex(u, vertices);
+	
+	    // recompute the edge collapse costs in neighborhood
+	    for (i = 0; i < tmpVertices.length; i++) {
+	
+	      computeEdgeCostAtVertex(tmpVertices[i]);
+	    }
+	  }
+	
+	  function minimumCostEdge(vertices) {
+	
+	    // O(n * n) approach. TODO optimize this
+	
+	    var least = vertices[0];
+	
+	    for (var i = 0; i < vertices.length; i++) {
+	
+	      if (vertices[i].collapseCost < least.collapseCost) {
+	
+	        least = vertices[i];
+	      }
+	    }
+	
+	    return least;
+	  }
+	
+	  // we use a triangle class to represent structure of face slightly differently
+	
+	  function Triangle(v1, v2, v3, a, b, c) {
+	    this.a = a;
+	    this.b = b;
+	    this.c = c;
+	
+	    this.v1 = v1;
+	    this.v2 = v2;
+	    this.v3 = v3;
+	
+	    this.normal = new _three2['default'].Vector3();
+	
+	    this.computeNormal();
+	
+	    v1.faces.push(this);
+	    v1.addUniqueNeighbor(v2);
+	    v1.addUniqueNeighbor(v3);
+	
+	    v2.faces.push(this);
+	    v2.addUniqueNeighbor(v1);
+	    v2.addUniqueNeighbor(v3);
+	
+	    v3.faces.push(this);
+	    v3.addUniqueNeighbor(v1);
+	    v3.addUniqueNeighbor(v2);
+	  }
+	
+	  Triangle.prototype.computeNormal = function () {
+	
+	    var vA = this.v1.position;
+	    var vB = this.v2.position;
+	    var vC = this.v3.position;
+	
+	    cb.subVectors(vC, vB);
+	    ab.subVectors(vA, vB);
+	    cb.cross(ab).normalize();
+	
+	    this.normal.copy(cb);
+	  };
+	
+	  Triangle.prototype.hasVertex = function (v) {
+	
+	    return v === this.v1 || v === this.v2 || v === this.v3;
+	  };
+	
+	  Triangle.prototype.replaceVertex = function (oldv, newv) {
+	
+	    if (oldv === this.v1) this.v1 = newv;else if (oldv === this.v2) this.v2 = newv;else if (oldv === this.v3) this.v3 = newv;
+	
+	    removeFromArray(oldv.faces, this);
+	    newv.faces.push(this);
+	
+	    oldv.removeIfNonNeighbor(this.v1);
+	    this.v1.removeIfNonNeighbor(oldv);
+	
+	    oldv.removeIfNonNeighbor(this.v2);
+	    this.v2.removeIfNonNeighbor(oldv);
+	
+	    oldv.removeIfNonNeighbor(this.v3);
+	    this.v3.removeIfNonNeighbor(oldv);
+	
+	    this.v1.addUniqueNeighbor(this.v2);
+	    this.v1.addUniqueNeighbor(this.v3);
+	
+	    this.v2.addUniqueNeighbor(this.v1);
+	    this.v2.addUniqueNeighbor(this.v3);
+	
+	    this.v3.addUniqueNeighbor(this.v1);
+	    this.v3.addUniqueNeighbor(this.v2);
+	
+	    this.computeNormal();
+	  };
+	
+	  function Vertex(v, id) {
+	
+	    this.position = v;
+	
+	    this.id = id; // old index id
+	
+	    this.faces = []; // faces vertex is connected
+	    this.neighbors = []; // neighbouring vertices aka "adjacentVertices"
+	
+	    // these will be computed in computeEdgeCostAtVertex()
+	    this.collapseCost = 0; // cost of collapsing this vertex, the less the better. aka objdist
+	    this.collapseNeighbor = null; // best candinate for collapsing
+	  }
+	
+	  Vertex.prototype.addUniqueNeighbor = function (vertex) {
+	    pushIfUnique(this.neighbors, vertex);
+	  };
+	
+	  Vertex.prototype.removeIfNonNeighbor = function (n) {
+	
+	    var neighbors = this.neighbors;
+	    var faces = this.faces;
+	
+	    var offset = neighbors.indexOf(n);
+	    if (offset === -1) return;
+	    for (var i = 0; i < faces.length; i++) {
+	
+	      if (faces[i].hasVertex(n)) return;
+	    }
+	
+	    neighbors.splice(offset, 1);
+	  };
+	
+	  SimplifyModifier.prototype.modify = function (geometry, count) {
+	
+	    if (geometry instanceof _three2['default'].BufferGeometry && !geometry.vertices && !geometry.faces) {
+	      console.log('converting BufferGeometry to Geometry');
+	      geometry = new _three2['default'].Geometry().fromBufferGeometry(geometry);
+	    }
+	
+	    geometry.mergeVertices();
+	
+	    var oldVertices = geometry.vertices; // Three Position
+	    var oldFaces = geometry.faces; // Three Face
+	
+	    var newGeometry = new _three2['default'].Geometry();
+	
+	    // conversion
+	    var vertices = new Array(oldVertices.length); // Simplify Custom Vertex Struct
+	    var faces = new Array(oldFaces.length); // Simplify Custom Traignle Struct
+	
+	    var i, il, face;
+	
+	    //
+	    // put data of original geometry in different data structures
+	    //
+	
+	    // add vertices
+	    for (i = 0, il = oldVertices.length; i < il; i++) {
+	
+	      vertices[i] = new Vertex(oldVertices[i], i);
+	    }
+	
+	    // add faces
+	    for (i = 0, il = oldFaces.length; i < il; i++) {
+	
+	      face = oldFaces[i];
+	      faces[i] = new Triangle(vertices[face.a], vertices[face.b], vertices[face.c], face.a, face.b, face.c);
+	    }
+	
+	    // compute all edge collapse costs
+	    for (i = 0, il = vertices.length; i < il; i++) {
+	
+	      computeEdgeCostAtVertex(vertices[i]);
+	    }
+	
+	    var permutation = new Array(vertices.length);
+	    var map = new Array(vertices.length);
+	
+	    var nextVertex;
+	
+	    var z = count;
+	
+	    // console.time('z')
+	    // console.profile('zz');
+	
+	    while (z--) {
+	      nextVertex = minimumCostEdge(vertices);
+	      if (!nextVertex) {
+	        console.log('no next vertex');
+	        break;
+	      }
+	      collapse(vertices, faces, nextVertex, nextVertex.collapseNeighbor);
+	    }
+	
+	    // console.profileEnd('zz');
+	    // console.timeEnd('z')
+	
+	    // TODO convert to buffer geometry.
+	    var newGeo = new _three2['default'].Geometry();
+	
+	    for (i = 0; i < vertices.length; i++) {
+	
+	      var v = vertices[i];
+	      newGeo.vertices.push(v.position);
+	    }
+	
+	    for (i = 0; i < faces.length; i++) {
+	
+	      var tri = faces[i];
+	      newGeo.faces.push(new _three2['default'].Face3(vertices.indexOf(tri.v1), vertices.indexOf(tri.v2), vertices.indexOf(tri.v3)));
+	    }
+	
+	    return newGeo;
+	  };
+	})();
+	
+	exports['default'] = SimplifyModifier;
+	
+	_three2['default'].SimplifyModifier = SimplifyModifier;
+	module.exports = exports['default'];
+
+/***/ },
+/* 87 */
+/***/ function(module, exports) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	/**
+	 * Worker Utils
+	 */
+	
+	var WorkerUtils = (function () {
+	
+	  var self = this;
+	
+	  /** base directory */
+	  var base = (function () {
+	    var current = (function () {
+	      if (!self.isWorker) {
+	        if (document.currentScript) {
+	          return document.currentScript.src;
+	        } else {
+	          var scripts = document.getElementsByTagName('script');
+	          var script = scripts[scripts.length - 1];
+	          if (script.src) {
+	            return script.src;
+	          }
+	        }
+	      }
+	    })();
+	    if (current) {
+	      return dirname(current);
+	    }
+	  })();
+	
+	  /** Definition: Worker dependencies */
+	  var dependencies = [base + '/three.min.js', base + '/vizicities-worker.min.js'];
+	
+	  /**
+	   * Returns worker dependencies
+	   *
+	   * @returns {string[]}
+	   */
+	  var getDependencies = function getDependencies() {
+	    return dependencies;
+	  };
+	
+	  // --- internal helper methods
+	  function basename(path) {
+	    return path.replace(/\\/g, '/').replace(/.*\//, '');
+	  }
+	  function dirname(path) {
+	    return path.replace(/\\/g, '/').replace(/\/[^\/]*$/, '');;
+	  }
+	  // ---
+	
+	  // return the utility object
+	  return {
+	    getDependencies: getDependencies
+	  };
+	})();
+	
+	exports['default'] = WorkerUtils;
+	module.exports = exports['default'];
+
+/***/ },
+/* 88 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -20140,7 +20788,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 86 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -20157,7 +20805,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorBinaryLoader = __webpack_require__(87);
+	var _vendorBinaryLoader = __webpack_require__(90);
 	
 	var _vendorBinaryLoader2 = _interopRequireDefault(_vendorBinaryLoader);
 	
@@ -20220,7 +20868,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 87 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -20866,7 +21514,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 88 */
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -20973,6 +21621,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // finish
 	        this.add(root);
 	
+	        // adjust the label
+	        this._adjustLabelOffset();
+	
 	        // callback
 	        if (this.callback) {
 	          this.callback(self);
@@ -20988,7 +21639,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 89 */
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -21053,19 +21704,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _vendorGPUComputationRenderer2 = _interopRequireDefault(_vendorGPUComputationRenderer);
 	
-	var _VehicleModel = __webpack_require__(90);
+	var _VehicleModel = __webpack_require__(93);
 	
 	var _VehicleModel2 = _interopRequireDefault(_VehicleModel);
 	
-	var _ModelRepository = __webpack_require__(85);
+	var _ModelRepository = __webpack_require__(88);
 	
 	var _ModelRepository2 = _interopRequireDefault(_ModelRepository);
 	
-	var _Vehicle = __webpack_require__(91);
+	var _Vehicle = __webpack_require__(94);
 	
 	var _Vehicle2 = _interopRequireDefault(_Vehicle);
 	
-	var _vendorBinaryLoader = __webpack_require__(87);
+	var _vendorBinaryLoader = __webpack_require__(90);
 	
 	var _vendorBinaryLoader2 = _interopRequireDefault(_vendorBinaryLoader);
 	
@@ -21268,6 +21919,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }, {
+	    key: 'getVehicle',
+	    value: function getVehicle(id) {
+	      if (id in this._entries) {
+	        return this._entries[id];
+	      }
+	      return null;
+	    }
+	  }, {
 	    key: '_setVelocity',
 	    value: function _setVelocity(id, vx, vy, vz, wheel) {
 	      _get(Object.getPrototypeOf(VehicleLayer.prototype), '_setVelocity', this).call(this, id, vx, vy, vz, wheel);
@@ -21298,7 +21957,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.vehicleLayer = noNew;
 
 /***/ },
-/* 90 */
+/* 93 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -21315,9 +21974,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorBinaryLoader = __webpack_require__(87);
+	var _vendorBinaryLoader = __webpack_require__(90);
 	
 	var _vendorBinaryLoader2 = _interopRequireDefault(_vendorBinaryLoader);
+	
+	var _utilObjectUtils = __webpack_require__(84);
+	
+	var _utilObjectUtils2 = _interopRequireDefault(_utilObjectUtils);
 	
 	var VehicleModel = function VehicleModel(parameters, callback) {
 	
@@ -21365,12 +22028,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // internal helper methods
 	  function createBody(geometry, materials) {
+	    geometry.sortFacesByMaterialIndex();
+	    geometry.computeVertexNormals();
+	
 	    scope.bodyGeometry = geometry;
 	    scope.bodyMaterials = materials;
 	
 	    onCreated();
 	  }
 	  function createWheel(geometry, materials) {
+	    geometry.sortFacesByMaterialIndex();
+	    geometry.computeVertexNormals();
+	
 	    scope.wheelGeometry = geometry;
 	    scope.wheelMaterials = materials;
 	
@@ -21407,7 +22076,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 91 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -21514,14 +22183,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // wheels rolling
 	      if (this.updateWheel) {
-	        var angularSpeedRatio = 1 / (this.modelScale * (this.wheelDiameter / 2));
+	        var angularSpeedRatio = 1 / (this.model.scale * (this.wheelDiameter / 2.));
 	        var wheelDelta = forwardDelta * angularSpeedRatio;
-	        if (this.loaded) {
-	          this.frontLeftWheelMesh.rotation.x += wheelDelta;
-	          this.frontRightWheelMesh.rotation.x += wheelDelta;
-	          this.backLeftWheelMesh.rotation.x += wheelDelta;
-	          this.backRightWheelMesh.rotation.x += wheelDelta;
-	        }
+	
+	        this.frontLeftWheelMesh.rotation.x += wheelDelta;
+	        this.frontRightWheelMesh.rotation.x += wheelDelta;
+	        this.rearLeftWheelMesh.rotation.x += wheelDelta;
+	        this.rearRightWheelMesh.rotation.x += wheelDelta;
 	      }
 	    }
 	
@@ -21557,6 +22225,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // setup combined materials
 	        var bodyFaceMaterial = new THREE.MultiMaterial(bodyMaterials);
 	        var wheelFaceMaterial = new THREE.MultiMaterial(wheelMaterials);
+	        // var bodyFaceMaterial = new THREE.MeshFaceMaterial(bodyMaterials);
+	        // var wheelFaceMaterial = new THREE.MeshFaceMaterial(wheelMaterials);
+	        // var bodyFaceMaterial = new THREE.MeshPhongMaterial({ color: 0x00000bb });
+	        // var wheelFaceMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
 	
 	        // create body mesh
 	        this.bodyMesh = new THREE.Mesh(bodyGeometry, bodyFaceMaterial);
@@ -21569,6 +22241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.frontLeftWheelRoot.position.add(delta);
 	        this.frontLeftWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
 	        this.frontLeftWheelMesh.scale.set(s, s, s);
+	        this.frontLeftWheelMesh.rotateY(0.0);
 	        this.frontLeftWheelRoot.add(this.frontLeftWheelMesh);
 	        root.add(this.frontLeftWheelRoot);
 	        // front right
@@ -21576,18 +22249,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.frontRightWheelRoot.position.add(delta);
 	        this.frontRightWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
 	        this.frontRightWheelMesh.scale.set(s, s, s);
+	        this.frontRightWheelMesh.rotateY(Math.PI);
 	        this.frontRightWheelRoot.add(this.frontRightWheelMesh);
 	        root.add(this.frontRightWheelRoot);
 	        // rear left
 	        delta.multiplyVectors(wheelOffset, new THREE.Vector3(s, s, -s));
 	        this.rearLeftWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
 	        this.rearLeftWheelMesh.scale.set(s, s, s);
+	        this.rearLeftWheelMesh.rotateY(0.0);
 	        this.rearLeftWheelMesh.position.add(delta);
 	        root.add(this.rearLeftWheelMesh);
 	        // rear right
 	        delta.multiplyVectors(wheelOffset, new THREE.Vector3(-s, s, -s));
 	        this.rearRightWheelMesh = new THREE.Mesh(wheelGeometry, wheelFaceMaterial);
 	        this.rearRightWheelMesh.scale.set(s, s, s);
+	        this.rearRightWheelMesh.rotateY(Math.PI);
 	        this.rearRightWheelMesh.position.add(delta);
 	        root.add(this.rearRightWheelMesh);
 	
@@ -21597,6 +22273,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // finish
 	        this.add(root);
+	
+	        // adjust the label
+	        this._adjustLabelOffset();
 	
 	        // callback
 	        if (this.callback) {
@@ -21616,7 +22295,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 92 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -21627,7 +22306,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// TODO: A lot of these utils don't need to be in separate, tiny files
 	
-	var _wrapNum = __webpack_require__(93);
+	var _wrapNum = __webpack_require__(96);
 	
 	var _wrapNum2 = _interopRequireDefault(_wrapNum);
 	
@@ -21643,18 +22322,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Buffer2 = _interopRequireDefault(_Buffer);
 	
+	var _ObjectUtils = __webpack_require__(84);
+	
+	var _ObjectUtils2 = _interopRequireDefault(_ObjectUtils);
+	
+	var _WorkerUtils = __webpack_require__(87);
+	
+	var _WorkerUtils2 = _interopRequireDefault(_WorkerUtils);
+	
 	var Util = {};
 	
 	Util.wrapNum = _wrapNum2['default'];
 	Util.extrudePolygon = _extrudePolygon2['default'];
 	Util.GeoJSON = _GeoJSON2['default'];
 	Util.Buffer = _Buffer2['default'];
+	Util.ObjectUtils = _ObjectUtils2['default'];
+	Util.WorkerUtils = _WorkerUtils2['default'];
 	
 	exports['default'] = Util;
 	module.exports = exports['default'];
 
 /***/ },
-/* 93 */
+/* 96 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {

@@ -4,11 +4,15 @@ import (
 	"strconv"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	. "./infra"
 	. "./models"
 	"math"
+	"io/ioutil"
 )
 
 var (
+	// controller
+	simController = NewSimController("localhost:8033")
 	// vehicles
 	vehicleManager = GetVehicleManager()
 	// pedestrians
@@ -35,6 +39,21 @@ func main() {
 			r.LoadHTMLGlob("views/wsdebug/*.html")
 			c.HTML(200, "index.html", gin.H{
 				"path": "/api/v1/vehicles/"+id+"/ws",
+			})
+		})
+
+		wsdebug.GET("/pedestrians", func(c *gin.Context) {
+			r.LoadHTMLGlob("views/wsdebug/*.html")
+			c.HTML(200, "index.html", gin.H{
+				"path": "/api/v1/pedestrians-ws",
+			})
+		})
+
+		wsdebug.GET("/pedestrians/:id", func(c *gin.Context) {
+			id := c.Param("id")
+			r.LoadHTMLGlob("views/wsdebug/*.html")
+			c.HTML(200, "index.html", gin.H{
+				"path": "/api/v1/pedestrians/"+id+"/ws",
 			})
 		})
 	}
@@ -69,6 +88,53 @@ func main() {
 	{
 		v1 := api.Group("/v1")
 		{
+			// ---------------------------------------------------------------
+			// Controller
+			// ---------------------------------------------------------------
+			// start the simulation
+			v1.POST("/start", func(c *gin.Context) {
+				byteData, err := ioutil.ReadAll(c.Request.Body)
+				if (err != nil) {
+					c.JSON(500, err)
+				}
+				data := string(byteData)
+
+				err = simController.StartSimulation(data)
+				if (err != nil) {
+					c.JSON(500, err)
+				} else {
+					c.JSON(200, struct {}{})
+				}
+			})
+
+			// returns if the simulation is running
+			v1.GET("/isRunning", func(c *gin.Context) {
+				state, err := simController.CheckState()
+				if (err != nil) {
+					c.JSON(500, err)
+				} else {
+					var isRunning bool = false
+					if (state == SIMULATOR_STATE_RUNNING) {
+						isRunning = true
+					}
+					c.JSON(200, struct {
+						IsRunning bool `json:"isRunning"`
+					}{IsRunning: isRunning})
+				}
+			})
+
+			// stop the simulation
+			v1.POST("/stop", func(c *gin.Context) {
+				err := simController.StopSimulation()
+				if (err != nil) {
+					c.JSON(500, err)
+				} else {
+					c.JSON(200, struct {}{})
+				}
+			})
+
+
+
 			// ---------------------------------------------------------------
 			// Vehicles
 			// ---------------------------------------------------------------

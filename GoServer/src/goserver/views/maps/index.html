@@ -4,59 +4,243 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <title>Simultra</title>
-    <link rel="stylesheet" href="/stylesheets/maps/main.css">
+    <!-- Material Design fonts -->
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="/vendor/bootstrap-material-design.min.css">
+    <link rel="stylesheet" href="/vendor/ripples.min.css">
+    <!-- simultra -->
     <link rel="stylesheet" href="/vendor/vizicities.css">
     <link rel="stylesheet" href="/vendor/simultra.css">
+    <link rel="stylesheet" href="/stylesheets/maps/main.css">
 </head>
 <body>
-<div id="world"></div>
-<script src="/vendor/three.min.js"></script>
-<script src="/vendor/stats.min.js"></script>
-<script src="/vendor/threex.rendererstats.js"></script>
-<script src="/vendor/TweenMax.min.js"></script>
-<script src="/vendor/operative.min.js"></script>
-<script src="/vendor/vizicities.min.js"></script>
-<script src="/vendor/jquery-3.0.0.min.js"></script>
-<script src="/vendor/simultra.js"></script>
-<script type="text/javascript">
-    // FIXME: something is wrong with the Simultra compilation. it's not UMD...
-    window.Simultra = window.Simultra.default;
+    <!-- the map -->
+    <div id="world"></div>
 
-    if (typeof Simultra === 'function') {
-        simultra = new Simultra(location.protocol + '//' + location.host, null, {
-            debug: {{.debug}},
-            renderer: "{{.renderer}}",
-            renderBuilding: !{{.test}},
-        });
-        {{if .dynamic}}
-        simultra.start();
-        {{end}}
+    <!-- controller -->
+    <div id="controller">
+        <div id="eyecatch">
+            <img src="" />
+            <div id="heading" class="dark">
+                <h1>Simultra</h1>
+            </div>
+        </div>
 
-        {{if .test}}
-        <!-- beginning of test -->
-        // add cars
-        var veyrons = [];
-        for (var i = 0; i < {{.n}}; i++) {
-            veyrons.push(
-                    simultra._vehicleLayer._addVehicle({
-                        type: 'veyron',
-                        location: {lat: 35.156324 + (0.0003*~~(i/{{.sn}})), lon: 136.923108 + 0.0003*(i%{{.sn}})},
-                        velocity: 40 / 3600 * 1000,
-                        angle: 0.0,
-                        wheel: 30*Math.PI/180.0
-                    })
-            );
+        <div id="content">
+            <div id="control">
+                <div id="state" class="pull-left">
+                    <p>Simulator is <span id="state_span"></span></p>
+                </div>
+                <div class="pull-right">
+                    <a id="followVehicles" class="btn btn-default btn-fab"><i class="material-icons">lock open</i></a>
+                </div>
+            </div>
+
+            <form id="simulationSettings" class="form-horizontal">
+                <fieldset>
+                    <legend>Simulation Settings:</legend>
+                    <div class="form-group">
+                        <label for="selectMap" class="col-md-2 control-label">Map</label>
+
+                        <div class="col-md-10">
+                            <select name="map" id="selectMap" class="form-control">
+                                <option>Nagoya Area</option>
+                                <option>Tsurumai Area</option>
+                                <option>Sakae Area</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="selectType" class="col-md-2 control-label">Type</label>
+
+                        <div class="col-md-10">
+                            <select name="types" id="selectType" class="form-control">
+                                <option>types1.xml</option>
+                                <option>types2.xml</option>
+                                <option>types3.xml</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!--<div class="form-group" style="margin-top: 0;">
+                        <label for="inputEmail" class="col-md-2 control-label">Type</label>
+
+                        <div class="col-md-10">
+                            <input type="email" class="form-control" id="inputEmail" placeholder="Email">
+                        </div>
+                    </div>-->
+                    <div class="form-group">
+                        <label for="selectScenario" class="col-md-2 control-label">Scenario</label>
+
+                        <div class="col-md-10">
+                            <select name="scenario" id="selectScenario" class="form-control">
+                                <option name="simx_scenario">simx_scenario</option>
+                                <option name="simxx_scenario">simxx_scenario</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-left: 0; margin-right: 0;">
+                        <div class="pull-right">
+                            <button type="button" id="stop" class="btn btn-default" disabled>Stop</button>
+                            <button type="button" id="run" class="btn btn-primary btn-raised">Run</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="/vendor/jquery-3.0.0.min.js"></script>
+    <!-- bootstrap -->
+    <script src="/vendor/bootstrap.min.js"></script>
+    <script src="/vendor/ripples.min.js"></script>
+    <script src="/vendor/material.min.js"></script>
+    <!-- simultra -->
+    <script src="/vendor/three.min.js"></script>
+    <script src="/vendor/stats.min.js"></script>
+    <script src="/vendor/threex.rendererstats.js"></script>
+    <script src="/vendor/TweenMax.min.js"></script>
+    <script src="/vendor/operative.min.js"></script>
+    <script src="/vendor/vizicities.min.js"></script>
+    <script src="/vendor/jquery-3.0.0.min.js"></script>
+    <script src="/vendor/simultra.js"></script>
+    <script type="text/javascript">
+        // FIXME: something is wrong with the Simultra compilation. it's not UMD...
+        window.Simultra = window.Simultra.default;
+
+        if (typeof Simultra === 'function') {
+            simultra = new Simultra(location.protocol + '//' + location.host, [35.170346, 136.900802], {
+                debug: {{.debug}},
+                renderer: "{{.renderer}}",
+//                renderBuilding: !{{.test}},
+                renderBuilding: false,
+                renderFootway: false,
+            });
+            {{if .dynamic}}
+            simultra.start();
+            {{end}}
+
+            {{if .test}}
+            <!-- beginning of test -->
+            // add cars
+            var veyrons = [];
+            for (var i = 0; i < {{.n}}; i++) {
+                veyrons.push(
+                        simultra._vehicleLayer._addVehicle({
+                            type: 'veyron',
+                            location: {lat: 35.156324 + (0.0003*~~(i/{{.sn}})), lon: 136.923108 + 0.0003*(i%{{.sn}})},
+                            velocity: 40 / 3600 * 1000,
+                            angle: 0.0,
+                            wheel: 30*Math.PI/180.0
+                        })
+                );
+            }
+
+            // sets the vehicles to move
+            simultra._vehicleLayer._viziLayer.on('loadCompleted', function() {
+                veyrons.forEach(function(veyron, id) {
+                    simultra._vehicleLayer._viziLayer.setVelocity(id, veyron.data.velocity, 0, 0, veyron.data.wheel);
+                });
+            });
+            <!-- end of test -->
+            {{end}}
         }
 
-        // sets the vehicles to move
-        simultra._vehicleLayer._viziLayer.on('loadCompleted', function() {
-            veyrons.forEach(function(veyron, id) {
-                simultra._vehicleLayer._viziLayer.setVelocity(id, veyron.data.velocity, 0, 0, veyron.data.wheel);
+        // TODO: The Controller
+        (function($) {
+
+            function setupControl() {
+                $('#control').ready(function() {
+                    var $control = $('#control');
+
+                    // retrieve and update the simulation state
+                    var updateControl = (function($control) {
+                        console.log('!!');
+                        return function() {
+                            // state
+                            if (simultra._options.followVehicles) {
+                                $control.find('a#followVehicles').addClass('btn-primary');
+                            } else {
+                                $control.find('a#followVehicles').removeClass('btn-primary');
+                            }
+                        }
+                    })($control);
+
+                    // followVehicles button
+                    $control.find('a#followVehicles').on('click', function() {
+                        simultra._options.followVehicles = !simultra._options.followVehicles;
+                        updateControl();
+                    });
+
+                    updateControl();
+                });
+            }
+
+            /**
+             * Sets up Simulation Settings Form
+             */
+            function setupSimulationSettings() {
+                $('form#simulationSettings').ready(function() {
+                    var $form = $('form#simulationSettings');
+                    var $control = $('#control');
+
+                    // retrieve and update the simulation state
+                    var updateStates = (function($form) {
+                        return function() {
+                            // retrieve the simulator status
+                            simultra.isSimulationRunning()
+                                    .then(function (data) {
+                                        if (data.isRunning) {
+                                            $form.find('button#stop').prop('disabled', false);
+                                            $form.find('button#run').prop('disabled', true);
+
+                                            $control.find('span#state_span').text("RUNNING");
+                                        } else {
+                                            $form.find('button#stop').prop('disabled', true);
+                                            $form.find('button#run').prop('disabled', false);
+
+                                            $control.find('span#state_span').text("not running");
+                                        }
+                                    })
+                        }
+                    })($form);
+
+                    // stop button listener
+                    $form.find('button#stop').on('click', function() {
+                        simultra.stopSimulation().then(function() { updateStates(); });
+                    });
+
+                    // run button listener
+                    $form.find('button#run').on('click', function() {
+                        var data = {};
+                        $form.serializeArray().forEach(function(obj) {
+                            if (obj.name === 'options') {
+                                if (!(obj.name in data)) {
+                                    data[obj.name] = [];
+                                }
+                                data[obj.name].push(obj.value);
+                            } else {
+                                data[obj.name] = obj.value;
+                            }
+                        });
+                        simultra.startSimulation(data['map'], data['type'], data['scenario']).then(function() { updateStates(); });
+                    });
+
+                    updateStates();
+                });
+            }
+
+            /**
+             * onLoad
+             */
+            $(document).ready(function() {
+                setupControl();
+                setupSimulationSettings();
             });
-        });
-        <!-- end of test -->
-        {{end}}
-    }
-</script>
+        })($);
+    </script>
 </body>
 </html>
