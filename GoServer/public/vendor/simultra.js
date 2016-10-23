@@ -211,8 +211,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._vehicleLayer.on('onAddVehicle', function (id, entry) {
 	          self.emit('onAddVehicle', id, entry);
 	        });
-	        this._vehicleLayer.on('onUpdateVehicle', function (id, entry) {
-	          self.emit('onUpdateVehicle', id, entry);
+	        this._vehicleLayer.on('onUpdateVehicle', function (id, entry, sender) {
+	          self.emit('onUpdateVehicle', id, entry, sender);
 	        });
 	      }
 	      // Pedestrian
@@ -220,8 +220,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._pedestrianLayer.on('onAddPedestrian', function (id, entry) {
 	          self.emit('onAddPedestrian', id, entry);
 	        });
-	        this._pedestrianLayer.on('onUpdatePedestrian', function (id, entry) {
-	          self.emit('onUpdatePedestrian', id, entry);
+	        this._pedestrianLayer.on('onUpdatePedestrian', function (id, entry, sender) {
+	          self.emit('onUpdatePedestrian', id, entry, sender);
 	        });
 	      }
 	    }
@@ -2217,7 +2217,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            viziLayer.setVelocity(pedestrian.id, pedestrian.velocity, 0, 0, 0);
 	
 	            // emit
-	            that.emit('onUpdatePedestrian', pedestrian.id, entry);
+	            that.emit('onUpdatePedestrian', pedestrian.id, entry, sender);
 	          }
 	        };
 	      }(this);
@@ -2925,7 +2925,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
 	
 	            // emit
-	            that.emit('onUpdateVehicle', vehicle.id, entry);
+	            that.emit('onUpdateVehicle', vehicle.id, entry, sender);
 	          }
 	        };
 	      }(this);
@@ -2961,8 +2961,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	
 	  }, {
-	    key: 'focusOnf',
-	    value: function focusOnf(id) {
+	    key: 'focusOn',
+	    value: function focusOn(id) {
 	      if (id in this._vehicles) {
 	        this._getSimultra().focusOn(function (self, id) {
 	          return {

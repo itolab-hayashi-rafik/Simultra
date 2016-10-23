@@ -288,7 +288,7 @@ class PedestrianLayer extends Layer {
           viziLayer.setVelocity(pedestrian.id, pedestrian.velocity, 0, 0, 0);
 
           // emit
-          that.emit('onUpdatePedestrian', pedestrian.id, entry);
+          that.emit('onUpdatePedestrian', pedestrian.id, entry, sender);
         }
       };
     })(this);

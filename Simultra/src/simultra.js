@@ -92,12 +92,12 @@ class Simultra extends EventEmitter {
     // Vehicle
     if (this._vehicleLayer) {
       this._vehicleLayer.on('onAddVehicle', function(id, entry) { self.emit('onAddVehicle', id, entry); });
-      this._vehicleLayer.on('onUpdateVehicle', function(id, entry) { self.emit('onUpdateVehicle', id, entry); });
+      this._vehicleLayer.on('onUpdateVehicle', function(id, entry, sender) { self.emit('onUpdateVehicle', id, entry, sender); });
     }
     // Pedestrian
     if (this._pedestrianLayer) {
       this._pedestrianLayer.on('onAddPedestrian', function(id, entry) { self.emit('onAddPedestrian', id, entry); });
-      this._pedestrianLayer.on('onUpdatePedestrian', function(id, entry) { self.emit('onUpdatePedestrian', id, entry); });
+      this._pedestrianLayer.on('onUpdatePedestrian', function(id, entry, sender) { self.emit('onUpdatePedestrian', id, entry, sender); });
     }
   }
 

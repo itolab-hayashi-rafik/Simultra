@@ -340,7 +340,7 @@ class VehicleLayer extends Layer {
           viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
 
           // emit
-          that.emit('onUpdateVehicle', vehicle.id, entry);
+          that.emit('onUpdateVehicle', vehicle.id, entry, sender);
         }
       };
     })(this);
@@ -371,7 +371,7 @@ class VehicleLayer extends Layer {
    *
    * @param id
    */
-  focusOnf(id) {
+  focusOn(id) {
     if (id in this._vehicles) {
       this._getSimultra().focusOn((function(self, id) {
         return {

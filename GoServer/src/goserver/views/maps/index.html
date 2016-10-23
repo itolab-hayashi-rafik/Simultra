@@ -21,7 +21,7 @@
     <div id="world"></div>
 
     <!-- controller -->
-    <div id="controller">
+    <div id="controller" class="open">
         <div id="eyecatch">
             <img src="" />
             <div id="heading" class="dark">
@@ -91,6 +91,41 @@
             </form>
         </div>
     </div>
+    <div id="controller-toggle" class="open">
+        <button>&lt;</button>
+    </div>
+
+    <!-- monitor -->
+    <div id="monitor" class="closed">
+        <ul id="monitor-list" class="nav nav-tabs">
+            <li class="template" style="display: none;"><a href="#tab-template" data-toggle="tab"><img src="/images/ic_veyron.png" /><p>#</p></a></li>
+        </ul>
+        <div id="monitor-content" class="tab-content">
+            <div class="tab-pane template" style="display: none;">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="eyecatch">
+                                <div class="inner">
+                                    <img src="/images/eyecatch_veyron.png" />
+                                    <p class="name">#</p>
+                                    <p class="sender">#</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-10">
+                            <div class="content">
+                                <pre></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="monitor-toggle" class="closed">
+        <button>open</button>
+    </div>
 
     <!-- jQuery -->
     <script src="/vendor/jquery-3.0.0.min.js"></script>
@@ -152,6 +187,27 @@
         // TODO: The Controller
         (function($) {
 
+            function setupToggle() {
+                $('#controller-toggle').ready(function() {
+                    var $controlToggle = $('#controller-toggle');
+
+                    // button listener
+                    $controlToggle.find('button').on('click', function() {
+                        if ($controlToggle.hasClass('open')) {
+                            // close the control
+                            $('#controller').removeClass('open').addClass('closed');
+                            $controlToggle.removeClass('open').addClass('closed');
+                            $(this).text('>');
+                        } else {
+                            // open the control
+                            $('#controller').removeClass('closed').addClass('open');
+                            $controlToggle.removeClass('closed').addClass('open');
+                            $(this).text('<');
+                        }
+                    });
+                });
+            }
+
             function setupControl() {
                 $('#control').ready(function() {
                     var $control = $('#control');
@@ -169,7 +225,7 @@
                         }
                     })($control);
 
-                    // followVehicles button
+                    // fixCamera button
                     $control.find('a#followVehicles').on('click', function() {
                         simultra._options.fixCamera = !simultra._options.fixCamera;
                         updateControl();
@@ -237,17 +293,82 @@
              * onLoad
              */
             $(document).ready(function() {
+                setupToggle();
                 setupControl();
                 setupSimulationSettings();
+            });
+        })($);
 
-                // TODO: test code
+
+        // TODO: The Monitor
+        (function($) {
+
+            function setupToggle() {
+                $('#monitor-toggle').ready(function() {
+                    var $monitorToggle = $('#monitor-toggle');
+
+                    // button listener
+                    $monitorToggle.find('button').on('click', function() {
+                        if ($monitorToggle.hasClass('open')) {
+                            // close the control
+                            $('#monitor').removeClass('open').addClass('closed');
+                            $monitorToggle.removeClass('open').addClass('closed');
+                            $(this).text('open');
+                        } else {
+                            // open the control
+                            $('#monitor').removeClass('closed').addClass('open');
+                            $monitorToggle.removeClass('closed').addClass('open');
+                            $(this).text('close');
+                        }
+                    });
+                });
+            }
+
+            function addVehicleTab(id, entry) {
+                // retrieve dom template
+                var $li = $('#monitor-list').find('.template').clone().removeClass('template');
+                var $content = $('#monitor-content').find('.template').clone().removeClass('template');
+
+                // fill data
+                $li.find('a').attr('href', '#vehicle' + id);
+                $li.find('img').attr('src', '/images/ic_veyron.png');
+                $li.find('p').text('Vehicle' + id); // FIXME: change name
+                $li.css('display', '');
+
+                $content.attr('id', 'vehicle' + id);
+                $content.find('.eyecatch').find('img').attr('src', '/images/eyecatch_veyron.png');
+                $content.find('.eyecatch').find('p.name').text('Vehicle' + id); // FIXME: change name
+                $content.find('.eyecatch').find('p.sender').text('');
+                $content.css('display', '');
+
+                // event listener
+                $li.on('click', (function(id) {
+                    return function() {
+                        onClickVehicleTab(id);
+                    };
+                })(id));
+
+                $('#monitor-list').append($li);
+                $('#monitor-content').append($content);
+            }
+
+            function onClickVehicleTab(id) {
+                simultra.focusOnVehicle(id);
+            }
+
+            /**
+             * onLoad
+             */
+            $(document).ready(function() {
+                setupToggle();
+
                 simultra.on('onAddVehicle', (function(){
                     return function (id, entry) {
-//                        console.log('!!!!!!!!!!! added ' + JSON.stringify(entry));
+                        addVehicleTab(id, entry);
                     };
                 })());
                 simultra.on('onUpdateVehicle', (function(){
-                    return function (id, entry) {
+                    return function (id, entry, sender) {
 //                        console.log('!!!!!!!!!!! updated ' + entry.data.id + " location = " + JSON.stringify(entry.data.location));
                     };
                 })());

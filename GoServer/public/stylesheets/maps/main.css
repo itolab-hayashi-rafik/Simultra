@@ -1,15 +1,97 @@
+/* ========================================================
+    common
+   ======================================================== */
 .dark {
-    background-color: rgba(0,0,0,0.25);
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+.rotate {
+
+    /* Safari */
+    -webkit-transform: rotate(-90deg);
+
+    /* Firefox */
+    -moz-transform: rotate(-90deg);
+
+    /* IE */
+    -ms-transform: rotate(-90deg);
+
+    /* Opera */
+    -o-transform: rotate(-90deg);
+
+    /* Internet Explorer */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+
+}
+
+.nav-tabs {
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: -webkit-box;
+    display: -moz-box;
+}
+.nav-tabs > li {
+    float: none;
+}
+
+/* ========================================================
+    world
+   ======================================================== */
+#world {
+
+}
+
+#world .label.vehicle {
+    background: transparent;
+    color: #444;
+    /*visibility: collapse;*/
+}
+
+#world .label.pedestrian {
+    background: transparent;
+    color: #444;
+}
+
+/* ========================================================
+    controller
+   ======================================================== */
+#controller-toggle {
+    width: 20px;
+    height: 50px;
+    position: absolute;
+    top: 30px;
+}
+
+#controller-toggle.open {
+    left: 360px;
+}
+
+#controller-toggle.closed {
+    left: 0;
+}
+
+#controller-toggle button {
+    width: 100%;
+    height: 100%;
 }
 
 #controller {
-    width: 360px;
     height: 100%;
     position: fixed;
     left: 0;
     top: 0;
     background: #ffffff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+#controller.open {
+    width: 360px;
+}
+
+#controller.closed {
+    width: 0;
 }
 
 #controller #eyecatch {
@@ -62,19 +144,107 @@
     margin-bottom: 0;
 }
 
-
-
-#world {
-
+/* ========================================================
+    monitor
+   ======================================================== */
+#monitor-toggle {
+    width: 60px;
+    height: 20px;
+    position: absolute;
+    right: 50px;
 }
 
-#world .label.vehicle {
-    background: transparent;
-    color: #444;
-    /*visibility: collapse;*/
+#monitor-toggle.open {
+    bottom: 300px;
 }
 
-#world .label.pedestrian {
+#monitor-toggle.closed {
+    bottom: 70px;
+}
+
+#monitor-toggle button {
+    width: 100%;
+    height: 100%;
+}
+
+#monitor {
+    width: 100%;
+    position: fixed;
+    left: 0;
+    bottom: 0;
     background: transparent;
-    color: #444;
+    /*box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);*/
+    overflow: hidden;
+}
+
+#monitor.open {
+    height: 300px;
+}
+
+#monitor.closed {
+    height: 70px;
+}
+
+#monitor-list {
+    height: 70px;
+    background: rgba(0,0,0,0.6);
+}
+
+#monitor-list li p {
+    font-weight: 100;
+    margin: 0;
+}
+
+#monitor-content {
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+#monitor-content .tab-pane { height: 100%; }
+#monitor-content .tab-pane .container-fluid { height: 100%; }
+#monitor-content .tab-pane .container-fluid .row { height: 100%; }
+#monitor-content .tab-pane .container-fluid .row > div { height: 100%; }
+
+#monitor-content .eyecatch {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#monitor-content .eyecatch .inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -80px;
+    margin-top: -100px;
+    text-align: center;
+}
+
+#monitor-content .eyecatch img {
+    margin: 10px;
+    width: 160px;
+}
+
+#monitor-content .eyecatch p.name {
+    font-size: 18px;
+    margin: 0;
+}
+
+#monitor-content .eyecatch p.sender {
+    font-size: 14px;
+    margin: 0;
+}
+
+#monitor-content .content {
+    width: 100%;
+    height: 100%;
+}
+
+#monitor-content .content pre {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
