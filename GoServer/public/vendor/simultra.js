@@ -1788,6 +1788,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+	
 	var _vizi = __webpack_require__(1);
 	
 	var _vizi2 = _interopRequireDefault(_vizi);
@@ -1863,6 +1865,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // set the instance property
 	      this._setViziLayer(viziLayer);
 	    }
+	  }, {
+	    key: '_onAdd',
+	    value: function _onAdd(simultra) {
+	      _get(Object.getPrototypeOf(PedestrianLayer.prototype), '_onAdd', this).call(this, simultra);
+	
+	      // create the worker thread for websocket
+	      this._worker = operative(this._createWorker(), _WorkerUtils2.default.getDependencies());
+	    }
+	  }, {
+	    key: '_onRemove',
+	    value: function _onRemove() {
+	      _get(Object.getPrototypeOf(PedestrianLayer.prototype), '_onRemove', this).call(this);
+	
+	      // destroy the worker
+	      this._worker = null;
+	    }
 	
 	    /**
 	     * Starts updating the view
@@ -1876,11 +1894,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var self = this;
 	
 	      // start all of the workers
-	      this._pedestrians.forEach(function (pedestrian, id) {
-	        if (pedestrian.worker) {
-	          pedestrian.worker.start(id, self._createWorkerCallback());
-	        }
-	      });
+	      this._worker.start(this._createWorkerCallback());
 	
 	      // start pedestrian manager
 	      var ws = this._api.wsPedestrians();
@@ -1915,11 +1929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      // terminate all of the workers
-	      this._pedestrians.forEach(function (pedestrian) {
-	        if (pedestrian.worker) {
-	          pedestrian.worker.stop();
-	        }
-	      });
+	      this._worker.stop();
 	    }
 	  }, {
 	    key: '_onMessage',
@@ -2020,21 +2030,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // add pedestrian to the vizi layer
 	      var object = viziLayer.addPedestrian(pedestrian.type, new _vizi2.default.LatLon(pedestrian.location.lat, pedestrian.location.lon), pedestrian.angle);
 	
-	      // create a new updating thread
-	      var worker = operative(this._createWorker(), _WorkerUtils2.default.getDependencies());
-	
 	      // add entry to dictionary
 	      var entry = {
 	        data: pedestrian,
-	        object: object,
-	        worker: worker
+	        object: object
 	      };
 	      this._pedestrians[pedestrian.id] = entry;
-	
-	      // start the worker
-	      if (this._isRunning) {
-	        worker.start(pedestrian.id, this._createWorkerCallback());
-	      }
 	
 	      console.log('added pedestrian: ' + JSON.stringify(pedestrian));
 	      return entry;
@@ -2049,14 +2050,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return {
 	        _baseUrl: baseUrl,
 	        _api: null,
-	        _id: null,
 	        _callback: null,
 	        _isRunning: false,
 	
 	        /** start updating the pedestrian */
-	        start: function start(id, callback) {
+	        start: function start(callback) {
 	          this._api = new SimWorker.API(this._baseUrl);
-	          this._id = id;
 	          this._callback = callback;
 	          this._isRunning = true;
 	
@@ -2069,10 +2068,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _update: function _update() {
 	          var self = this;
 	
-	          var socket = this._api.wsPedestrian(this._id);
+	          var socket = this._api.wsAllPedestrians();
 	          socket.onclose = function (event) {
 	            self._isRunning = false;
-	            console.log('closed pedestrian ' + self._id);
+	            console.log('closed pedestrian websocket');
 	          };
 	          socket.onmessage = function (event) {
 	            // here, "event" is an instance of MessageEvent, which cannot be serialized to send to the UI thread,
@@ -2083,7 +2082,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	          };
 	          socket.onopen = function () {
-	            console.log('opened pedestrian ' + self._id);
+	            console.log('opened pedestrian websocket');
 	          };
 	        },
 	
@@ -2739,7 +2738,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var socket = this._api.wsAllVehicles();
 	          socket.onclose = function (event) {
 	            self._isRunning = false;
-	            console.log('closed vehicle ' + self._id);
+	            console.log('closed vehicle websocket');
 	          };
 	          socket.onmessage = function (event) {
 	            // here, "event" is an instance of MessageEvent, which cannot be serialized to send to the UI thread,
@@ -2750,7 +2749,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	          };
 	          socket.onopen = function () {
-	            console.log('opened vehicle ' + self._id);
+	            console.log('opened vehicle websocket');
 	          };
 	          self._socket = socket;
 	        },

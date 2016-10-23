@@ -285,7 +285,7 @@ class VehicleLayer extends Layer {
         var socket = this._api.wsAllVehicles();
         socket.onclose = function(event) {
           self._isRunning = false;
-          console.log('closed vehicle ' + self._id);
+          console.log('closed vehicle websocket');
         };
         socket.onmessage = function(event) {
           // here, "event" is an instance of MessageEvent, which cannot be serialized to send to the UI thread,
@@ -296,7 +296,7 @@ class VehicleLayer extends Layer {
           }
         };
         socket.onopen = function() {
-          console.log('opened vehicle ' + self._id);
+          console.log('opened vehicle websocket');
         };
         self._socket = socket;
       },
