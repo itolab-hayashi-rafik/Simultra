@@ -205,7 +205,7 @@ Client.prototype.updateVehicle = function(mobility) {
     changed = true;
   }
   if ('Speed' in mobility) {
-    vehicle.velocity = mobility['speed'];
+    vehicle.velocity = mobility['Speed'];
     // vehicle.velocity = 40 * 1000 / 3600;
     changed = true;
   }
