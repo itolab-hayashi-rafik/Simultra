@@ -1931,7 +1931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          self._update();
 	        }, 0);
 	      } else if (data === 'deletion') {
-	        setTImeout(function () {
+	        setTimeout(function () {
 	          self._update();
 	        }, 0);
 	      } else {
@@ -2551,7 +2551,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          self._update();
 	        }, 0);
 	      } else if (data === 'deletion') {
-	        setTImeout(function () {
+	        setTimeout(function () {
 	          self._update();
 	        }, 0);
 	      } else {

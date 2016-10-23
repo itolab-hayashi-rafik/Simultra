@@ -112,7 +112,7 @@ class VehicleLayer extends Layer {
     if (data === 'creation') {
       setTimeout(function() { self._update(); }, 0);
     } else if (data === 'deletion') {
-      setTImeout(function() { self._update(); }, 0);
+      setTimeout(function() { self._update(); }, 0);
     } else {
       console.error('unknown message ' + data);
     }
