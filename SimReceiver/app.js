@@ -26,6 +26,13 @@ function Client(socket) {
       lon: 136.900831
     }
   };
+  this.pedestrian = {
+    type: 'monkey',
+    location: {
+      lat: 35.169555,
+      lon: 136.900831
+    }
+  };
   this.state = Client.State.NOT_CONNECTED;
 }
 
@@ -35,17 +42,78 @@ Client.State = {
   CONNECTED: 2
 };
 
-Client.prototype._initWebsocket = function(callback) {
+Client.prototype._initWsVehicle = function(callback) {
   var self = this;
 
   self.state = Client.State.CONNECTING;
 
-  // create a new vehicle
+  // create a new instance
   api.newVehicle(this.vehicle, function(vehicle) {
     self.vehicle = vehicle;
     console.log('[' + self.key + '] - New vehicle created: ' + JSON.stringify(vehicle));
 
     var url = wsBaseUrl+'/api/v1/vehicles/' + vehicle.id + '/ws?id=' + self.name;
+
+    // create a websocket client
+    var client = new WebSocketClient();
+
+    // add the connection failure listener
+    client.on('connectFailed', function(error) {
+      self.state = Client.State.NOT_CONNECTED;
+      console.log('[' + self.key + '] - Connect Error: ' + error.toString());
+    });
+
+    // on connected
+    client.on('connect', function(connection) {
+      self.state = Client.State.CONNECTED;
+      self.wsConnection = connection;
+      console.log('[' + self.key + '] - WebSocket Client Connected');
+
+      connection.on('error', function(error) {
+        self.state = Client.State.NOT_CONNECTED;
+        self.wsConnection = null;
+        console.log('[' + self.key + '] - WebSocket Connection Error: ' + error);
+      });
+
+      connection.on('close', function() {
+        self.state = Client.State.NOT_CONNECTED;
+        self.wsConnection = null;
+        console.log('[' + self.key + '] - WebSocket Connection Closed');
+      });
+
+      connection.on('message', function(msg) {
+        if (msg.type === 'utf8') {
+          var data = msg.utf8Data;
+          console.log('[' + self.key + '] - ' + data);
+        } else if (msg.type === 'binary') {
+          var data = msg.binaryData;
+          console.log('[' + self.key + '] - binary data');
+        } else {
+          console.log('[' + self.key + '] - Unknown message type!');
+          console.log('[' + self.key + '] - typeof msg = '+(typeof msg));
+          console.log('[' + self.key + '] - Object.keys(msg) = '+(Object.keys(msg)));
+        }
+      });
+
+      callback();
+    });
+
+    client.connect(url);
+    self.websocket = client;
+  });
+};
+
+Client.prototype._initWsPedestrian = function(callback) {
+  var self = this;
+
+  self.state = Client.State.CONNECTING;
+
+  // create a new instance
+  api.newPedestrian(this.pedestrian, function(pedestrian) {
+    self.pedestrian = pedestrian;
+    console.log('[' + self.key + '] - New pedestrian created: ' + JSON.stringify(pedestrian));
+
+    var url = wsBaseUrl+'/api/v1/pedestrians/' + pedestrian.id + '/ws?id=' + self.name;
 
     // create a websocket client
     var client = new WebSocketClient();
@@ -118,7 +186,7 @@ Client.prototype.wsWriteData = function(d) {
   }
 };
 
-Client.prototype.update = function(mobility) {
+Client.prototype.updateVehicle = function(mobility) {
   var vehicle = this.vehicle;
   var changed = false;
 
@@ -146,6 +214,34 @@ Client.prototype.update = function(mobility) {
   }
 };
 
+Client.prototype.updatePedestrian = function(mobility) {
+  var pedestrian = this.pedestrian;
+  var changed = false;
+
+  if ('Latitude' in mobility) {
+    pedestrian.location.lat = mobility['Latitude'];
+    changed = true;
+  }
+  if ('Longitude' in mobility) {
+    pedestrian.location.lon = mobility['Longitude'];
+    changed = true;
+  }
+  if ('Angle' in mobility) {
+    var angle = mobility['Angle'] * Math.PI / 180.; // convert degrees to radians
+    angle += -90 * Math.PI / 180.; // TODO: temporary fix, adding -90 degrees to the original angle!!
+    pedestrian.angle = angle;
+    changed = true;
+  }
+  if ('Speed' in mobility) {
+    pedestrian.velocity = mobility['speed'];
+    changed = true;
+  }
+
+  if (changed) {
+    this.wsWriteData(JSON.stringify(pedestrian));
+  }
+};
+
 Client.prototype.onReceiveData = function(data) {
   var self = this;
 
@@ -154,30 +250,75 @@ Client.prototype.onReceiveData = function(data) {
   if ('Mobility' in data) {
     var mobility = data['Mobility'];
 
-    if ('Name' in mobility) {
-      // var name = mobility['Name'] + ' (' + ip + ')';
-      var name = ip;
-      if (name && this.name !== name) {
-        this.name = name;
-      }
-
-      // init websocket if needed
-      if (this.state == Client.State.NOT_CONNECTED) {
-        this._initWebsocket(function() {
-          self.update(mobility);
-          self.ack();
-        });
-      }
-      // if already initialized, pipe the data to websocket
-      else if (this.state == Client.State.CONNECTED) {
-        self.update(mobility);
-        self.ack();
+    if ('Type' in mobility) {
+      var type = mobility['Type'];
+      if (type == 0) {
+        this.onReceiveVehicleData(mobility);
+      } else if (type == 1) {
+        this.onReceivePedestrianData(mobility);
+      } else {
+        console.log('[' + this.key + '] (in) - Unknown type ' + type);
       }
     } else {
-      console.log('[' + this.key + '] (in) - Mobility.Name not exists');
+      console.log('[' + this.key + '] (in) - Mobility.Type not exists');
     }
   } else {
     console.log('[' + this.key + '] (in) - Mobility not exists');
+  }
+
+};
+
+Client.prototype.onReceiveVehicleData = function(mobility) {
+  var self = this;
+
+  if ('Name' in mobility) {
+    // var name = mobility['Name'] + ' (' + ip + ')';
+    var name = ip;
+    if (name && this.name !== name) {
+      this.name = name;
+    }
+
+    // init websocket if needed
+    if (this.state == Client.State.NOT_CONNECTED) {
+      this._initWsVehicle(function() {
+        self.updateVehicle(mobility);
+        self.ack();
+      });
+    }
+    // if already initialized, pipe the data to websocket
+    else if (this.state == Client.State.CONNECTED) {
+      self.updateVehicle(mobility);
+      self.ack();
+    }
+  } else {
+    console.log('[' + this.key + '] (in) - Mobility.Name not exists');
+  }
+};
+
+Client.prototype.onReceivePedestrianData = function(mobility) {
+  var self = this;
+
+  if ('Name' in mobility) {
+    // var name = mobility['Name'] + ' (' + ip + ')';
+    var name = ip;
+    if (name && this.name !== name) {
+      this.name = name;
+    }
+
+    // init websocket if needed
+    if (this.state == Client.State.NOT_CONNECTED) {
+      this._initWsPedestrian(function() {
+        self.updatePedestrian(mobility);
+        self.ack();
+      });
+    }
+    // if already initialized, pipe the data to websocket
+    else if (this.state == Client.State.CONNECTED) {
+      self.updatePedestrian(mobility);
+      self.ack();
+    }
+  } else {
+    console.log('[' + this.key + '] (in) - Mobility.Name not exists');
   }
 };
 
@@ -193,6 +334,13 @@ Client.prototype.onDisconnected = function() {
   if (this.vehicle && this.vehicle.id) {
     api.deleteVehicle(this.vehicle.id, function(vehicle) {
       console.log('deleted the vehicle ' + JSON.stringify(vehicle));
+    });
+  }
+
+  // delete the pedestrian if needed
+  if (this.pedestrian && this.pedestrian.id) {
+    api.deletePedestrian(this.pedestrian.id, function(pedestrian) {
+      console.log('deleted the pedestrian ' + JSON.stringify(pedestrian));
     });
   }
 };
