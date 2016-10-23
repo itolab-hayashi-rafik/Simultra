@@ -129,7 +129,7 @@ class Simultra extends EventEmitter {
 
   lookAtLatLon(latLon) {
     var point = this._world.latLonToPoint(latLon);
-    this.moveToPoint(point);
+    this.lookAtPoint(point);
   }
 
   lookAtPoint(point) {
