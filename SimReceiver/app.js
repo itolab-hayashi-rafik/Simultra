@@ -136,6 +136,10 @@ Client.prototype.update = function(mobility) {
     vehicle.angle = angle;
     changed = true;
   }
+  if ('Speed' in mobility) {
+    vehicle.velocity = mobility['speed'];
+    changed = true;
+  }
 
   if (changed) {
     this.wsWriteData(JSON.stringify(vehicle));
