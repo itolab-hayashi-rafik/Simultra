@@ -27,12 +27,14 @@ class Simultra extends EventEmitter {
       renderBuilding: true,
       renderVehicle: true,
       renderPedestrian: true,
-      followVehicles: false
+      fixCamera: false,
     };
     this._options = extend({}, defaultOptions, options);
 
     this._api = new API(baseUrl);
     this._isRunning = false;
+
+    this._focusedObject = null;
 
     var coords = defaultCoords || [35.156324, 136.923108];
 
@@ -121,10 +123,8 @@ class Simultra extends EventEmitter {
       }
     }
 
-    // follow the car
-    if (this._options.followVehicles) {
-      this._updateCameraPosition();
-    }
+    // focus
+    this._updateCameraPosition();
   }
 
   lookAtLatLon(latLon) {
@@ -214,6 +214,7 @@ class Simultra extends EventEmitter {
 
   /**
    * Controls the remote to start the simulation
+   *
    * @param map
    * @param type
    * @param scenario
@@ -238,16 +239,54 @@ class Simultra extends EventEmitter {
   }
 
   /**
-   * update the camera position to follow the vehicles
+   * Updates the camera position to follow the vehicles
+   *
    * @private
    */
   _updateCameraPosition() {
-    if (this._options.followVehicles) {
-      var latLon = this._vehicleLayer.getCentroid();
+    if (this._focusedObject != null) {
+      var object = this._focusedObject;
+      var latLon = !('latLon' in object) ? null : (typeof object.latLon === 'function') ? object.latLon() : object.latLon;
+      var point = !('point' in object) ? null : (typeof object.point === 'function') ? object.point() : object.point;
+
       if (latLon != null) {
-        this.moveToLatLon(latLon);
+        this._options.fixCamera ? this.lookAtLatLon(latLon) : this.moveToLatLon(latLon);
+      } else if (point != null) {
+        this._options.fixCamera ? this.lookAtPoint(point) : this.moveToPoint(point);
       }
     }
+  }
+
+  /**
+   * Focuses on an object
+   *
+   * @param object an object that has either a function or property named "latLon" that returns VIZI.LatLon location or "point" that returns VIZI.point position
+   */
+  focusOn(object) {
+    if (object != null && !('latLon' in object) && !('point' in object)) {
+      throw new Error('object needs to have a property or function named "latLon" that returns VIZI.LatLon location or "point" that returns VIZI.Point position');
+    }
+    this._focusedObject = object;
+  }
+
+  /**
+   * Focuses on a vehicle
+   *
+   * @param vid
+   */
+  focusOnVehicle(vid) {
+    // proxy VehicleLayer#focusOn()
+    this._vehicleLayer && this._vehicleLayer.focusOn(vid);
+  }
+
+  /**
+   * Focuses on a pedestrian
+   *
+   * @param pid
+   */
+  focusOnPedestrian(pid) {
+    // proxy PedestrianLayer#focusOn()
+    this._pedestrianLayer && this._pedestrianLayer.focusOn(pid);
   }
 }
 

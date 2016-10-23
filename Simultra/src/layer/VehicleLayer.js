@@ -355,6 +355,26 @@ class VehicleLayer extends Layer {
     }
   }
 
+  /**
+   * Sets the Simultra to focus on the specific vehicle
+   *
+   * @param id
+   */
+  focusOn(id) {
+    if (id in this._vehicles) {
+      this._getSimultra().focusOn((function(self, id) {
+        return {
+          point: function() {
+            var position = self._vehicles[id].object.vehicle.root.position;
+            return new VIZI.Point(position.x, position.z);
+          }
+        };
+      })(this, id));
+    } else {
+      this._getSimultra().focusOn(null);
+    }
+  }
+
 }
 
 export default VehicleLayer;

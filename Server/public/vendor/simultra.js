@@ -139,12 +139,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      renderBuilding: true,
 	      renderVehicle: true,
 	      renderPedestrian: true,
-	      followVehicles: false
+	      fixCamera: false
 	    };
 	    _this._options = (0, _extend2.default)({}, defaultOptions, options);
 	
 	    _this._api = new _API2.default(baseUrl);
 	    _this._isRunning = false;
+	
+	    _this._focusedObject = null;
 	
 	    var coords = defaultCoords || [35.156324, 136.923108];
 	
@@ -239,10 +241,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 	
-	      // follow the car
-	      if (this._options.followVehicles) {
-	        this._updateCameraPosition();
-	      }
+	      // focus
+	      this._updateCameraPosition();
 	    }
 	  }, {
 	    key: 'lookAtLatLon',
@@ -351,6 +351,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    /**
 	     * Controls the remote to start the simulation
+	     *
 	     * @param map
 	     * @param type
 	     * @param scenario
@@ -384,19 +385,66 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    /**
-	     * update the camera position to follow the vehicles
+	     * Updates the camera position to follow the vehicles
+	     *
 	     * @private
 	     */
 	
 	  }, {
 	    key: '_updateCameraPosition',
 	    value: function _updateCameraPosition() {
-	      if (this._options.followVehicles) {
-	        var latLon = this._vehicleLayer.getCentroid();
+	      if (this._focusedObject != null) {
+	        var object = this._focusedObject;
+	        var latLon = !('latLon' in object) ? null : typeof object.latLon === 'function' ? object.latLon() : object.latLon;
+	        var point = !('point' in object) ? null : typeof object.point === 'function' ? object.point() : object.point;
+	
 	        if (latLon != null) {
-	          this.moveToLatLon(latLon);
+	          this._options.fixCamera ? this.lookAtLatLon(latLon) : this.moveToLatLon(latLon);
+	        } else if (point != null) {
+	          this._options.fixCamera ? this.lookAtPoint(point) : this.moveToPoint(point);
 	        }
 	      }
+	    }
+	
+	    /**
+	     * Focuses on an object
+	     *
+	     * @param object an object that has either a function or property named "latLon" that returns VIZI.LatLon location or "point" that returns VIZI.point position
+	     */
+	
+	  }, {
+	    key: 'focusOn',
+	    value: function focusOn(object) {
+	      if (object != null && !('latLon' in object) && !('point' in object)) {
+	        throw new Error('object needs to have a property or function named "latLon" that returns VIZI.LatLon location or "point" that returns VIZI.Point position');
+	      }
+	      this._focusedObject = object;
+	    }
+	
+	    /**
+	     * Focuses on a vehicle
+	     *
+	     * @param vid
+	     */
+	
+	  }, {
+	    key: 'focusOnVehicle',
+	    value: function focusOnVehicle(vid) {
+	      // proxy VehicleLayer#focusOn()
+	      this._vehicleLayer && this._vehicleLayer.focusOn(vid);
+	    }
+	
+	    /**
+	     * Focuses on a pedestrian
+	     *
+	     * @param pid
+	     */
+	
+	  }, {
+	    key: 'focusOnPedestrian',
+	    value: function focusOnPedestrian(pid) {
+	      // proxy PedestrianLayer#focusOn()
+	      this._pedestrianLayer && this._pedestrianLayer.focusOn(pid);
 	    }
 	  }]);
 	
@@ -943,6 +991,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_getViziWorld',
 	    value: function _getViziWorld() {
 	      return this._simultra._world;
+	    }
+	  }, {
+	    key: '_getSimultra',
+	    value: function _getSimultra() {
+	      return this._simultra;
 	    }
 	  }, {
 	    key: 'addTo',
@@ -2128,6 +2181,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	      }(this);
 	    }
+	
+	    /**
+	     * Sets the Simultra to focus on the specific vehicle
+	     *
+	     * @param id
+	     */
+	
+	  }, {
+	    key: 'focusOn',
+	    value: function focusOn(id) {
+	      if (id in this._pedestrians) {
+	        this._getSimultra().focusOn(function (self, id) {
+	          return {
+	            point: function point() {
+	              var position = self._vehicles[id].object.vehicle.root.position;
+	              return new _vizi2.default.Point(position.x, position.z);
+	            }
+	          };
+	        }(this, id));
+	      } else {
+	        this._getSimultra().focusOn(null);
+	      }
+	    }
 	  }]);
 	
 	  return PedestrianLayer;
@@ -2823,6 +2899,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      } else {
 	        return null;
+	      }
+	    }
+	
+	    /**
+	     * Sets the Simultra to focus on the specific vehicle
+	     *
+	     * @param id
+	     */
+	
+	  }, {
+	    key: 'focusOn',
+	    value: function focusOn(id) {
+	      if (id in this._vehicles) {
+	        this._getSimultra().focusOn(function (self, id) {
+	          return {
+	            point: function point() {
+	              var position = self._vehicles[id].object.vehicle.root.position;
+	              return new _vizi2.default.Point(position.x, position.z);
+	            }
+	          };
+	        }(this, id));
+	      } else {
+	        this._getSimultra().focusOn(null);
 	      }
 	    }
 	  }]);
