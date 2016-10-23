@@ -98,7 +98,7 @@
     <!-- monitor -->
     <div id="monitor" class="closed">
         <ul id="monitor-list" class="nav nav-tabs">
-            <li class="template" style="display: none;"><a href="#tab-template" data-toggle="tab"><img src="/images/ic_veyron.png" /><p>#</p></a></li>
+            <li class="template" style="display: none;"><a href="#tab-template" data-toggle="tab"><i class="material-icons">#</i><p>#</p></a></li>
         </ul>
         <div id="monitor-content" class="tab-content">
             <div class="tab-pane template" style="display: none;">
@@ -331,7 +331,7 @@
 
                 // fill data
                 $li.find('a').attr('href', '#vehicle' + id);
-                $li.find('img').attr('src', '/images/ic_veyron.png');
+                $li.find('i').html('directions_car');
                 $li.find('p').text('Vehicle' + id); // FIXME: change name
                 $li.css('display', '');
 
@@ -356,6 +356,38 @@
                 simultra.focusOnVehicle(id);
             }
 
+            function addPedestrianTab(id, entry) {
+                // retrieve dom template
+                var $li = $('#monitor-list').find('.template').clone().removeClass('template');
+                var $content = $('#monitor-content').find('.template').clone().removeClass('template');
+
+                // fill data
+                $li.find('a').attr('href', '#pedestrian' + id);
+                $li.find('i').html('directions_walk');
+                $li.find('p').text('Pedestrian' + id); // FIXME: change name
+                $li.css('display', '');
+
+                $content.attr('id', 'pedestrian' + id);
+                $content.find('.eyecatch').find('img').attr('src', '/images/eyecatch_veyron.png');
+                $content.find('.eyecatch').find('p.name').text('Pedestrian' + id); // FIXME: change name
+                $content.find('.eyecatch').find('p.sender').text('');
+                $content.css('display', '');
+
+                // event listener
+                $li.on('click', (function(id) {
+                    return function() {
+                        onClickPedestrianTab(id);
+                    };
+                })(id));
+
+                $('#monitor-list').append($li);
+                $('#monitor-content').append($content);
+            }
+
+            function onClickPedestrianTab(id) {
+                simultra.focusOnPedestrian(id);
+            }
+
             /**
              * onLoad
              */
@@ -369,7 +401,18 @@
                 })());
                 simultra.on('onUpdateVehicle', (function(){
                     return function (id, entry, sender) {
-//                        console.log('!!!!!!!!!!! updated ' + entry.data.id + " location = " + JSON.stringify(entry.data.location));
+//                        console.log('!!!!!!!!!!! updated ' + id + " by " + sender + ": location = " + JSON.stringify(entry.data.location));
+                    };
+                })());
+
+                simultra.on('onAddPedestrian', (function() {
+                    return function (id, entry) {
+                        addPedestrianTab(id, entry);
+                    };
+                })());
+                simultra.on('onUpdatePedestrian', (function() {
+                    return function (id, entry, sender) {
+//                        console.log('!!!!!!!!!!! updated ' + id + " by " + sender + ": location = " + JSON.stringify(entry.data.location));
                     };
                 })());
             });

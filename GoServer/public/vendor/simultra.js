@@ -2236,7 +2236,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._getSimultra().focusOn(function (self, id) {
 	          return {
 	            point: function point() {
-	              var position = self._vehicles[id].object.vehicle.root.position;
+	              var position = self._pedestrians[id].object.pedestrian.root.position;
 	              return new _vizi2.default.Point(position.x, position.z);
 	            }
 	          };

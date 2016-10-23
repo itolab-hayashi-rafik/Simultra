@@ -190,6 +190,10 @@
     background: rgba(0,0,0,0.6);
 }
 
+#monitor-list li {
+    text-align: center;
+}
+
 #monitor-list li p {
     font-weight: 100;
     margin: 0;

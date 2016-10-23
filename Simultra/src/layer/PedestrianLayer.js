@@ -304,7 +304,7 @@ class PedestrianLayer extends Layer {
       this._getSimultra().focusOn((function(self, id) {
         return {
           point: function() {
-            var position = self._vehicles[id].object.vehicle.root.position;
+            var position = self._pedestrians[id].object.pedestrian.root.position;
             return new VIZI.Point(position.x, position.z);
           }
         };
