@@ -40,6 +40,7 @@ class Simultra extends EventEmitter {
 
     this._setupWorld(coords);
     this._setupLayers();
+    this._setupEvents();
     this._setupDebug();
   }
 
@@ -83,6 +84,21 @@ class Simultra extends EventEmitter {
     this._vehicleLayer    = this._options.renderVehicle    ? new VehicleLayer(this._options).addTo(this)    : null;
     // Pedestrian
     this._pedestrianLayer = this._options.renderPedestrian ? new PedestrianLayer(this._options).addTo(this) : null;
+  }
+
+  _setupEvents() {
+    var self = this;
+
+    // Vehicle
+    if (this._vehicleLayer) {
+      this._vehicleLayer.on('onAddVehicle', function(id, entry) { self.emit('onAddVehicle', id, entry); });
+      this._vehicleLayer.on('onUpdateVehicle', function(id, entry) { self.emit('onUpdateVehicle', id, entry); });
+    }
+    // Pedestrian
+    if (this._pedestrianLayer) {
+      this._pedestrianLayer.on('onAddPedestrian', function(id, entry) { self.emit('onAddPedestrian', id, entry); });
+      this._pedestrianLayer.on('onUpdatePedestrian', function(id, entry) { self.emit('onUpdatePedestrian', id, entry); });
+    }
   }
 
   _setupDebug() {

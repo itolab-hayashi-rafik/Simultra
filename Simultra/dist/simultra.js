@@ -152,6 +152,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _this._setupWorld(coords);
 	    _this._setupLayers();
+	    _this._setupEvents();
 	    _this._setupDebug();
 	    return _this;
 	  }
@@ -199,6 +200,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._vehicleLayer = this._options.renderVehicle ? new _VehicleLayer2.default(this._options).addTo(this) : null;
 	      // Pedestrian
 	      this._pedestrianLayer = this._options.renderPedestrian ? new _PedestrianLayer2.default(this._options).addTo(this) : null;
+	    }
+	  }, {
+	    key: '_setupEvents',
+	    value: function _setupEvents() {
+	      var self = this;
+	
+	      // Vehicle
+	      if (this._vehicleLayer) {
+	        this._vehicleLayer.on('onAddVehicle', function (id, entry) {
+	          self.emit('onAddVehicle', id, entry);
+	        });
+	        this._vehicleLayer.on('onUpdateVehicle', function (id, entry) {
+	          self.emit('onUpdateVehicle', id, entry);
+	        });
+	      }
+	      // Pedestrian
+	      if (this._pedestrianLayer) {
+	        this._pedestrianLayer.on('onAddPedestrian', function (id, entry) {
+	          self.emit('onAddPedestrian', id, entry);
+	        });
+	        this._pedestrianLayer.on('onUpdatePedestrian', function (id, entry) {
+	          self.emit('onUpdatePedestrian', id, entry);
+	        });
+	      }
 	    }
 	  }, {
 	    key: '_setupDebug',
@@ -2105,6 +2130,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._pedestrians[pedestrian.id] = entry;
 	
 	      console.log('added pedestrian: ' + JSON.stringify(pedestrian));
+	      this.emit('onAddPedestrian', pedestrian.id, entry);
 	      return entry;
 	    }
 	
@@ -2163,21 +2189,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_createWorkerCallback',
 	    value: function _createWorkerCallback() {
 	      return function (that) {
-	        var prevSender = '';
+	        var scopes = {};
+	        var defaultScope = {
+	          prevSender: ''
+	        };
+	
 	        return function (msg) {
 	          var sender = msg.sender;
 	          var pedestrian = msg.data;
 	
-	          var viziLayer = that._getViziLayer();
+	          // retrieve local scope for this pedestrian
+	          var scope = pedestrian.id in scopes ? scopes[pedestrian.id] : scopes[pedestrian.id] = (0, _extend2.default)({}, defaultScope);
 	
-	          // update the object in vizi layer
-	          if (prevSender !== sender) {
-	            viziLayer.setLabelClass(pedestrian.id, 'label pedestrian');
-	            viziLayer.setLabelText(pedestrian.id, sender);
-	            prevSender = sender;
+	          // update the object in simultra
+	          if (pedestrian.id in that._pedestrians) {
+	            var entry = that._pedestrians[pedestrian.id];
+	            entry.data = pedestrian;
+	
+	            var viziLayer = that._getViziLayer();
+	
+	            // update the object in vizi layer
+	            if (scope.prevSender !== sender) {
+	              viziLayer.setLabelClass(pedestrian.id, 'label pedestrian');
+	              viziLayer.setLabelText(pedestrian.id, sender);
+	            }
+	            viziLayer.setLocation(pedestrian.id, pedestrian.location.lat, pedestrian.location.lon, -pedestrian.angle);
+	            viziLayer.setVelocity(pedestrian.id, pedestrian.velocity, 0, 0, 0);
+	
+	            // emit
+	            that.emit('onUpdatePedestrian', pedestrian.id, entry);
 	          }
-	          viziLayer.setLocation(pedestrian.id, pedestrian.location.lat, pedestrian.location.lon, -pedestrian.angle);
-	          viziLayer.setVelocity(pedestrian.id, pedestrian.velocity, 0, 0, 0);
 	        };
 	      }(this);
 	    }
@@ -2744,10 +2785,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        data: vehicle,
 	        object: object
 	      };
-	      // this._vehicles[vehicle.id] = entry;
-	      this._vehicles.push(entry);
+	      this._vehicles[vehicle.id] = entry;
+	      // this._vehicles.push(entry);
 	
 	      console.log('added vehicle: ' + JSON.stringify(vehicle));
+	      this.emit('onAddVehicle', vehicle.id, entry);
 	      return entry;
 	    }
 	
@@ -2854,27 +2896,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: '_createWorkerCallback',
 	    value: function _createWorkerCallback() {
 	      return function (that) {
-	        var prevSender = '';
+	        var scopes = {};
+	        var defaultScope = {
+	          prevSender: ''
+	        };
 	
 	        return function (msg) {
 	          var sender = msg.sender;
 	          var vehicle = msg.data;
 	
-	          var viziLayer = that._getViziLayer();
+	          // retrieve local scope for this vehicle
+	          var scope = vehicle.id in scopes ? scopes[vehicle.id] : scopes[vehicle.id] = (0, _extend2.default)({}, defaultScope);
 	
-	          // update the object location in simultra
+	          // update the object in simultra
 	          if (vehicle.id in that._vehicles) {
-	            that._vehicles[vehicle.id].data = vehicle;
-	          }
+	            var entry = that._vehicles[vehicle.id];
+	            entry.data = vehicle;
 	
-	          // update the object in vizi layer
-	          if (prevSender !== sender) {
-	            viziLayer.setLabelClass(vehicle.id, 'label vehicle');
-	            viziLayer.setLabelText(vehicle.id, sender);
-	            prevSender = sender;
+	            var viziLayer = that._getViziLayer();
+	
+	            // update the object in vizi layer
+	            if (scope.prevSender !== sender) {
+	              viziLayer.setLabelClass(vehicle.id, 'label vehicle');
+	              viziLayer.setLabelText(vehicle.id, sender);
+	              scope.prevSender = sender;
+	            }
+	            viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, -vehicle.angle);
+	            viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
+	
+	            // emit
+	            that.emit('onUpdateVehicle', vehicle.id, entry);
 	          }
-	          viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, -vehicle.angle);
-	          viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
 	        };
 	      }(this);
 	    }
@@ -2909,8 +2961,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	
 	  }, {
-	    key: 'focusOn',
-	    value: function focusOn(id) {
+	    key: 'focusOnf',
+	    value: function focusOnf(id) {
 	      if (id in this._vehicles) {
 	        this._getSimultra().focusOn(function (self, id) {
 	          return {

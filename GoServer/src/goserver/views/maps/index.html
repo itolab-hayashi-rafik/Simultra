@@ -161,7 +161,7 @@
                         console.log('!!');
                         return function() {
                             // state
-                            if (simultra._options.followVehicles) {
+                            if (simultra._options.fixCamera) {
                                 $control.find('a#followVehicles').addClass('btn-primary');
                             } else {
                                 $control.find('a#followVehicles').removeClass('btn-primary');
@@ -171,7 +171,7 @@
 
                     // followVehicles button
                     $control.find('a#followVehicles').on('click', function() {
-                        simultra._options.followVehicles = !simultra._options.followVehicles;
+                        simultra._options.fixCamera = !simultra._options.fixCamera;
                         updateControl();
                     });
 
@@ -239,6 +239,18 @@
             $(document).ready(function() {
                 setupControl();
                 setupSimulationSettings();
+
+                // TODO: test code
+                simultra.on('onAddVehicle', (function(){
+                    return function (id, entry) {
+//                        console.log('!!!!!!!!!!! added ' + JSON.stringify(entry));
+                    };
+                })());
+                simultra.on('onUpdateVehicle', (function(){
+                    return function (id, entry) {
+//                        console.log('!!!!!!!!!!! updated ' + entry.data.id + " location = " + JSON.stringify(entry.data.location));
+                    };
+                })());
             });
         })($);
     </script>

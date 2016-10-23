@@ -1,3 +1,4 @@
+import extend from 'extend';
 import API from './io/API';
 
 const SimWorker = {

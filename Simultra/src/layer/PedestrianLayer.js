@@ -207,6 +207,7 @@ class PedestrianLayer extends Layer {
     this._pedestrians[pedestrian.id] = entry;
 
     console.log('added pedestrian: ' + JSON.stringify(pedestrian));
+    this.emit('onAddPedestrian', pedestrian.id, entry);
     return entry;
   }
 
@@ -259,21 +260,36 @@ class PedestrianLayer extends Layer {
 
   _createWorkerCallback() {
     return (function(that) {
-      var prevSender = '';
+      var scopes = {};
+      var defaultScope = {
+        prevSender: ''
+      };
+
       return function(msg) {
         var sender = msg.sender;
         var pedestrian = msg.data;
 
-        var viziLayer = that._getViziLayer();
+        // retrieve local scope for this pedestrian
+        var scope = (pedestrian.id in scopes) ? scopes[pedestrian.id] : (scopes[pedestrian.id] = extend({}, defaultScope));
 
-        // update the object in vizi layer
-        if (prevSender !== sender) {
-          viziLayer.setLabelClass(pedestrian.id, 'label pedestrian');
-          viziLayer.setLabelText(pedestrian.id, sender);
-          prevSender = sender;
+        // update the object in simultra
+        if (pedestrian.id in that._pedestrians) {
+          var entry = that._pedestrians[pedestrian.id];
+          entry.data = pedestrian;
+
+          var viziLayer = that._getViziLayer();
+
+          // update the object in vizi layer
+          if (scope.prevSender !== sender) {
+            viziLayer.setLabelClass(pedestrian.id, 'label pedestrian');
+            viziLayer.setLabelText(pedestrian.id, sender);
+          }
+          viziLayer.setLocation(pedestrian.id, pedestrian.location.lat, pedestrian.location.lon, -pedestrian.angle);
+          viziLayer.setVelocity(pedestrian.id, pedestrian.velocity, 0, 0, 0);
+
+          // emit
+          that.emit('onUpdatePedestrian', pedestrian.id, entry);
         }
-        viziLayer.setLocation(pedestrian.id, pedestrian.location.lat, pedestrian.location.lon, -pedestrian.angle);
-        viziLayer.setVelocity(pedestrian.id, pedestrian.velocity, 0, 0, 0);
       };
     })(this);
   }

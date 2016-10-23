@@ -68,8 +68,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var SimWorker = {
 	  API: _API2.default
-	};
-	
+	}; // import extend from 'extend';
 	exports.default = SimWorker;
 	
 	self.SimWorker = SimWorker;
@@ -133,7 +132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function API(baseUrl) {
 	    _classCallCheck(this, API);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(API).call(this));
+	    var _this = _possibleConstructorReturn(this, (API.__proto__ || Object.getPrototypeOf(API)).call(this));
 	
 	    _this.baseUrl = baseUrl;
 	    _this.wsBaseUrl = baseUrl.replace(/^https?:\/\//, 'ws://');

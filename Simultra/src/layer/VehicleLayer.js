@@ -206,10 +206,11 @@ class VehicleLayer extends Layer {
       data: vehicle,
       object: object
     };
-    // this._vehicles[vehicle.id] = entry;
-    this._vehicles.push(entry);
+    this._vehicles[vehicle.id] = entry;
+    // this._vehicles.push(entry);
 
     console.log('added vehicle: ' + JSON.stringify(vehicle));
+    this.emit('onAddVehicle', vehicle.id, entry);
     return entry;
   }
 
@@ -310,27 +311,37 @@ class VehicleLayer extends Layer {
 
   _createWorkerCallback() {
     return (function(that) {
-      var prevSender = '';
+      var scopes = {};
+      var defaultScope = {
+        prevSender: ''
+      };
 
       return function(msg) {
         var sender = msg.sender;
         var vehicle = msg.data;
 
-        var viziLayer = that._getViziLayer();
+        // retrieve local scope for this vehicle
+        var scope = (vehicle.id in scopes) ? scopes[vehicle.id] : (scopes[vehicle.id] = extend({}, defaultScope));
 
-        // update the object location in simultra
+        // update the object in simultra
         if (vehicle.id in that._vehicles) {
-          that._vehicles[vehicle.id].data = vehicle;
-        }
+          var entry = that._vehicles[vehicle.id];
+          entry.data = vehicle;
 
-        // update the object in vizi layer
-        if (prevSender !== sender) {
-          viziLayer.setLabelClass(vehicle.id, 'label vehicle');
-          viziLayer.setLabelText(vehicle.id, sender);
-          prevSender = sender;
+          var viziLayer = that._getViziLayer();
+
+          // update the object in vizi layer
+          if (scope.prevSender !== sender) {
+            viziLayer.setLabelClass(vehicle.id, 'label vehicle');
+            viziLayer.setLabelText(vehicle.id, sender);
+            scope.prevSender = sender;
+          }
+          viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, -vehicle.angle);
+          viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
+
+          // emit
+          that.emit('onUpdateVehicle', vehicle.id, entry);
         }
-        viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, -vehicle.angle);
-        viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
       };
     })(this);
   }
@@ -360,7 +371,7 @@ class VehicleLayer extends Layer {
    *
    * @param id
    */
-  focusOn(id) {
+  focusOnf(id) {
     if (id in this._vehicles) {
       this._getSimultra().focusOn((function(self, id) {
         return {
