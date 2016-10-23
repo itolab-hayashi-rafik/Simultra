@@ -350,6 +350,7 @@ class VehicleLayer extends Layer {
         // var angle = Math.acos(cos);
         // console.log('vehicle ' + vehicle.id + ': cos = ' + cos + ', angle = ' + angle);
         var angle = vehicle.angle * Math.PI / 180.;
+        angle += 90 * Math.PI / 180.; // TODO: temporary fix, adding 90 degrees to the original angle!!
 
         // update the object in vizi layer
         if (prevSender !== sender) {
@@ -358,7 +359,7 @@ class VehicleLayer extends Layer {
           prevSender = sender;
         }
         // viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, -vehicle.angle);
-        viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, angle);
+        viziLayer.setLocation(vehicle.id, vehicle.location.lat, vehicle.location.lon, -angle);
         viziLayer.setVelocity(vehicle.id, vehicle.velocity, 0, 0, vehicle.wheel);
       };
     })(this);
