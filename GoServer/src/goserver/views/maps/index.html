@@ -124,7 +124,7 @@
         </div>
     </div>
     <div id="monitor-toggle" class="closed">
-        <button>open</button>
+        <a href="javascript:void(0)" class="btn btn-primary btn-fab btn-fab-mini"><i class="material-icons">keyboard_arrow_up</i></a>
     </div>
 
     <!-- jQuery -->
@@ -308,17 +308,19 @@
                     var $monitorToggle = $('#monitor-toggle');
 
                     // button listener
-                    $monitorToggle.find('button').on('click', function() {
+                    $monitorToggle.find('a').on('click', function() {
                         if ($monitorToggle.hasClass('open')) {
                             // close the control
                             $('#monitor').removeClass('open').addClass('closed');
                             $monitorToggle.removeClass('open').addClass('closed');
-                            $(this).text('open');
+                            $(this).removeClass('btn-default').addClass('btn-primary');
+                            $(this).find('i').html('keyboard_arrow_up');
                         } else {
                             // open the control
                             $('#monitor').removeClass('closed').addClass('open');
                             $monitorToggle.removeClass('closed').addClass('open');
-                            $(this).text('close');
+                            $(this).removeClass('btn-primary').addClass('btn-default');
+                            $(this).find('i').html('keyboard_arrow_down');
                         }
                     });
                 });
