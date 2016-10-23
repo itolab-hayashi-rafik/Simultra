@@ -159,7 +159,7 @@
 }
 
 #monitor-toggle.closed {
-    bottom: 70px;
+    bottom: 60px;
 }
 
 #monitor-toggle button {
@@ -182,16 +182,26 @@
 }
 
 #monitor.closed {
-    height: 70px;
+    height: 60px;
 }
 
 #monitor-list {
-    height: 70px;
+    height: 60px;
     background: rgba(0,0,0,0.6);
+    border: none;
 }
 
 #monitor-list li {
     text-align: center;
+    width: 100px;
+}
+
+#monitor-list li.active {
+    background: rgba(0,0,0,0.1);
+}
+
+#monitor-list li.active i, #monitor-list li.active p {
+    color: #1ebfb4;
 }
 
 #monitor-list li p {
