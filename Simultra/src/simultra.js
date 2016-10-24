@@ -296,7 +296,7 @@ class Simultra extends EventEmitter {
       throw new Error('object needs to have a property or function named "latLon" that returns VIZI.LatLon location or "point" that returns VIZI.Point position');
     }
 
-    if (animate) {
+    if (object != null && animate) {
       (function(self, object) {
         var counter = { a: 0.0 };
         var focusedOn = {

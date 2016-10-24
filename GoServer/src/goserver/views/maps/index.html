@@ -99,6 +99,7 @@
     <div id="monitor" class="closed">
         <ul id="monitor-list" class="nav nav-tabs">
             <li class="template" style="display: none;"><a href="#tab-template" data-toggle="tab"><i class="material-icons">#</i><p>#</p></a></li>
+            <li id="reset"><a href="#tab-reset" data-toggle="tab"><p>&nbsp;</p></a></li>
         </ul>
         <div id="monitor-content" class="tab-content">
             <div class="tab-pane template" style="display: none;">
@@ -120,6 +121,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="tab-pane" id="tab-reset">
+
             </div>
         </div>
     </div>
@@ -326,6 +330,12 @@
                 });
             }
 
+            function setupResetButton() {
+                $('#monitor-list').find('li#reset').on('click', function() {
+                    simultra.focusOn(null);
+                });
+            }
+
             function addVehicleTab(id, entry) {
                 // retrieve dom template
                 var $li = $('#monitor-list').find('.template').clone().removeClass('template');
@@ -395,6 +405,7 @@
              */
             $(document).ready(function() {
                 setupToggle();
+                setupResetButton();
 
                 simultra.on('onAddVehicle', (function(){
                     return function (id, entry) {
