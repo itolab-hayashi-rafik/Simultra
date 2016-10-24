@@ -132,7 +132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function Simultra(baseUrl, defaultCoords, options) {
 	    _classCallCheck(this, Simultra);
 	
-	    var _this = _possibleConstructorReturn(this, (Simultra.__proto__ || Object.getPrototypeOf(Simultra)).call(this));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Simultra).call(this));
 	
 	    console.log(_TweenLite2.default);
 	
@@ -988,7 +988,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, (BasemapLayer.__proto__ || Object.getPrototypeOf(BasemapLayer)).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BasemapLayer).call(this, _options));
 	
 	    _this._setup();
 	    return _this;
@@ -1042,6 +1042,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Base Layer class
 	 */
+	
 	var Layer = function (_EventEmitter) {
 	  _inherits(Layer, _EventEmitter);
 	
@@ -1049,7 +1050,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, Layer);
 	
 	    // delegate layer
-	    var _this = _possibleConstructorReturn(this, (Layer.__proto__ || Object.getPrototypeOf(Layer)).call(this));
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Layer).call(this));
 	
 	    _this._viziLayer = null;
 	    _this._options = options;
@@ -1156,6 +1158,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Utility
 	 */
+	
+	
 	var Util = {};
 	
 	Util.BuildingUtils = _BuildingUtils2.default;
@@ -1188,6 +1192,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Building Utilities
 	 */
+	
+	
 	var BuildingUtils = function () {
 	
 	  /**
@@ -1244,6 +1250,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Footway Utilities
 	 */
+	
+	
 	var FootwayUtils = function () {
 	
 	  /**
@@ -1662,7 +1670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, (BuildingLayer.__proto__ || Object.getPrototypeOf(BuildingLayer)).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BuildingLayer).call(this, _options));
 	
 	    _this._setup();
 	    return _this;
@@ -1674,7 +1682,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Buildings from Mapzen
 	      // var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/buildings/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
-	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/buildings/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+	      // var viziLayer = VIZI.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/buildings/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+	      var viziLayer = _vizi2.default.geoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/buildings/{z}/{x}/{y}.json?api_key=mapzen-2PvEx4B', {
 	        interactive: false,
 	        maxLOD: 14,
 	        style: function style(feature) {
@@ -1751,7 +1760,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, (FootwayLayer.__proto__ || Object.getPrototypeOf(FootwayLayer)).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(FootwayLayer).call(this, _options));
 	
 	    _this._setup();
 	    return _this;
@@ -1765,7 +1774,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Landuses from Mapzen
 	      // var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/landuse,roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
-	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/landuse,roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+	      // var viziLayer = VIZI.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/landuse,roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+	      var viziLayer = _vizi2.default.geoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/landuse,roads/{z}/{x}/{y}.json?api_key=mapzen-2PvEx4B', {
 	        interactive: false,
 	        maxLOD: 18,
 	        style: function style(feature) {
@@ -1857,7 +1867,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, (HighwayLayer.__proto__ || Object.getPrototypeOf(HighwayLayer)).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HighwayLayer).call(this, _options));
 	
 	    _this._setup();
 	    return _this;
@@ -1871,7 +1881,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Roads from Mapzen
 	      // var viziLayer = VIZI.topoJSONTileLayer('https://vector.mapzen.com/osm/roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
-	      var viziLayer = _vizi2.default.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+	      // var viziLayer = VIZI.topoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/roads/{z}/{x}/{y}.topojson?api_key=mapzen-2PvEx4B', {
+	      var viziLayer = _vizi2.default.geoJSONTileLayer('https://tile.mapzen.com/mapzen/vector/v1/roads/{z}/{x}/{y}.json?api_key=mapzen-2PvEx4B', {
 	        interactive: false,
 	        maxLOD: 18,
 	        style: function style(feature) {
@@ -1981,7 +1992,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, (PedestrianLayer.__proto__ || Object.getPrototypeOf(PedestrianLayer)).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PedestrianLayer).call(this, _options));
 	
 	    _this._pedestrians = [];
 	
@@ -2017,7 +2028,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onAdd',
 	    value: function _onAdd(simultra) {
-	      _get(PedestrianLayer.prototype.__proto__ || Object.getPrototypeOf(PedestrianLayer.prototype), '_onAdd', this).call(this, simultra);
+	      _get(Object.getPrototypeOf(PedestrianLayer.prototype), '_onAdd', this).call(this, simultra);
 	
 	      // create the worker thread for websocket
 	      this._worker = operative(this._createWorker(), _WorkerUtils2.default.getDependencies());
@@ -2025,7 +2036,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onRemove',
 	    value: function _onRemove() {
-	      _get(PedestrianLayer.prototype.__proto__ || Object.getPrototypeOf(PedestrianLayer.prototype), '_onRemove', this).call(this);
+	      _get(Object.getPrototypeOf(PedestrianLayer.prototype), '_onRemove', this).call(this);
 	
 	      // destroy the worker
 	      this._worker = null;
@@ -2368,7 +2379,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function API(baseUrl) {
 	    _classCallCheck(this, API);
 	
-	    var _this = _possibleConstructorReturn(this, (API.__proto__ || Object.getPrototypeOf(API)).call(this));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(API).call(this));
 	
 	    _this.baseUrl = baseUrl;
 	    _this.wsBaseUrl = baseUrl.replace(/^https?:\/\//, 'ws://');
@@ -2638,7 +2649,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _options = (0, _extend2.default)({}, defaultOptions, options);
 	
-	    var _this = _possibleConstructorReturn(this, (VehicleLayer.__proto__ || Object.getPrototypeOf(VehicleLayer)).call(this, _options));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(VehicleLayer).call(this, _options));
 	
 	    _this._vehicles = [];
 	
@@ -2676,7 +2687,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onAdd',
 	    value: function _onAdd(simultra) {
-	      _get(VehicleLayer.prototype.__proto__ || Object.getPrototypeOf(VehicleLayer.prototype), '_onAdd', this).call(this, simultra);
+	      _get(Object.getPrototypeOf(VehicleLayer.prototype), '_onAdd', this).call(this, simultra);
 	
 	      // create the worker thread for websocket
 	      this._worker = (0, _operative2.default)(this._createWorker(), _WorkerUtils2.default.getDependencies());
@@ -2684,7 +2695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_onRemove',
 	    value: function _onRemove() {
-	      _get(VehicleLayer.prototype.__proto__ || Object.getPrototypeOf(VehicleLayer.prototype), '_onRemove', this).call(this);
+	      _get(Object.getPrototypeOf(VehicleLayer.prototype), '_onRemove', this).call(this);
 	
 	      // destroy the worker
 	      this._worker = null;
