@@ -251,20 +251,27 @@
                     var updateStates = (function($form) {
                         return function() {
                             // retrieve the simulator status
-                            simultra.isSimulationRunning()
-                                    .then(function (data) {
-                                        if (data.isRunning) {
-                                            $form.find('button#stop').prop('disabled', false);
-                                            $form.find('button#run').prop('disabled', true);
+//                            simultra.isSimulationRunning()
+//                                    .then(function (data) {
+//                                        if (data.isRunning) {
+//                                            $form.find('button#stop').prop('disabled', false);
+//                                            $form.find('button#run').prop('disabled', true);
+//
+//                                            $control.find('span#state_span').text("RUNNING");
+//                                        } else {
+//                                            $form.find('button#stop').prop('disabled', true);
+//                                            $form.find('button#run').prop('disabled', false);
+//
+//                                            $control.find('span#state_span').text("not running");
+//                                        }
+//                                    })
 
-                                            $control.find('span#state_span').text("RUNNING");
-                                        } else {
-                                            $form.find('button#stop').prop('disabled', true);
-                                            $form.find('button#run').prop('disabled', false);
 
-                                            $control.find('span#state_span').text("not running");
-                                        }
-                                    })
+                            // TODO: temporal code for cheating
+                            $form.find('button#stop').prop('disabled', false);
+                            $form.find('button#run').prop('disabled', true);
+
+                            $control.find('span#state_span').text("RUNNING");
                         }
                     })($form);
 
