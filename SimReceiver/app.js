@@ -27,7 +27,7 @@ function Client(socket) {
     }
   };
   this.pedestrian = {
-    type: 'monkey',
+    type: 'simpleMan',
     location: {
       lat: 35.169555,
       lon: 136.900831

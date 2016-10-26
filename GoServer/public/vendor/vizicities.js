@@ -7,7 +7,7 @@
 		exports["VIZI"] = factory(require("THREE"), require("TweenLite"), require("operative"));
 	else
 		root["VIZI"] = factory(root["THREE"], root["TweenLite"], root["operative"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_8__, __WEBPACK_EXTERNAL_MODULE_38__, __WEBPACK_EXTERNAL_MODULE_82__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_10__, __WEBPACK_EXTERNAL_MODULE_41__, __WEBPACK_EXTERNAL_MODULE_85__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -64,75 +64,75 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _World2 = _interopRequireDefault(_World);
 	
-	var _controlsIndex = __webpack_require__(34);
+	var _controlsIndex = __webpack_require__(37);
 	
 	var _controlsIndex2 = _interopRequireDefault(_controlsIndex);
 	
-	var _geoGeoJs = __webpack_require__(4);
+	var _geoGeoJs = __webpack_require__(6);
 	
 	var _geoGeoJs2 = _interopRequireDefault(_geoGeoJs);
 	
-	var _layerLayer = __webpack_require__(30);
+	var _layerLayer = __webpack_require__(32);
 	
 	var _layerLayer2 = _interopRequireDefault(_layerLayer);
 	
-	var _layerEnvironmentEnvironmentLayer = __webpack_require__(29);
+	var _layerEnvironmentEnvironmentLayer = __webpack_require__(31);
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 	
-	var _layerTileImageTileLayer = __webpack_require__(39);
+	var _layerTileImageTileLayer = __webpack_require__(42);
 	
 	var _layerTileImageTileLayer2 = _interopRequireDefault(_layerTileImageTileLayer);
 	
-	var _layerTileGeoJSONTileLayer = __webpack_require__(54);
+	var _layerTileGeoJSONTileLayer = __webpack_require__(57);
 	
 	var _layerTileGeoJSONTileLayer2 = _interopRequireDefault(_layerTileGeoJSONTileLayer);
 	
-	var _layerTileTopoJSONTileLayer = __webpack_require__(72);
+	var _layerTileTopoJSONTileLayer = __webpack_require__(75);
 	
 	var _layerTileTopoJSONTileLayer2 = _interopRequireDefault(_layerTileTopoJSONTileLayer);
 	
-	var _layerGeoJSONLayer = __webpack_require__(56);
+	var _layerGeoJSONLayer = __webpack_require__(59);
 	
 	var _layerGeoJSONLayer2 = _interopRequireDefault(_layerGeoJSONLayer);
 	
-	var _layerTopoJSONLayer = __webpack_require__(73);
+	var _layerTopoJSONLayer = __webpack_require__(76);
 	
 	var _layerTopoJSONLayer2 = _interopRequireDefault(_layerTopoJSONLayer);
 	
-	var _layerGeometryPolygonLayer = __webpack_require__(69);
+	var _layerGeometryPolygonLayer = __webpack_require__(72);
 	
 	var _layerGeometryPolygonLayer2 = _interopRequireDefault(_layerGeometryPolygonLayer);
 	
-	var _layerGeometryPolylineLayer = __webpack_require__(70);
+	var _layerGeometryPolylineLayer = __webpack_require__(73);
 	
 	var _layerGeometryPolylineLayer2 = _interopRequireDefault(_layerGeometryPolylineLayer);
 	
-	var _layerGeometryPointLayer = __webpack_require__(71);
+	var _layerGeometryPointLayer = __webpack_require__(74);
 	
 	var _layerGeometryPointLayer2 = _interopRequireDefault(_layerGeometryPointLayer);
 	
-	var _layerObjectPedestrianLayer = __webpack_require__(74);
+	var _layerObjectPedestrianLayer = __webpack_require__(77);
 	
 	var _layerObjectPedestrianLayer2 = _interopRequireDefault(_layerObjectPedestrianLayer);
 	
-	var _layerObjectVehicleLayer = __webpack_require__(89);
+	var _layerObjectVehicleLayer = __webpack_require__(92);
 	
 	var _layerObjectVehicleLayer2 = _interopRequireDefault(_layerObjectVehicleLayer);
 	
-	var _geoPoint = __webpack_require__(6);
+	var _geoPoint = __webpack_require__(8);
 	
 	var _geoPoint2 = _interopRequireDefault(_geoPoint);
 	
-	var _geoLatLon = __webpack_require__(5);
+	var _geoLatLon = __webpack_require__(7);
 	
 	var _geoLatLon2 = _interopRequireDefault(_geoLatLon);
 	
-	var _enginePickingMaterial = __webpack_require__(67);
+	var _enginePickingMaterial = __webpack_require__(70);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilIndex = __webpack_require__(92);
+	var _utilIndex = __webpack_require__(95);
 	
 	var _utilIndex2 = _interopRequireDefault(_utilIndex);
 	
@@ -205,19 +205,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _geoGeo = __webpack_require__(4);
+	var _geoGeo = __webpack_require__(6);
 	
 	var _geoGeo2 = _interopRequireDefault(_geoGeo);
 	
-	var _geoPoint = __webpack_require__(6);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _geoLatLon = __webpack_require__(5);
+	var _geoLatLon = __webpack_require__(7);
 	
-	var _engineEngine = __webpack_require__(7);
+	var _engineEngine = __webpack_require__(9);
 	
 	var _engineEngine2 = _interopRequireDefault(_engineEngine);
 	
-	var _layerEnvironmentEnvironmentLayer = __webpack_require__(29);
+	var _layerEnvironmentEnvironmentLayer = __webpack_require__(31);
 	
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 	
@@ -888,7 +888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * lodash (Custom Build) <https://lodash.com/>
@@ -898,70 +898,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
 	 * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 */
+	var keys = __webpack_require__(4),
+	    rest = __webpack_require__(5);
 	
 	/** Used as references for various `Number` constants. */
 	var MAX_SAFE_INTEGER = 9007199254740991;
 	
 	/** `Object#toString` result references. */
-	var argsTag = '[object Arguments]',
-	    funcTag = '[object Function]',
+	var funcTag = '[object Function]',
 	    genTag = '[object GeneratorFunction]';
 	
 	/** Used to detect unsigned integer values. */
 	var reIsUint = /^(?:0|[1-9]\d*)$/;
-	
-	/**
-	 * A faster alternative to `Function#apply`, this function invokes `func`
-	 * with the `this` binding of `thisArg` and the arguments of `args`.
-	 *
-	 * @private
-	 * @param {Function} func The function to invoke.
-	 * @param {*} thisArg The `this` binding of `func`.
-	 * @param {Array} args The arguments to invoke `func` with.
-	 * @returns {*} Returns the result of `func`.
-	 */
-	function apply(func, thisArg, args) {
-	  switch (args.length) {
-	    case 0: return func.call(thisArg);
-	    case 1: return func.call(thisArg, args[0]);
-	    case 2: return func.call(thisArg, args[0], args[1]);
-	    case 3: return func.call(thisArg, args[0], args[1], args[2]);
-	  }
-	  return func.apply(thisArg, args);
-	}
-	
-	/**
-	 * The base implementation of `_.times` without support for iteratee shorthands
-	 * or max array length checks.
-	 *
-	 * @private
-	 * @param {number} n The number of times to invoke `iteratee`.
-	 * @param {Function} iteratee The function invoked per iteration.
-	 * @returns {Array} Returns the array of results.
-	 */
-	function baseTimes(n, iteratee) {
-	  var index = -1,
-	      result = Array(n);
-	
-	  while (++index < n) {
-	    result[index] = iteratee(index);
-	  }
-	  return result;
-	}
-	
-	/**
-	 * Creates a unary function that invokes `func` with its argument transformed.
-	 *
-	 * @private
-	 * @param {Function} func The function to wrap.
-	 * @param {Function} transform The argument transform.
-	 * @returns {Function} Returns the new function.
-	 */
-	function overArg(func, transform) {
-	  return function(arg) {
-	    return func(transform(arg));
-	  };
-	}
 	
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -971,7 +919,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/**
 	 * Used to resolve the
-	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
 	 * of values.
 	 */
 	var objectToString = objectProto.toString;
@@ -979,43 +927,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** Built-in value references. */
 	var propertyIsEnumerable = objectProto.propertyIsEnumerable;
 	
-	/* Built-in method references for those with the same name as other `lodash` methods. */
-	var nativeKeys = overArg(Object.keys, Object),
-	    nativeMax = Math.max;
-	
 	/** Detect if properties shadowing those on `Object.prototype` are non-enumerable. */
 	var nonEnumShadows = !propertyIsEnumerable.call({ 'valueOf': 1 }, 'valueOf');
 	
 	/**
-	 * Creates an array of the enumerable property names of the array-like `value`.
-	 *
-	 * @private
-	 * @param {*} value The value to query.
-	 * @param {boolean} inherited Specify returning inherited property names.
-	 * @returns {Array} Returns the array of property names.
-	 */
-	function arrayLikeKeys(value, inherited) {
-	  // Safari 8.1 makes `arguments.callee` enumerable in strict mode.
-	  // Safari 9 makes `arguments.length` enumerable in strict mode.
-	  var result = (isArray(value) || isArguments(value))
-	    ? baseTimes(value.length, String)
-	    : [];
-	
-	  var length = result.length,
-	      skipIndexes = !!length;
-	
-	  for (var key in value) {
-	    if ((inherited || hasOwnProperty.call(value, key)) &&
-	        !(skipIndexes && (key == 'length' || isIndex(key, length)))) {
-	      result.push(key);
-	    }
-	  }
-	  return result;
-	}
-	
-	/**
 	 * Assigns `value` to `key` of `object` if the existing value is not equivalent
-	 * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+	 * using [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
 	 * for equality comparisons.
 	 *
 	 * @private
@@ -1032,51 +949,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
+	 * The base implementation of `_.property` without support for deep paths.
 	 *
 	 * @private
-	 * @param {Object} object The object to query.
-	 * @returns {Array} Returns the array of property names.
+	 * @param {string} key The key of the property to get.
+	 * @returns {Function} Returns the new accessor function.
 	 */
-	function baseKeys(object) {
-	  if (!isPrototype(object)) {
-	    return nativeKeys(object);
-	  }
-	  var result = [];
-	  for (var key in Object(object)) {
-	    if (hasOwnProperty.call(object, key) && key != 'constructor') {
-	      result.push(key);
-	    }
-	  }
-	  return result;
-	}
-	
-	/**
-	 * The base implementation of `_.rest` which doesn't validate or coerce arguments.
-	 *
-	 * @private
-	 * @param {Function} func The function to apply a rest parameter to.
-	 * @param {number} [start=func.length-1] The start position of the rest parameter.
-	 * @returns {Function} Returns the new function.
-	 */
-	function baseRest(func, start) {
-	  start = nativeMax(start === undefined ? (func.length - 1) : start, 0);
-	  return function() {
-	    var args = arguments,
-	        index = -1,
-	        length = nativeMax(args.length - start, 0),
-	        array = Array(length);
-	
-	    while (++index < length) {
-	      array[index] = args[start + index];
-	    }
-	    index = -1;
-	    var otherArgs = Array(start + 1);
-	    while (++index < start) {
-	      otherArgs[index] = args[index];
-	    }
-	    otherArgs[start] = array;
-	    return apply(func, this, otherArgs);
+	function baseProperty(key) {
+	  return function(object) {
+	    return object == null ? undefined : object[key];
 	  };
 	}
 	
@@ -1101,9 +982,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var newValue = customizer
 	      ? customizer(object[key], source[key], key, object, source)
-	      : undefined;
+	      : source[key];
 	
-	    assignValue(object, key, newValue === undefined ? source[key] : newValue);
+	    assignValue(object, key, newValue);
 	  }
 	  return object;
 	}
@@ -1116,7 +997,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {Function} Returns the new assigner function.
 	 */
 	function createAssigner(assigner) {
-	  return baseRest(function(object, sources) {
+	  return rest(function(object, sources) {
 	    var index = -1,
 	        length = sources.length,
 	        customizer = length > 1 ? sources[length - 1] : undefined,
@@ -1140,6 +1021,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return object;
 	  });
 	}
+	
+	/**
+	 * Gets the "length" property value of `object`.
+	 *
+	 * **Note:** This function is used to avoid a
+	 * [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792) that affects
+	 * Safari on at least iOS 8.1-8.3 ARM64.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @returns {*} Returns the "length" value.
+	 */
+	var getLength = baseProperty('length');
 	
 	/**
 	 * Checks if `value` is a valid array-like index.
@@ -1196,7 +1090,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/**
 	 * Performs a
-	 * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+	 * [`SameValueZero`](http://ecma-international.org/ecma-262/6.0/#sec-samevaluezero)
 	 * comparison between two values to determine if they are equivalent.
 	 *
 	 * @static
@@ -1208,8 +1102,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
 	 * @example
 	 *
-	 * var object = { 'a': 1 };
-	 * var other = { 'a': 1 };
+	 * var object = { 'user': 'fred' };
+	 * var other = { 'user': 'fred' };
 	 *
 	 * _.eq(object, object);
 	 * // => true
@@ -1231,6 +1125,345 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
+	 * Checks if `value` is array-like. A value is considered array-like if it's
+	 * not a function and has a `value.length` that's an integer greater than or
+	 * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
+	 * @example
+	 *
+	 * _.isArrayLike([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isArrayLike(document.body.children);
+	 * // => true
+	 *
+	 * _.isArrayLike('abc');
+	 * // => true
+	 *
+	 * _.isArrayLike(_.noop);
+	 * // => false
+	 */
+	function isArrayLike(value) {
+	  return value != null && isLength(getLength(value)) && !isFunction(value);
+	}
+	
+	/**
+	 * Checks if `value` is classified as a `Function` object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
+	 * @example
+	 *
+	 * _.isFunction(_);
+	 * // => true
+	 *
+	 * _.isFunction(/abc/);
+	 * // => false
+	 */
+	function isFunction(value) {
+	  // The use of `Object#toString` avoids issues with the `typeof` operator
+	  // in Safari 8 which returns 'object' for typed array and weak map constructors,
+	  // and PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+	  var tag = isObject(value) ? objectToString.call(value) : '';
+	  return tag == funcTag || tag == genTag;
+	}
+	
+	/**
+	 * Checks if `value` is a valid array-like length.
+	 *
+	 * **Note:** This function is loosely based on
+	 * [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a valid length,
+	 *  else `false`.
+	 * @example
+	 *
+	 * _.isLength(3);
+	 * // => true
+	 *
+	 * _.isLength(Number.MIN_VALUE);
+	 * // => false
+	 *
+	 * _.isLength(Infinity);
+	 * // => false
+	 *
+	 * _.isLength('3');
+	 * // => false
+	 */
+	function isLength(value) {
+	  return typeof value == 'number' &&
+	    value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+	}
+	
+	/**
+	 * Checks if `value` is the
+	 * [language type](http://www.ecma-international.org/ecma-262/6.0/#sec-ecmascript-language-types)
+	 * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(_.noop);
+	 * // => true
+	 *
+	 * _.isObject(null);
+	 * // => false
+	 */
+	function isObject(value) {
+	  var type = typeof value;
+	  return !!value && (type == 'object' || type == 'function');
+	}
+	
+	/**
+	 * Assigns own enumerable string keyed properties of source objects to the
+	 * destination object. Source objects are applied from left to right.
+	 * Subsequent sources overwrite property assignments of previous sources.
+	 *
+	 * **Note:** This method mutates `object` and is loosely based on
+	 * [`Object.assign`](https://mdn.io/Object/assign).
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.10.0
+	 * @category Object
+	 * @param {Object} object The destination object.
+	 * @param {...Object} [sources] The source objects.
+	 * @returns {Object} Returns `object`.
+	 * @see _.assignIn
+	 * @example
+	 *
+	 * function Foo() {
+	 *   this.c = 3;
+	 * }
+	 *
+	 * function Bar() {
+	 *   this.e = 5;
+	 * }
+	 *
+	 * Foo.prototype.d = 4;
+	 * Bar.prototype.f = 6;
+	 *
+	 * _.assign({ 'a': 1 }, new Foo, new Bar);
+	 * // => { 'a': 1, 'c': 3, 'e': 5 }
+	 */
+	var assign = createAssigner(function(object, source) {
+	  if (nonEnumShadows || isPrototype(source) || isArrayLike(source)) {
+	    copyObject(source, keys(source), object);
+	    return;
+	  }
+	  for (var key in source) {
+	    if (hasOwnProperty.call(source, key)) {
+	      assignValue(object, key, source[key]);
+	    }
+	  }
+	});
+	
+	module.exports = assign;
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	/**
+	 * lodash (Custom Build) <https://lodash.com/>
+	 * Build: `lodash modularize exports="npm" -o ./`
+	 * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+	 * Released under MIT license <https://lodash.com/license>
+	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+	 * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 */
+	
+	/** Used as references for various `Number` constants. */
+	var MAX_SAFE_INTEGER = 9007199254740991;
+	
+	/** `Object#toString` result references. */
+	var argsTag = '[object Arguments]',
+	    funcTag = '[object Function]',
+	    genTag = '[object GeneratorFunction]',
+	    stringTag = '[object String]';
+	
+	/** Used to detect unsigned integer values. */
+	var reIsUint = /^(?:0|[1-9]\d*)$/;
+	
+	/**
+	 * The base implementation of `_.times` without support for iteratee shorthands
+	 * or max array length checks.
+	 *
+	 * @private
+	 * @param {number} n The number of times to invoke `iteratee`.
+	 * @param {Function} iteratee The function invoked per iteration.
+	 * @returns {Array} Returns the array of results.
+	 */
+	function baseTimes(n, iteratee) {
+	  var index = -1,
+	      result = Array(n);
+	
+	  while (++index < n) {
+	    result[index] = iteratee(index);
+	  }
+	  return result;
+	}
+	
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+	
+	/** Used to check objects for own properties. */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+	
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objectToString = objectProto.toString;
+	
+	/** Built-in value references. */
+	var propertyIsEnumerable = objectProto.propertyIsEnumerable;
+	
+	/* Built-in method references for those with the same name as other `lodash` methods. */
+	var nativeGetPrototype = Object.getPrototypeOf,
+	    nativeKeys = Object.keys;
+	
+	/**
+	 * The base implementation of `_.has` without support for deep paths.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @param {Array|string} key The key to check.
+	 * @returns {boolean} Returns `true` if `key` exists, else `false`.
+	 */
+	function baseHas(object, key) {
+	  // Avoid a bug in IE 10-11 where objects with a [[Prototype]] of `null`,
+	  // that are composed entirely of index properties, return `false` for
+	  // `hasOwnProperty` checks of them.
+	  return hasOwnProperty.call(object, key) ||
+	    (typeof object == 'object' && key in object && getPrototype(object) === null);
+	}
+	
+	/**
+	 * The base implementation of `_.keys` which doesn't skip the constructor
+	 * property of prototypes or treat sparse arrays as dense.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @returns {Array} Returns the array of property names.
+	 */
+	function baseKeys(object) {
+	  return nativeKeys(Object(object));
+	}
+	
+	/**
+	 * The base implementation of `_.property` without support for deep paths.
+	 *
+	 * @private
+	 * @param {string} key The key of the property to get.
+	 * @returns {Function} Returns the new accessor function.
+	 */
+	function baseProperty(key) {
+	  return function(object) {
+	    return object == null ? undefined : object[key];
+	  };
+	}
+	
+	/**
+	 * Gets the "length" property value of `object`.
+	 *
+	 * **Note:** This function is used to avoid a
+	 * [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792) that affects
+	 * Safari on at least iOS 8.1-8.3 ARM64.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @returns {*} Returns the "length" value.
+	 */
+	var getLength = baseProperty('length');
+	
+	/**
+	 * Gets the `[[Prototype]]` of `value`.
+	 *
+	 * @private
+	 * @param {*} value The value to query.
+	 * @returns {null|Object} Returns the `[[Prototype]]`.
+	 */
+	function getPrototype(value) {
+	  return nativeGetPrototype(Object(value));
+	}
+	
+	/**
+	 * Creates an array of index keys for `object` values of arrays,
+	 * `arguments` objects, and strings, otherwise `null` is returned.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @returns {Array|null} Returns index keys, else `null`.
+	 */
+	function indexKeys(object) {
+	  var length = object ? object.length : undefined;
+	  if (isLength(length) &&
+	      (isArray(object) || isString(object) || isArguments(object))) {
+	    return baseTimes(length, String);
+	  }
+	  return null;
+	}
+	
+	/**
+	 * Checks if `value` is a valid array-like index.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
+	 * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
+	 */
+	function isIndex(value, length) {
+	  length = length == null ? MAX_SAFE_INTEGER : length;
+	  return !!length &&
+	    (typeof value == 'number' || reIsUint.test(value)) &&
+	    (value > -1 && value % 1 == 0 && value < length);
+	}
+	
+	/**
+	 * Checks if `value` is likely a prototype object.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a prototype, else `false`.
+	 */
+	function isPrototype(value) {
+	  var Ctor = value && value.constructor,
+	      proto = (typeof Ctor == 'function' && Ctor.prototype) || objectProto;
+	
+	  return value === proto;
+	}
+	
+	/**
 	 * Checks if `value` is likely an `arguments` object.
 	 *
 	 * @static
@@ -1238,7 +1471,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @since 0.1.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is an `arguments` object,
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
 	 *  else `false`.
 	 * @example
 	 *
@@ -1249,7 +1482,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * // => false
 	 */
 	function isArguments(value) {
-	  // Safari 8.1 makes `arguments.callee` enumerable in strict mode.
+	  // Safari 8.1 incorrectly makes `arguments.callee` enumerable in strict mode.
 	  return isArrayLikeObject(value) && hasOwnProperty.call(value, 'callee') &&
 	    (!propertyIsEnumerable.call(value, 'callee') || objectToString.call(value) == argsTag);
 	}
@@ -1260,9 +1493,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @static
 	 * @memberOf _
 	 * @since 0.1.0
+	 * @type {Function}
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is an array, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isArray([1, 2, 3]);
@@ -1305,7 +1540,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * // => false
 	 */
 	function isArrayLike(value) {
-	  return value != null && isLength(value.length) && !isFunction(value);
+	  return value != null && isLength(getLength(value)) && !isFunction(value);
 	}
 	
 	/**
@@ -1345,7 +1580,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @since 0.1.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a function, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isFunction(_);
@@ -1356,7 +1592,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function isFunction(value) {
 	  // The use of `Object#toString` avoids issues with the `typeof` operator
-	  // in Safari 8-9 which returns 'object' for typed array and other constructors.
+	  // in Safari 8 which returns 'object' for typed array and weak map constructors,
+	  // and PhantomJS 1.9 which returns 'function' for `NodeList` instances.
 	  var tag = isObject(value) ? objectToString.call(value) : '';
 	  return tag == funcTag || tag == genTag;
 	}
@@ -1364,15 +1601,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Checks if `value` is a valid array-like length.
 	 *
-	 * **Note:** This method is loosely based on
-	 * [`ToLength`](http://ecma-international.org/ecma-262/7.0/#sec-tolength).
+	 * **Note:** This function is loosely based on
+	 * [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
 	 *
 	 * @static
 	 * @memberOf _
 	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is a valid length,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isLength(3);
@@ -1394,7 +1632,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/**
 	 * Checks if `value` is the
-	 * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+	 * [language type](http://www.ecma-international.org/ecma-262/6.0/#sec-ecmascript-language-types)
 	 * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
 	 *
 	 * @static
@@ -1451,54 +1689,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Assigns own enumerable string keyed properties of source objects to the
-	 * destination object. Source objects are applied from left to right.
-	 * Subsequent sources overwrite property assignments of previous sources.
-	 *
-	 * **Note:** This method mutates `object` and is loosely based on
-	 * [`Object.assign`](https://mdn.io/Object/assign).
+	 * Checks if `value` is classified as a `String` primitive or object.
 	 *
 	 * @static
+	 * @since 0.1.0
 	 * @memberOf _
-	 * @since 0.10.0
-	 * @category Object
-	 * @param {Object} object The destination object.
-	 * @param {...Object} [sources] The source objects.
-	 * @returns {Object} Returns `object`.
-	 * @see _.assignIn
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
 	 * @example
 	 *
-	 * function Foo() {
-	 *   this.a = 1;
-	 * }
+	 * _.isString('abc');
+	 * // => true
 	 *
-	 * function Bar() {
-	 *   this.c = 3;
-	 * }
-	 *
-	 * Foo.prototype.b = 2;
-	 * Bar.prototype.d = 4;
-	 *
-	 * _.assign({ 'a': 0 }, new Foo, new Bar);
-	 * // => { 'a': 1, 'c': 3 }
+	 * _.isString(1);
+	 * // => false
 	 */
-	var assign = createAssigner(function(object, source) {
-	  if (nonEnumShadows || isPrototype(source) || isArrayLike(source)) {
-	    copyObject(source, keys(source), object);
-	    return;
-	  }
-	  for (var key in source) {
-	    if (hasOwnProperty.call(source, key)) {
-	      assignValue(object, key, source[key]);
-	    }
-	  }
-	});
+	function isString(value) {
+	  return typeof value == 'string' ||
+	    (!isArray(value) && isObjectLike(value) && objectToString.call(value) == stringTag);
+	}
 	
 	/**
 	 * Creates an array of the own enumerable property names of `object`.
 	 *
 	 * **Note:** Non-object values are coerced to objects. See the
-	 * [ES spec](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
+	 * [ES spec](http://ecma-international.org/ecma-262/6.0/#sec-object.keys)
 	 * for more details.
 	 *
 	 * @static
@@ -1523,23 +1740,390 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * // => ['0', '1']
 	 */
 	function keys(object) {
-	  return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
+	  var isProto = isPrototype(object);
+	  if (!(isProto || isArrayLike(object))) {
+	    return baseKeys(object);
+	  }
+	  var indexes = indexKeys(object),
+	      skipIndexes = !!indexes,
+	      result = indexes || [],
+	      length = result.length;
+	
+	  for (var key in object) {
+	    if (baseHas(object, key) &&
+	        !(skipIndexes && (key == 'length' || isIndex(key, length))) &&
+	        !(isProto && key == 'constructor')) {
+	      result.push(key);
+	    }
+	  }
+	  return result;
 	}
 	
-	module.exports = assign;
+	module.exports = keys;
 
 
 /***/ },
-/* 4 */
+/* 5 */
+/***/ function(module, exports) {
+
+	/**
+	 * lodash (Custom Build) <https://lodash.com/>
+	 * Build: `lodash modularize exports="npm" -o ./`
+	 * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+	 * Released under MIT license <https://lodash.com/license>
+	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+	 * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 */
+	
+	/** Used as the `TypeError` message for "Functions" methods. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+	
+	/** Used as references for various `Number` constants. */
+	var INFINITY = 1 / 0,
+	    MAX_INTEGER = 1.7976931348623157e+308,
+	    NAN = 0 / 0;
+	
+	/** `Object#toString` result references. */
+	var funcTag = '[object Function]',
+	    genTag = '[object GeneratorFunction]',
+	    symbolTag = '[object Symbol]';
+	
+	/** Used to match leading and trailing whitespace. */
+	var reTrim = /^\s+|\s+$/g;
+	
+	/** Used to detect bad signed hexadecimal string values. */
+	var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+	
+	/** Used to detect binary string values. */
+	var reIsBinary = /^0b[01]+$/i;
+	
+	/** Used to detect octal string values. */
+	var reIsOctal = /^0o[0-7]+$/i;
+	
+	/** Built-in method references without a dependency on `root`. */
+	var freeParseInt = parseInt;
+	
+	/**
+	 * A faster alternative to `Function#apply`, this function invokes `func`
+	 * with the `this` binding of `thisArg` and the arguments of `args`.
+	 *
+	 * @private
+	 * @param {Function} func The function to invoke.
+	 * @param {*} thisArg The `this` binding of `func`.
+	 * @param {Array} args The arguments to invoke `func` with.
+	 * @returns {*} Returns the result of `func`.
+	 */
+	function apply(func, thisArg, args) {
+	  var length = args.length;
+	  switch (length) {
+	    case 0: return func.call(thisArg);
+	    case 1: return func.call(thisArg, args[0]);
+	    case 2: return func.call(thisArg, args[0], args[1]);
+	    case 3: return func.call(thisArg, args[0], args[1], args[2]);
+	  }
+	  return func.apply(thisArg, args);
+	}
+	
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+	
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objectToString = objectProto.toString;
+	
+	/* Built-in method references for those with the same name as other `lodash` methods. */
+	var nativeMax = Math.max;
+	
+	/**
+	 * Creates a function that invokes `func` with the `this` binding of the
+	 * created function and arguments from `start` and beyond provided as
+	 * an array.
+	 *
+	 * **Note:** This method is based on the
+	 * [rest parameter](https://mdn.io/rest_parameters).
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Function
+	 * @param {Function} func The function to apply a rest parameter to.
+	 * @param {number} [start=func.length-1] The start position of the rest parameter.
+	 * @returns {Function} Returns the new function.
+	 * @example
+	 *
+	 * var say = _.rest(function(what, names) {
+	 *   return what + ' ' + _.initial(names).join(', ') +
+	 *     (_.size(names) > 1 ? ', & ' : '') + _.last(names);
+	 * });
+	 *
+	 * say('hello', 'fred', 'barney', 'pebbles');
+	 * // => 'hello fred, barney, & pebbles'
+	 */
+	function rest(func, start) {
+	  if (typeof func != 'function') {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  start = nativeMax(start === undefined ? (func.length - 1) : toInteger(start), 0);
+	  return function() {
+	    var args = arguments,
+	        index = -1,
+	        length = nativeMax(args.length - start, 0),
+	        array = Array(length);
+	
+	    while (++index < length) {
+	      array[index] = args[start + index];
+	    }
+	    switch (start) {
+	      case 0: return func.call(this, array);
+	      case 1: return func.call(this, args[0], array);
+	      case 2: return func.call(this, args[0], args[1], array);
+	    }
+	    var otherArgs = Array(start + 1);
+	    index = -1;
+	    while (++index < start) {
+	      otherArgs[index] = args[index];
+	    }
+	    otherArgs[start] = array;
+	    return apply(func, this, otherArgs);
+	  };
+	}
+	
+	/**
+	 * Checks if `value` is classified as a `Function` object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
+	 * @example
+	 *
+	 * _.isFunction(_);
+	 * // => true
+	 *
+	 * _.isFunction(/abc/);
+	 * // => false
+	 */
+	function isFunction(value) {
+	  // The use of `Object#toString` avoids issues with the `typeof` operator
+	  // in Safari 8 which returns 'object' for typed array and weak map constructors,
+	  // and PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+	  var tag = isObject(value) ? objectToString.call(value) : '';
+	  return tag == funcTag || tag == genTag;
+	}
+	
+	/**
+	 * Checks if `value` is the
+	 * [language type](http://www.ecma-international.org/ecma-262/6.0/#sec-ecmascript-language-types)
+	 * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(_.noop);
+	 * // => true
+	 *
+	 * _.isObject(null);
+	 * // => false
+	 */
+	function isObject(value) {
+	  var type = typeof value;
+	  return !!value && (type == 'object' || type == 'function');
+	}
+	
+	/**
+	 * Checks if `value` is object-like. A value is object-like if it's not `null`
+	 * and has a `typeof` result of "object".
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+	 * @example
+	 *
+	 * _.isObjectLike({});
+	 * // => true
+	 *
+	 * _.isObjectLike([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObjectLike(_.noop);
+	 * // => false
+	 *
+	 * _.isObjectLike(null);
+	 * // => false
+	 */
+	function isObjectLike(value) {
+	  return !!value && typeof value == 'object';
+	}
+	
+	/**
+	 * Checks if `value` is classified as a `Symbol` primitive or object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
+	 * @example
+	 *
+	 * _.isSymbol(Symbol.iterator);
+	 * // => true
+	 *
+	 * _.isSymbol('abc');
+	 * // => false
+	 */
+	function isSymbol(value) {
+	  return typeof value == 'symbol' ||
+	    (isObjectLike(value) && objectToString.call(value) == symbolTag);
+	}
+	
+	/**
+	 * Converts `value` to a finite number.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.12.0
+	 * @category Lang
+	 * @param {*} value The value to convert.
+	 * @returns {number} Returns the converted number.
+	 * @example
+	 *
+	 * _.toFinite(3.2);
+	 * // => 3.2
+	 *
+	 * _.toFinite(Number.MIN_VALUE);
+	 * // => 5e-324
+	 *
+	 * _.toFinite(Infinity);
+	 * // => 1.7976931348623157e+308
+	 *
+	 * _.toFinite('3.2');
+	 * // => 3.2
+	 */
+	function toFinite(value) {
+	  if (!value) {
+	    return value === 0 ? value : 0;
+	  }
+	  value = toNumber(value);
+	  if (value === INFINITY || value === -INFINITY) {
+	    var sign = (value < 0 ? -1 : 1);
+	    return sign * MAX_INTEGER;
+	  }
+	  return value === value ? value : 0;
+	}
+	
+	/**
+	 * Converts `value` to an integer.
+	 *
+	 * **Note:** This function is loosely based on
+	 * [`ToInteger`](http://www.ecma-international.org/ecma-262/6.0/#sec-tointeger).
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to convert.
+	 * @returns {number} Returns the converted integer.
+	 * @example
+	 *
+	 * _.toInteger(3.2);
+	 * // => 3
+	 *
+	 * _.toInteger(Number.MIN_VALUE);
+	 * // => 0
+	 *
+	 * _.toInteger(Infinity);
+	 * // => 1.7976931348623157e+308
+	 *
+	 * _.toInteger('3.2');
+	 * // => 3
+	 */
+	function toInteger(value) {
+	  var result = toFinite(value),
+	      remainder = result % 1;
+	
+	  return result === result ? (remainder ? result - remainder : result) : 0;
+	}
+	
+	/**
+	 * Converts `value` to a number.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to process.
+	 * @returns {number} Returns the number.
+	 * @example
+	 *
+	 * _.toNumber(3.2);
+	 * // => 3.2
+	 *
+	 * _.toNumber(Number.MIN_VALUE);
+	 * // => 5e-324
+	 *
+	 * _.toNumber(Infinity);
+	 * // => Infinity
+	 *
+	 * _.toNumber('3.2');
+	 * // => 3.2
+	 */
+	function toNumber(value) {
+	  if (typeof value == 'number') {
+	    return value;
+	  }
+	  if (isSymbol(value)) {
+	    return NAN;
+	  }
+	  if (isObject(value)) {
+	    var other = isFunction(value.valueOf) ? value.valueOf() : value;
+	    value = isObject(other) ? (other + '') : other;
+	  }
+	  if (typeof value != 'string') {
+	    return value === 0 ? value : +value;
+	  }
+	  value = value.replace(reTrim, '');
+	  var isBinary = reIsBinary.test(value);
+	  return (isBinary || reIsOctal.test(value))
+	    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+	    : (reIsBadHex.test(value) ? NAN : +value);
+	}
+	
+	module.exports = rest;
+
+
+/***/ },
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
 	
-	var _LatLon = __webpack_require__(5);
+	var _LatLon = __webpack_require__(7);
 	
-	var _Point = __webpack_require__(6);
+	var _Point = __webpack_require__(8);
 	
 	var Geo = {};
 	
@@ -1733,7 +2317,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 5 */
+/* 7 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -1810,7 +2394,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.latLon = noNew;
 
 /***/ },
-/* 6 */
+/* 8 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -1898,7 +2482,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.point = _point;
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -1919,67 +2503,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _eventemitter32 = _interopRequireDefault(_eventemitter3);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Scene = __webpack_require__(9);
+	var _Scene = __webpack_require__(11);
 	
 	var _Scene2 = _interopRequireDefault(_Scene);
 	
-	var _DOMScene3D = __webpack_require__(10);
+	var _DOMScene3D = __webpack_require__(12);
 	
 	var _DOMScene3D2 = _interopRequireDefault(_DOMScene3D);
 	
-	var _DOMScene2D = __webpack_require__(11);
+	var _DOMScene2D = __webpack_require__(13);
 	
 	var _DOMScene2D2 = _interopRequireDefault(_DOMScene2D);
 	
-	var _Renderer = __webpack_require__(12);
+	var _Renderer = __webpack_require__(14);
 	
 	var _Renderer2 = _interopRequireDefault(_Renderer);
 	
-	var _DOMRenderer3D = __webpack_require__(13);
+	var _DOMRenderer3D = __webpack_require__(15);
 	
 	var _DOMRenderer3D2 = _interopRequireDefault(_DOMRenderer3D);
 	
-	var _DOMRenderer2D = __webpack_require__(15);
+	var _DOMRenderer2D = __webpack_require__(17);
 	
 	var _DOMRenderer2D2 = _interopRequireDefault(_DOMRenderer2D);
 	
-	var _Camera = __webpack_require__(17);
+	var _Camera = __webpack_require__(19);
 	
 	var _Camera2 = _interopRequireDefault(_Camera);
 	
-	var _Picking = __webpack_require__(18);
+	var _Picking = __webpack_require__(20);
 	
 	var _Picking2 = _interopRequireDefault(_Picking);
 	
-	var _EffectComposer = __webpack_require__(20);
+	var _EffectComposer = __webpack_require__(22);
 	
 	var _EffectComposer2 = _interopRequireDefault(_EffectComposer);
 	
-	var _vendorRenderPass = __webpack_require__(25);
+	var _vendorRenderPass = __webpack_require__(27);
 	
 	var _vendorRenderPass2 = _interopRequireDefault(_vendorRenderPass);
 	
-	var _vendorShaderPass = __webpack_require__(23);
+	var _vendorShaderPass = __webpack_require__(25);
 	
 	var _vendorShaderPass2 = _interopRequireDefault(_vendorShaderPass);
 	
-	var _vendorCopyShader = __webpack_require__(22);
+	var _vendorCopyShader = __webpack_require__(24);
 	
 	var _vendorCopyShader2 = _interopRequireDefault(_vendorCopyShader);
 	
-	var _vendorHorizontalTiltShiftShader = __webpack_require__(26);
+	var _vendorHorizontalTiltShiftShader = __webpack_require__(28);
 	
 	var _vendorHorizontalTiltShiftShader2 = _interopRequireDefault(_vendorHorizontalTiltShiftShader);
 	
-	var _vendorVerticalTiltShiftShader = __webpack_require__(27);
+	var _vendorVerticalTiltShiftShader = __webpack_require__(29);
 	
 	var _vendorVerticalTiltShiftShader2 = _interopRequireDefault(_vendorVerticalTiltShiftShader);
 	
-	var _vendorFXAAShader = __webpack_require__(28);
+	var _vendorFXAAShader = __webpack_require__(30);
 	
 	var _vendorFXAAShader2 = _interopRequireDefault(_vendorFXAAShader);
 	
@@ -2172,13 +2756,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 8 */
+/* 10 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_8__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_10__;
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2187,7 +2771,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -2205,54 +2789,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _three = __webpack_require__(8);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	// This can be imported from anywhere and will still reference the same scene,
-	// though there is a helper reference in Engine.scene
-	
-	exports['default'] = (function () {
-	  var scene = new _three2['default'].Scene();
-	  return scene;
-	})();
-	
-	module.exports = exports['default'];
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _three = __webpack_require__(8);
-	
-	var _three2 = _interopRequireDefault(_three);
-	
-	// This can be imported from anywhere and will still reference the same scene,
-	// though there is a helper reference in Engine.scene
-	
-	exports['default'] = (function () {
-	  var scene = new _three2['default'].Scene();
-	  return scene;
-	})();
-	
-	module.exports = exports['default'];
-
-/***/ },
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2262,11 +2798,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Scene = __webpack_require__(9);
+	// This can be imported from anywhere and will still reference the same scene,
+	// though there is a helper reference in Engine.scene
+	
+	exports['default'] = (function () {
+	  var scene = new _three2['default'].Scene();
+	  return scene;
+	})();
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	// This can be imported from anywhere and will still reference the same scene,
+	// though there is a helper reference in Engine.scene
+	
+	exports['default'] = (function () {
+	  var scene = new _three2['default'].Scene();
+	  return scene;
+	})();
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _three = __webpack_require__(10);
+	
+	var _three2 = _interopRequireDefault(_three);
+	
+	var _Scene = __webpack_require__(11);
 	
 	var _Scene2 = _interopRequireDefault(_Scene);
 	
@@ -2320,7 +2904,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2329,13 +2913,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorCSS3DRenderer = __webpack_require__(14);
+	var _vendorCSS3DRenderer = __webpack_require__(16);
 	
-	var _DOMScene3D = __webpack_require__(10);
+	var _DOMScene3D = __webpack_require__(12);
 	
 	var _DOMScene3D2 = _interopRequireDefault(_DOMScene3D);
 	
@@ -2364,7 +2948,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2381,7 +2965,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -2587,7 +3171,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	_three2['default'].CSS3DRenderer = CSS3DRenderer;
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2596,13 +3180,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorCSS2DRenderer = __webpack_require__(16);
+	var _vendorCSS2DRenderer = __webpack_require__(18);
 	
-	var _DOMScene2D = __webpack_require__(11);
+	var _DOMScene2D = __webpack_require__(13);
 	
 	var _DOMScene2D2 = _interopRequireDefault(_DOMScene2D);
 	
@@ -2631,7 +3215,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2647,7 +3231,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -2760,7 +3344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	_three2['default'].CSS2DRenderer = CSS2DRenderer;
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2769,7 +3353,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -2800,7 +3384,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2813,13 +3397,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _geoPoint = __webpack_require__(6);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _PickingScene = __webpack_require__(19);
+	var _PickingScene = __webpack_require__(21);
 	
 	var _PickingScene2 = _interopRequireDefault(_PickingScene);
 	
@@ -3060,7 +3644,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3069,7 +3653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -3084,7 +3668,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3093,11 +3677,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorEffectComposer = __webpack_require__(21);
+	var _vendorEffectComposer = __webpack_require__(23);
 	
 	var _vendorEffectComposer2 = _interopRequireDefault(_vendorEffectComposer);
 	
@@ -3124,7 +3708,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3136,19 +3720,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _CopyShader = __webpack_require__(22);
+	var _CopyShader = __webpack_require__(24);
 	
 	var _CopyShader2 = _interopRequireDefault(_CopyShader);
 	
-	var _ShaderPass = __webpack_require__(23);
+	var _ShaderPass = __webpack_require__(25);
 	
 	var _ShaderPass2 = _interopRequireDefault(_ShaderPass);
 	
-	var _MaskPass = __webpack_require__(24);
+	var _MaskPass = __webpack_require__(26);
 	
 	var _MaskPass2 = _interopRequireDefault(_MaskPass);
 	
@@ -3282,7 +3866,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -3294,7 +3878,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -3325,7 +3909,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -3337,7 +3921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -3409,7 +3993,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3421,7 +4005,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -3512,7 +4096,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	_three2['default'].ClearMaskPass = ClearMaskPass;
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3524,7 +4108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -3582,7 +4166,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -3594,7 +4178,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -3631,7 +4215,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 27 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -3643,7 +4227,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -3680,7 +4264,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 28 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -3692,7 +4276,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -3727,7 +4311,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 29 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3744,7 +4328,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(30);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -3752,11 +4336,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Skybox = __webpack_require__(31);
+	var _Skybox = __webpack_require__(33);
 	
 	var _Skybox2 = _interopRequireDefault(_Skybox);
 	
@@ -3918,7 +4502,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.environmentLayer = noNew;
 
 /***/ },
-/* 30 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -3943,17 +4527,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _engineScene = __webpack_require__(9);
+	var _engineScene = __webpack_require__(11);
 	
 	var _engineScene2 = _interopRequireDefault(_engineScene);
 	
-	var _vendorCSS3DRenderer = __webpack_require__(14);
+	var _vendorCSS3DRenderer = __webpack_require__(16);
 	
-	var _vendorCSS2DRenderer = __webpack_require__(16);
+	var _vendorCSS2DRenderer = __webpack_require__(18);
 	
 	// TODO: Make sure nothing is left behind in the heap after calling destroy()
 	
@@ -4170,7 +4754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.layer = noNew;
 
 /***/ },
-/* 31 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4183,15 +4767,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _Sky = __webpack_require__(32);
+	var _Sky = __webpack_require__(34);
 	
 	var _Sky2 = _interopRequireDefault(_Sky);
 	
-	var _lodashThrottle = __webpack_require__(33);
+	var _lodashThrottle = __webpack_require__(35);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
@@ -4403,7 +4987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.skybox = noNew;
 
 /***/ },
-/* 32 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4431,7 +5015,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Three.js integration by zz85 http://twitter.com/blurspline
 	*/
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -4486,11 +5070,117 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 33 */
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * lodash 4.0.1 (Custom Build) <https://lodash.com/>
+	 * Build: `lodash modularize exports="npm" -o ./`
+	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
+	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 * Available under MIT license <https://lodash.com/license>
+	 */
+	var debounce = __webpack_require__(36);
+	
+	/** Used as the `TypeError` message for "Functions" methods. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+	
+	/**
+	 * Creates a throttled function that only invokes `func` at most once per
+	 * every `wait` milliseconds. The throttled function comes with a `cancel`
+	 * method to cancel delayed `func` invocations and a `flush` method to
+	 * immediately invoke them. Provide an options object to indicate whether
+	 * `func` should be invoked on the leading and/or trailing edge of the `wait`
+	 * timeout. The `func` is invoked with the last arguments provided to the
+	 * throttled function. Subsequent calls to the throttled function return the
+	 * result of the last `func` invocation.
+	 *
+	 * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
+	 * on the trailing edge of the timeout only if the throttled function is
+	 * invoked more than once during the `wait` timeout.
+	 *
+	 * See [David Corbacho's article](http://drupalmotion.com/article/debounce-and-throttle-visual-explanation)
+	 * for details over the differences between `_.throttle` and `_.debounce`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Function
+	 * @param {Function} func The function to throttle.
+	 * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
+	 * @param {Object} [options] The options object.
+	 * @param {boolean} [options.leading=true] Specify invoking on the leading
+	 *  edge of the timeout.
+	 * @param {boolean} [options.trailing=true] Specify invoking on the trailing
+	 *  edge of the timeout.
+	 * @returns {Function} Returns the new throttled function.
+	 * @example
+	 *
+	 * // Avoid excessively updating the position while scrolling.
+	 * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
+	 *
+	 * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
+	 * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
+	 * jQuery(element).on('click', throttled);
+	 *
+	 * // Cancel the trailing throttled invocation.
+	 * jQuery(window).on('popstate', throttled.cancel);
+	 */
+	function throttle(func, wait, options) {
+	  var leading = true,
+	      trailing = true;
+	
+	  if (typeof func != 'function') {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  if (isObject(options)) {
+	    leading = 'leading' in options ? !!options.leading : leading;
+	    trailing = 'trailing' in options ? !!options.trailing : trailing;
+	  }
+	  return debounce(func, wait, {
+	    'leading': leading,
+	    'maxWait': wait,
+	    'trailing': trailing
+	  });
+	}
+	
+	/**
+	 * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
+	 * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(_.noop);
+	 * // => true
+	 *
+	 * _.isObject(null);
+	 * // => false
+	 */
+	function isObject(value) {
+	  var type = typeof value;
+	  return !!value && (type == 'object' || type == 'function');
+	}
+	
+	module.exports = throttle;
+
+
+/***/ },
+/* 36 */
 /***/ function(module, exports) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {/**
-	 * lodash (Custom Build) <https://lodash.com/>
+	/**
+	 * lodash 4.0.6 (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
 	 * Copyright jQuery Foundation and other contributors <https://jquery.org/>
 	 * Released under MIT license <https://lodash.com/license>
@@ -4505,7 +5195,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var NAN = 0 / 0;
 	
 	/** `Object#toString` result references. */
-	var symbolTag = '[object Symbol]';
+	var funcTag = '[object Function]',
+	    genTag = '[object GeneratorFunction]',
+	    symbolTag = '[object Symbol]';
 	
 	/** Used to match leading and trailing whitespace. */
 	var reTrim = /^\s+|\s+$/g;
@@ -4522,21 +5214,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** Built-in method references without a dependency on `root`. */
 	var freeParseInt = parseInt;
 	
-	/** Detect free variable `global` from Node.js. */
-	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
-	
-	/** Detect free variable `self`. */
-	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
-	
-	/** Used as a reference to the global object. */
-	var root = freeGlobal || freeSelf || Function('return this')();
-	
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
 	
 	/**
 	 * Used to resolve the
-	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
 	 * of values.
 	 */
 	var objectToString = objectProto.toString;
@@ -4552,6 +5235,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @static
 	 * @memberOf _
 	 * @since 2.4.0
+	 * @type {Function}
 	 * @category Date
 	 * @returns {number} Returns the timestamp.
 	 * @example
@@ -4559,29 +5243,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * _.defer(function(stamp) {
 	 *   console.log(_.now() - stamp);
 	 * }, _.now());
-	 * // => Logs the number of milliseconds it took for the deferred invocation.
+	 * // => Logs the number of milliseconds it took for the deferred function to be invoked.
 	 */
-	var now = function() {
-	  return root.Date.now();
-	};
+	var now = Date.now;
 	
 	/**
 	 * Creates a debounced function that delays invoking `func` until after `wait`
 	 * milliseconds have elapsed since the last time the debounced function was
 	 * invoked. The debounced function comes with a `cancel` method to cancel
 	 * delayed `func` invocations and a `flush` method to immediately invoke them.
-	 * Provide `options` to indicate whether `func` should be invoked on the
-	 * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
-	 * with the last arguments provided to the debounced function. Subsequent
-	 * calls to the debounced function return the result of the last `func`
-	 * invocation.
+	 * Provide an options object to indicate whether `func` should be invoked on
+	 * the leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+	 * with the last arguments provided to the debounced function. Subsequent calls
+	 * to the debounced function return the result of the last `func` invocation.
 	 *
-	 * **Note:** If `leading` and `trailing` options are `true`, `func` is
-	 * invoked on the trailing edge of the timeout only if the debounced function
-	 * is invoked more than once during the `wait` timeout.
-	 *
-	 * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
-	 * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+	 * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
+	 * on the trailing edge of the timeout only if the debounced function is
+	 * invoked more than once during the `wait` timeout.
 	 *
 	 * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
 	 * for details over the differences between `_.debounce` and `_.throttle`.
@@ -4625,7 +5303,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      maxWait,
 	      result,
 	      timerId,
-	      lastCallTime,
+	      lastCallTime = 0,
 	      lastInvokeTime = 0,
 	      leading = false,
 	      maxing = false,
@@ -4676,7 +5354,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Either this is the first call, activity has stopped and we're at the
 	    // trailing edge, the system time has gone backwards and we're treating
 	    // it as the trailing edge, or we've hit the `maxWait` limit.
-	    return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
+	    return (!lastCallTime || (timeSinceLastCall >= wait) ||
 	      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
 	  }
 	
@@ -4690,6 +5368,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  function trailingEdge(time) {
+	    clearTimeout(timerId);
 	    timerId = undefined;
 	
 	    // Only invoke if we have `lastArgs` which means `func` has been
@@ -4705,8 +5384,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (timerId !== undefined) {
 	      clearTimeout(timerId);
 	    }
-	    lastInvokeTime = 0;
-	    lastArgs = lastCallTime = lastThis = timerId = undefined;
+	    lastCallTime = lastInvokeTime = 0;
+	    lastArgs = lastThis = timerId = undefined;
 	  }
 	
 	  function flush() {
@@ -4727,6 +5406,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      if (maxing) {
 	        // Handle invocations in a tight loop.
+	        clearTimeout(timerId);
 	        timerId = setTimeout(timerExpired, wait);
 	        return invokeFunc(lastCallTime);
 	      }
@@ -4742,70 +5422,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Creates a throttled function that only invokes `func` at most once per
-	 * every `wait` milliseconds. The throttled function comes with a `cancel`
-	 * method to cancel delayed `func` invocations and a `flush` method to
-	 * immediately invoke them. Provide `options` to indicate whether `func`
-	 * should be invoked on the leading and/or trailing edge of the `wait`
-	 * timeout. The `func` is invoked with the last arguments provided to the
-	 * throttled function. Subsequent calls to the throttled function return the
-	 * result of the last `func` invocation.
-	 *
-	 * **Note:** If `leading` and `trailing` options are `true`, `func` is
-	 * invoked on the trailing edge of the timeout only if the throttled function
-	 * is invoked more than once during the `wait` timeout.
-	 *
-	 * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
-	 * until to the next tick, similar to `setTimeout` with a timeout of `0`.
-	 *
-	 * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
-	 * for details over the differences between `_.throttle` and `_.debounce`.
+	 * Checks if `value` is classified as a `Function` object.
 	 *
 	 * @static
 	 * @memberOf _
 	 * @since 0.1.0
-	 * @category Function
-	 * @param {Function} func The function to throttle.
-	 * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
-	 * @param {Object} [options={}] The options object.
-	 * @param {boolean} [options.leading=true]
-	 *  Specify invoking on the leading edge of the timeout.
-	 * @param {boolean} [options.trailing=true]
-	 *  Specify invoking on the trailing edge of the timeout.
-	 * @returns {Function} Returns the new throttled function.
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
 	 * @example
 	 *
-	 * // Avoid excessively updating the position while scrolling.
-	 * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
+	 * _.isFunction(_);
+	 * // => true
 	 *
-	 * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
-	 * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
-	 * jQuery(element).on('click', throttled);
-	 *
-	 * // Cancel the trailing throttled invocation.
-	 * jQuery(window).on('popstate', throttled.cancel);
+	 * _.isFunction(/abc/);
+	 * // => false
 	 */
-	function throttle(func, wait, options) {
-	  var leading = true,
-	      trailing = true;
-	
-	  if (typeof func != 'function') {
-	    throw new TypeError(FUNC_ERROR_TEXT);
-	  }
-	  if (isObject(options)) {
-	    leading = 'leading' in options ? !!options.leading : leading;
-	    trailing = 'trailing' in options ? !!options.trailing : trailing;
-	  }
-	  return debounce(func, wait, {
-	    'leading': leading,
-	    'maxWait': wait,
-	    'trailing': trailing
-	  });
+	function isFunction(value) {
+	  // The use of `Object#toString` avoids issues with the `typeof` operator
+	  // in Safari 8 which returns 'object' for typed array and weak map constructors,
+	  // and PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+	  var tag = isObject(value) ? objectToString.call(value) : '';
+	  return tag == funcTag || tag == genTag;
 	}
 	
 	/**
 	 * Checks if `value` is the
-	 * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+	 * [language type](http://www.ecma-international.org/ecma-262/6.0/#sec-ecmascript-language-types)
 	 * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
 	 *
 	 * @static
@@ -4869,7 +5513,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @since 4.0.0
 	 * @category Lang
 	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified,
+	 *  else `false`.
 	 * @example
 	 *
 	 * _.isSymbol(Symbol.iterator);
@@ -4894,8 +5539,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {number} Returns the number.
 	 * @example
 	 *
-	 * _.toNumber(3.2);
-	 * // => 3.2
+	 * _.toNumber(3);
+	 * // => 3
 	 *
 	 * _.toNumber(Number.MIN_VALUE);
 	 * // => 5e-324
@@ -4903,8 +5548,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * _.toNumber(Infinity);
 	 * // => Infinity
 	 *
-	 * _.toNumber('3.2');
-	 * // => 3.2
+	 * _.toNumber('3');
+	 * // => 3
 	 */
 	function toNumber(value) {
 	  if (typeof value == 'number') {
@@ -4914,7 +5559,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return NAN;
 	  }
 	  if (isObject(value)) {
-	    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+	    var other = isFunction(value.valueOf) ? value.valueOf() : value;
 	    value = isObject(other) ? (other + '') : other;
 	  }
 	  if (typeof value != 'string') {
@@ -4927,12 +5572,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    : (reIsBadHex.test(value) ? NAN : +value);
 	}
 	
-	module.exports = throttle;
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+	module.exports = debounce;
+
 
 /***/ },
-/* 34 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4941,7 +5585,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _ControlsOrbit = __webpack_require__(35);
+	var _ControlsOrbit = __webpack_require__(38);
 	
 	var _ControlsOrbit2 = _interopRequireDefault(_ControlsOrbit);
 	
@@ -4954,7 +5598,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 35 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -4975,15 +5619,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _eventemitter32 = _interopRequireDefault(_eventemitter3);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorOrbitControls = __webpack_require__(36);
+	var _vendorOrbitControls = __webpack_require__(39);
 	
 	var _vendorOrbitControls2 = _interopRequireDefault(_vendorOrbitControls);
 	
-	var _TweenLite = __webpack_require__(38);
+	var _TweenLite = __webpack_require__(41);
 	
 	var _TweenLite2 = _interopRequireDefault(_TweenLite);
 	
@@ -5269,7 +5913,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.orbit = noNew;
 
 /***/ },
-/* 36 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -5281,11 +5925,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _hammerjs = __webpack_require__(37);
+	var _hammerjs = __webpack_require__(40);
 	
 	var _hammerjs2 = _interopRequireDefault(_hammerjs);
 	
@@ -6457,7 +7101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 37 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*! Hammer.JS - v2.0.7 - 2016-04-22
@@ -9106,13 +9750,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 38 */
+/* 41 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_38__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_41__;
 
 /***/ },
-/* 39 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -9129,23 +9773,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _TileLayer2 = __webpack_require__(40);
+	var _TileLayer2 = __webpack_require__(43);
 	
 	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
-	var _ImageTile = __webpack_require__(50);
+	var _ImageTile = __webpack_require__(53);
 	
 	var _ImageTile2 = _interopRequireDefault(_ImageTile);
 	
-	var _ImageTileLayerBaseMaterial = __webpack_require__(53);
+	var _ImageTileLayerBaseMaterial = __webpack_require__(56);
 	
 	var _ImageTileLayerBaseMaterial2 = _interopRequireDefault(_ImageTileLayerBaseMaterial);
 	
-	var _lodashThrottle = __webpack_require__(33);
+	var _lodashThrottle = __webpack_require__(35);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -9333,7 +9977,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.imageTileLayer = noNew;
 
 /***/ },
-/* 40 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -9350,7 +9994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(30);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -9358,11 +10002,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _TileCache = __webpack_require__(41);
+	var _TileCache = __webpack_require__(44);
 	
 	var _TileCache2 = _interopRequireDefault(_TileCache);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -9759,7 +10403,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 41 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -9772,7 +10416,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _lruCache = __webpack_require__(42);
+	var _lruCache = __webpack_require__(45);
 	
 	var _lruCache2 = _interopRequireDefault(_lruCache);
 	
@@ -9840,18 +10484,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.tileCache = noNew;
 
 /***/ },
-/* 42 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = LRUCache
 	
 	// This will be a proper iterable 'Map' in engines that support it,
 	// or a fakey-fake PseudoMap in older versions.
-	var Map = __webpack_require__(43)
-	var util = __webpack_require__(46)
+	var Map = __webpack_require__(46)
+	var util = __webpack_require__(49)
 	
 	// A linked list to keep track of recently-used-ness
-	var Yallist = __webpack_require__(49)
+	var Yallist = __webpack_require__(52)
 	
 	// use symbols if possible, otherwise just _props
 	var symbols = {}
@@ -10315,7 +10959,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 43 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -10325,16 +10969,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
 	  module.exports = Map
 	} else {
-	  module.exports = __webpack_require__(45)
+	  module.exports = __webpack_require__(48)
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(44)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47)))
 
 /***/ },
-/* 44 */
+/* 47 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
+	
 	var process = module.exports = {};
 	
 	// cached from whatever global is present so that test runners that stub it
@@ -10345,84 +10990,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	var cachedSetTimeout;
 	var cachedClearTimeout;
 	
-	function defaultSetTimout() {
-	    throw new Error('setTimeout has not been defined');
-	}
-	function defaultClearTimeout () {
-	    throw new Error('clearTimeout has not been defined');
-	}
 	(function () {
-	    try {
-	        if (typeof setTimeout === 'function') {
-	            cachedSetTimeout = setTimeout;
-	        } else {
-	            cachedSetTimeout = defaultSetTimout;
-	        }
-	    } catch (e) {
-	        cachedSetTimeout = defaultSetTimout;
+	  try {
+	    cachedSetTimeout = setTimeout;
+	  } catch (e) {
+	    cachedSetTimeout = function () {
+	      throw new Error('setTimeout is not defined');
 	    }
-	    try {
-	        if (typeof clearTimeout === 'function') {
-	            cachedClearTimeout = clearTimeout;
-	        } else {
-	            cachedClearTimeout = defaultClearTimeout;
-	        }
-	    } catch (e) {
-	        cachedClearTimeout = defaultClearTimeout;
+	  }
+	  try {
+	    cachedClearTimeout = clearTimeout;
+	  } catch (e) {
+	    cachedClearTimeout = function () {
+	      throw new Error('clearTimeout is not defined');
 	    }
+	  }
 	} ())
-	function runTimeout(fun) {
-	    if (cachedSetTimeout === setTimeout) {
-	        //normal enviroments in sane situations
-	        return setTimeout(fun, 0);
-	    }
-	    // if setTimeout wasn't available but was latter defined
-	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-	        cachedSetTimeout = setTimeout;
-	        return setTimeout(fun, 0);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedSetTimeout(fun, 0);
-	    } catch(e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-	            return cachedSetTimeout.call(null, fun, 0);
-	        } catch(e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-	            return cachedSetTimeout.call(this, fun, 0);
-	        }
-	    }
-	
-	
-	}
-	function runClearTimeout(marker) {
-	    if (cachedClearTimeout === clearTimeout) {
-	        //normal enviroments in sane situations
-	        return clearTimeout(marker);
-	    }
-	    // if clearTimeout wasn't available but was latter defined
-	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-	        cachedClearTimeout = clearTimeout;
-	        return clearTimeout(marker);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedClearTimeout(marker);
-	    } catch (e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-	            return cachedClearTimeout.call(null, marker);
-	        } catch (e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-	            return cachedClearTimeout.call(this, marker);
-	        }
-	    }
-	
-	
-	
-	}
 	var queue = [];
 	var draining = false;
 	var currentQueue;
@@ -10447,7 +11030,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (draining) {
 	        return;
 	    }
-	    var timeout = runTimeout(cleanUpNextTick);
+	    var timeout = cachedSetTimeout(cleanUpNextTick);
 	    draining = true;
 	
 	    var len = queue.length;
@@ -10464,7 +11047,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    currentQueue = null;
 	    draining = false;
-	    runClearTimeout(timeout);
+	    cachedClearTimeout(timeout);
 	}
 	
 	process.nextTick = function (fun) {
@@ -10476,7 +11059,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    queue.push(new Item(fun, args));
 	    if (queue.length === 1 && !draining) {
-	        runTimeout(drainQueue);
+	        cachedSetTimeout(drainQueue, 0);
 	    }
 	};
 	
@@ -10517,7 +11100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 45 */
+/* 48 */
 /***/ function(module, exports) {
 
 	var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -10636,7 +11219,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 46 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -11164,7 +11747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.isPrimitive = isPrimitive;
 	
-	exports.isBuffer = __webpack_require__(47);
+	exports.isBuffer = __webpack_require__(50);
 	
 	function objectToString(o) {
 	  return Object.prototype.toString.call(o);
@@ -11208,7 +11791,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     prototype.
 	 * @param {function} superCtor Constructor function to inherit prototype from.
 	 */
-	exports.inherits = __webpack_require__(48);
+	exports.inherits = __webpack_require__(51);
 	
 	exports._extend = function(origin, add) {
 	  // Don't do anything if add isn't an object
@@ -11226,10 +11809,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Object.prototype.hasOwnProperty.call(obj, prop);
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(44)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(47)))
 
 /***/ },
-/* 47 */
+/* 50 */
 /***/ function(module, exports) {
 
 	module.exports = function isBuffer(arg) {
@@ -11240,7 +11823,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 48 */
+/* 51 */
 /***/ function(module, exports) {
 
 	if (typeof Object.create === 'function') {
@@ -11269,7 +11852,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 49 */
+/* 52 */
 /***/ function(module, exports) {
 
 	module.exports = Yallist
@@ -11635,7 +12218,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 50 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -11652,15 +12235,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Tile2 = __webpack_require__(51);
+	var _Tile2 = __webpack_require__(54);
 	
 	var _Tile3 = _interopRequireDefault(_Tile2);
 	
-	var _vendorBoxHelper = __webpack_require__(52);
+	var _vendorBoxHelper = __webpack_require__(55);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -11871,7 +12454,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.imageTile = noNew;
 
 /***/ },
-/* 51 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -11884,11 +12467,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var _geoPoint = __webpack_require__(6);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _geoLatLon = __webpack_require__(5);
+	var _geoLatLon = __webpack_require__(7);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -12124,7 +12707,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 52 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12136,7 +12719,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -12214,7 +12797,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 53 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12223,7 +12806,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -12277,7 +12860,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 54 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12294,7 +12877,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _TileLayer2 = __webpack_require__(40);
+	var _TileLayer2 = __webpack_require__(43);
 	
 	var _TileLayer3 = _interopRequireDefault(_TileLayer2);
 	
@@ -12302,15 +12885,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _GeoJSONTile = __webpack_require__(55);
+	var _GeoJSONTile = __webpack_require__(58);
 	
 	var _GeoJSONTile2 = _interopRequireDefault(_GeoJSONTile);
 	
-	var _lodashThrottle = __webpack_require__(33);
+	var _lodashThrottle = __webpack_require__(35);
 	
 	var _lodashThrottle2 = _interopRequireDefault(_lodashThrottle);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -12471,7 +13054,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.geoJSONTileLayer = noNew;
 
 /***/ },
-/* 55 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12488,27 +13071,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Tile2 = __webpack_require__(51);
+	var _Tile2 = __webpack_require__(54);
 	
 	var _Tile3 = _interopRequireDefault(_Tile2);
 	
-	var _GeoJSONLayer = __webpack_require__(56);
+	var _GeoJSONLayer = __webpack_require__(59);
 	
-	var _vendorBoxHelper = __webpack_require__(52);
+	var _vendorBoxHelper = __webpack_require__(55);
 	
 	var _vendorBoxHelper2 = _interopRequireDefault(_vendorBoxHelper);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _reqwest = __webpack_require__(58);
+	var _reqwest = __webpack_require__(61);
 	
 	var _reqwest2 = _interopRequireDefault(_reqwest);
 	
-	var _geoPoint = __webpack_require__(6);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _geoLatLon = __webpack_require__(5);
+	var _geoLatLon = __webpack_require__(7);
 	
 	var _lodashAssign = __webpack_require__(3);
 	
@@ -12516,15 +13099,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// import Offset from 'polygon-offset';
 	
-	var _utilGeoJSON = __webpack_require__(60);
+	var _utilGeoJSON = __webpack_require__(63);
 	
 	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
 	
-	var _utilBuffer = __webpack_require__(66);
+	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
-	var _enginePickingMaterial = __webpack_require__(67);
+	var _enginePickingMaterial = __webpack_require__(70);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
@@ -12875,7 +13458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.geoJSONTile = noNew;
 
 /***/ },
-/* 56 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -12900,7 +13483,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// For example, only allow polygons to be interactive via a polygonInteractive
 	// option
 	
-	var _LayerGroup2 = __webpack_require__(57);
+	var _LayerGroup2 = __webpack_require__(60);
 	
 	var _LayerGroup3 = _interopRequireDefault(_LayerGroup2);
 	
@@ -12908,31 +13491,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _reqwest = __webpack_require__(58);
+	var _reqwest = __webpack_require__(61);
 	
 	var _reqwest2 = _interopRequireDefault(_reqwest);
 	
-	var _utilGeoJSON = __webpack_require__(60);
+	var _utilGeoJSON = __webpack_require__(63);
 	
 	var _utilGeoJSON2 = _interopRequireDefault(_utilGeoJSON);
 	
-	var _utilBuffer = __webpack_require__(66);
+	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
-	var _enginePickingMaterial = __webpack_require__(67);
+	var _enginePickingMaterial = __webpack_require__(70);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _geometryPolygonLayer = __webpack_require__(69);
+	var _geometryPolygonLayer = __webpack_require__(72);
 	
 	var _geometryPolygonLayer2 = _interopRequireDefault(_geometryPolygonLayer);
 	
-	var _geometryPolylineLayer = __webpack_require__(70);
+	var _geometryPolylineLayer = __webpack_require__(73);
 	
 	var _geometryPolylineLayer2 = _interopRequireDefault(_geometryPolylineLayer);
 	
-	var _geometryPointLayer = __webpack_require__(71);
+	var _geometryPointLayer = __webpack_require__(74);
 	
 	var _geometryPointLayer2 = _interopRequireDefault(_geometryPointLayer);
 	
@@ -13464,7 +14047,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.geoJSONLayer = noNew;
 
 /***/ },
-/* 57 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -13481,7 +14064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(30);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -13557,7 +14140,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.layerGroup = noNew;
 
 /***/ },
-/* 58 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -13581,7 +14164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else {
 	    var XHR2
 	    try {
-	      XHR2 = __webpack_require__(59)
+	      XHR2 = __webpack_require__(62)
 	    } catch (ex) {
 	      throw new Error('Peer dependency `xhr2` required! Please npm install xhr2')
 	    }
@@ -14193,13 +14776,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 59 */
+/* 62 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 60 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -14212,23 +14795,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * GeoJSON helpers for handling data and generating objects
 	 */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _topojson2 = __webpack_require__(61);
+	var _topojson2 = __webpack_require__(64);
 	
 	var _topojson3 = _interopRequireDefault(_topojson2);
 	
-	var _geojsonMerge = __webpack_require__(62);
+	var _geojsonMerge = __webpack_require__(65);
 	
 	var _geojsonMerge2 = _interopRequireDefault(_geojsonMerge);
 	
-	var _earcut = __webpack_require__(64);
+	var _earcut = __webpack_require__(67);
 	
 	var _earcut2 = _interopRequireDefault(_earcut);
 	
-	var _extrudePolygon = __webpack_require__(65);
+	var _extrudePolygon = __webpack_require__(68);
 	
 	var _extrudePolygon2 = _interopRequireDefault(_extrudePolygon);
 	
@@ -14477,562 +15060,560 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 61 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function (global, factory) {
 	   true ? factory(exports) :
 	  typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	  (factory((global.topojson = global.topojson || {})));
-	}(this, (function (exports) { 'use strict';
+	}(this, function (exports) { 'use strict';
 	
-	function noop() {}
+	  function noop() {}
 	
-	function transformAbsolute(transform) {
-	  if (!transform) return noop;
-	  var x0,
-	      y0,
-	      kx = transform.scale[0],
-	      ky = transform.scale[1],
-	      dx = transform.translate[0],
-	      dy = transform.translate[1];
-	  return function(point, i) {
-	    if (!i) x0 = y0 = 0;
-	    point[0] = (x0 += point[0]) * kx + dx;
-	    point[1] = (y0 += point[1]) * ky + dy;
-	  };
-	}
-	
-	function transformRelative(transform) {
-	  if (!transform) return noop;
-	  var x0,
-	      y0,
-	      kx = transform.scale[0],
-	      ky = transform.scale[1],
-	      dx = transform.translate[0],
-	      dy = transform.translate[1];
-	  return function(point, i) {
-	    if (!i) x0 = y0 = 0;
-	    var x1 = Math.round((point[0] - dx) / kx),
-	        y1 = Math.round((point[1] - dy) / ky);
-	    point[0] = x1 - x0;
-	    point[1] = y1 - y0;
-	    x0 = x1;
-	    y0 = y1;
-	  };
-	}
-	
-	function reverse(array, n) {
-	  var t, j = array.length, i = j - n;
-	  while (i < --j) t = array[i], array[i++] = array[j], array[j] = t;
-	}
-	
-	function bisect(a, x) {
-	  var lo = 0, hi = a.length;
-	  while (lo < hi) {
-	    var mid = lo + hi >>> 1;
-	    if (a[mid] < x) lo = mid + 1;
-	    else hi = mid;
+	  function transformAbsolute(transform) {
+	    if (!transform) return noop;
+	    var x0,
+	        y0,
+	        kx = transform.scale[0],
+	        ky = transform.scale[1],
+	        dx = transform.translate[0],
+	        dy = transform.translate[1];
+	    return function(point, i) {
+	      if (!i) x0 = y0 = 0;
+	      point[0] = (x0 += point[0]) * kx + dx;
+	      point[1] = (y0 += point[1]) * ky + dy;
+	    };
 	  }
-	  return lo;
-	}
 	
-	function feature(topology, o) {
-	  return o.type === "GeometryCollection" ? {
-	    type: "FeatureCollection",
-	    features: o.geometries.map(function(o) { return feature$1(topology, o); })
-	  } : feature$1(topology, o);
-	}
+	  function transformRelative(transform) {
+	    if (!transform) return noop;
+	    var x0,
+	        y0,
+	        kx = transform.scale[0],
+	        ky = transform.scale[1],
+	        dx = transform.translate[0],
+	        dy = transform.translate[1];
+	    return function(point, i) {
+	      if (!i) x0 = y0 = 0;
+	      var x1 = Math.round((point[0] - dx) / kx),
+	          y1 = Math.round((point[1] - dy) / ky);
+	      point[0] = x1 - x0;
+	      point[1] = y1 - y0;
+	      x0 = x1;
+	      y0 = y1;
+	    };
+	  }
 	
-	function feature$1(topology, o) {
-	  var f = {
-	    type: "Feature",
-	    id: o.id,
-	    properties: o.properties || {},
-	    geometry: object(topology, o)
-	  };
-	  if (o.id == null) delete f.id;
-	  return f;
-	}
+	  function reverse(array, n) {
+	    var t, j = array.length, i = j - n;
+	    while (i < --j) t = array[i], array[i++] = array[j], array[j] = t;
+	  }
 	
-	function object(topology, o) {
-	  var absolute = transformAbsolute(topology.transform),
-	      arcs = topology.arcs;
-	
-	  function arc(i, points) {
-	    if (points.length) points.pop();
-	    for (var a = arcs[i < 0 ? ~i : i], k = 0, n = a.length, p; k < n; ++k) {
-	      points.push(p = a[k].slice());
-	      absolute(p, k);
+	  function bisect(a, x) {
+	    var lo = 0, hi = a.length;
+	    while (lo < hi) {
+	      var mid = lo + hi >>> 1;
+	      if (a[mid] < x) lo = mid + 1;
+	      else hi = mid;
 	    }
-	    if (i < 0) reverse(points, n);
+	    return lo;
 	  }
 	
-	  function point(p) {
-	    p = p.slice();
-	    absolute(p, 0);
-	    return p;
+	  function feature(topology, o) {
+	    return o.type === "GeometryCollection" ? {
+	      type: "FeatureCollection",
+	      features: o.geometries.map(function(o) { return feature$1(topology, o); })
+	    } : feature$1(topology, o);
 	  }
 	
-	  function line(arcs) {
-	    var points = [];
-	    for (var i = 0, n = arcs.length; i < n; ++i) arc(arcs[i], points);
-	    if (points.length < 2) points.push(points[0].slice());
-	    return points;
+	  function feature$1(topology, o) {
+	    var f = {
+	      type: "Feature",
+	      id: o.id,
+	      properties: o.properties || {},
+	      geometry: object(topology, o)
+	    };
+	    if (o.id == null) delete f.id;
+	    return f;
 	  }
 	
-	  function ring(arcs) {
-	    var points = line(arcs);
-	    while (points.length < 4) points.push(points[0].slice());
-	    return points;
-	  }
+	  function object(topology, o) {
+	    var absolute = transformAbsolute(topology.transform),
+	        arcs = topology.arcs;
 	
-	  function polygon(arcs) {
-	    return arcs.map(ring);
-	  }
-	
-	  function geometry(o) {
-	    var t = o.type;
-	    return t === "GeometryCollection" ? {type: t, geometries: o.geometries.map(geometry)}
-	        : t in geometryType ? {type: t, coordinates: geometryType[t](o)}
-	        : null;
-	  }
-	
-	  var geometryType = {
-	    Point: function(o) { return point(o.coordinates); },
-	    MultiPoint: function(o) { return o.coordinates.map(point); },
-	    LineString: function(o) { return line(o.arcs); },
-	    MultiLineString: function(o) { return o.arcs.map(line); },
-	    Polygon: function(o) { return polygon(o.arcs); },
-	    MultiPolygon: function(o) { return o.arcs.map(polygon); }
-	  };
-	
-	  return geometry(o);
-	}
-	
-	function stitchArcs(topology, arcs) {
-	  var stitchedArcs = {},
-	      fragmentByStart = {},
-	      fragmentByEnd = {},
-	      fragments = [],
-	      emptyIndex = -1;
-	
-	  // Stitch empty arcs first, since they may be subsumed by other arcs.
-	  arcs.forEach(function(i, j) {
-	    var arc = topology.arcs[i < 0 ? ~i : i], t;
-	    if (arc.length < 3 && !arc[1][0] && !arc[1][1]) {
-	      t = arcs[++emptyIndex], arcs[emptyIndex] = i, arcs[j] = t;
+	    function arc(i, points) {
+	      if (points.length) points.pop();
+	      for (var a = arcs[i < 0 ? ~i : i], k = 0, n = a.length, p; k < n; ++k) {
+	        points.push(p = a[k].slice());
+	        absolute(p, k);
+	      }
+	      if (i < 0) reverse(points, n);
 	    }
-	  });
 	
-	  arcs.forEach(function(i) {
-	    var e = ends(i),
-	        start = e[0],
-	        end = e[1],
-	        f, g;
+	    function point(p) {
+	      p = p.slice();
+	      absolute(p, 0);
+	      return p;
+	    }
 	
-	    if (f = fragmentByEnd[start]) {
-	      delete fragmentByEnd[f.end];
-	      f.push(i);
-	      f.end = end;
-	      if (g = fragmentByStart[end]) {
-	        delete fragmentByStart[g.start];
-	        var fg = g === f ? f : f.concat(g);
-	        fragmentByStart[fg.start = f.start] = fragmentByEnd[fg.end = g.end] = fg;
-	      } else {
-	        fragmentByStart[f.start] = fragmentByEnd[f.end] = f;
+	    function line(arcs) {
+	      var points = [];
+	      for (var i = 0, n = arcs.length; i < n; ++i) arc(arcs[i], points);
+	      if (points.length < 2) points.push(points[0].slice());
+	      return points;
+	    }
+	
+	    function ring(arcs) {
+	      var points = line(arcs);
+	      while (points.length < 4) points.push(points[0].slice());
+	      return points;
+	    }
+	
+	    function polygon(arcs) {
+	      return arcs.map(ring);
+	    }
+	
+	    function geometry(o) {
+	      var t = o.type;
+	      return t === "GeometryCollection" ? {type: t, geometries: o.geometries.map(geometry)}
+	          : t in geometryType ? {type: t, coordinates: geometryType[t](o)}
+	          : null;
+	    }
+	
+	    var geometryType = {
+	      Point: function(o) { return point(o.coordinates); },
+	      MultiPoint: function(o) { return o.coordinates.map(point); },
+	      LineString: function(o) { return line(o.arcs); },
+	      MultiLineString: function(o) { return o.arcs.map(line); },
+	      Polygon: function(o) { return polygon(o.arcs); },
+	      MultiPolygon: function(o) { return o.arcs.map(polygon); }
+	    };
+	
+	    return geometry(o);
+	  }
+	
+	  function stitchArcs(topology, arcs) {
+	    var stitchedArcs = {},
+	        fragmentByStart = {},
+	        fragmentByEnd = {},
+	        fragments = [],
+	        emptyIndex = -1;
+	
+	    // Stitch empty arcs first, since they may be subsumed by other arcs.
+	    arcs.forEach(function(i, j) {
+	      var arc = topology.arcs[i < 0 ? ~i : i], t;
+	      if (arc.length < 3 && !arc[1][0] && !arc[1][1]) {
+	        t = arcs[++emptyIndex], arcs[emptyIndex] = i, arcs[j] = t;
 	      }
-	    } else if (f = fragmentByStart[end]) {
-	      delete fragmentByStart[f.start];
-	      f.unshift(i);
-	      f.start = start;
-	      if (g = fragmentByEnd[start]) {
-	        delete fragmentByEnd[g.end];
-	        var gf = g === f ? f : g.concat(f);
-	        fragmentByStart[gf.start = g.start] = fragmentByEnd[gf.end = f.end] = gf;
+	    });
+	
+	    arcs.forEach(function(i) {
+	      var e = ends(i),
+	          start = e[0],
+	          end = e[1],
+	          f, g;
+	
+	      if (f = fragmentByEnd[start]) {
+	        delete fragmentByEnd[f.end];
+	        f.push(i);
+	        f.end = end;
+	        if (g = fragmentByStart[end]) {
+	          delete fragmentByStart[g.start];
+	          var fg = g === f ? f : f.concat(g);
+	          fragmentByStart[fg.start = f.start] = fragmentByEnd[fg.end = g.end] = fg;
+	        } else {
+	          fragmentByStart[f.start] = fragmentByEnd[f.end] = f;
+	        }
+	      } else if (f = fragmentByStart[end]) {
+	        delete fragmentByStart[f.start];
+	        f.unshift(i);
+	        f.start = start;
+	        if (g = fragmentByEnd[start]) {
+	          delete fragmentByEnd[g.end];
+	          var gf = g === f ? f : g.concat(f);
+	          fragmentByStart[gf.start = g.start] = fragmentByEnd[gf.end = f.end] = gf;
+	        } else {
+	          fragmentByStart[f.start] = fragmentByEnd[f.end] = f;
+	        }
 	      } else {
-	        fragmentByStart[f.start] = fragmentByEnd[f.end] = f;
+	        f = [i];
+	        fragmentByStart[f.start = start] = fragmentByEnd[f.end = end] = f;
 	      }
+	    });
+	
+	    function ends(i) {
+	      var arc = topology.arcs[i < 0 ? ~i : i], p0 = arc[0], p1;
+	      if (topology.transform) p1 = [0, 0], arc.forEach(function(dp) { p1[0] += dp[0], p1[1] += dp[1]; });
+	      else p1 = arc[arc.length - 1];
+	      return i < 0 ? [p1, p0] : [p0, p1];
+	    }
+	
+	    function flush(fragmentByEnd, fragmentByStart) {
+	      for (var k in fragmentByEnd) {
+	        var f = fragmentByEnd[k];
+	        delete fragmentByStart[f.start];
+	        delete f.start;
+	        delete f.end;
+	        f.forEach(function(i) { stitchedArcs[i < 0 ? ~i : i] = 1; });
+	        fragments.push(f);
+	      }
+	    }
+	
+	    flush(fragmentByEnd, fragmentByStart);
+	    flush(fragmentByStart, fragmentByEnd);
+	    arcs.forEach(function(i) { if (!stitchedArcs[i < 0 ? ~i : i]) fragments.push([i]); });
+	
+	    return fragments;
+	  }
+	
+	  function mesh(topology) {
+	    return object(topology, meshArcs.apply(this, arguments));
+	  }
+	
+	  function meshArcs(topology, o, filter) {
+	    var arcs = [];
+	
+	    function arc(i) {
+	      var j = i < 0 ? ~i : i;
+	      (geomsByArc[j] || (geomsByArc[j] = [])).push({i: i, g: geom});
+	    }
+	
+	    function line(arcs) {
+	      arcs.forEach(arc);
+	    }
+	
+	    function polygon(arcs) {
+	      arcs.forEach(line);
+	    }
+	
+	    function geometry(o) {
+	      if (o.type === "GeometryCollection") o.geometries.forEach(geometry);
+	      else if (o.type in geometryType) geom = o, geometryType[o.type](o.arcs);
+	    }
+	
+	    if (arguments.length > 1) {
+	      var geomsByArc = [],
+	          geom;
+	
+	      var geometryType = {
+	        LineString: line,
+	        MultiLineString: polygon,
+	        Polygon: polygon,
+	        MultiPolygon: function(arcs) { arcs.forEach(polygon); }
+	      };
+	
+	      geometry(o);
+	
+	      geomsByArc.forEach(arguments.length < 3
+	          ? function(geoms) { arcs.push(geoms[0].i); }
+	          : function(geoms) { if (filter(geoms[0].g, geoms[geoms.length - 1].g)) arcs.push(geoms[0].i); });
 	    } else {
-	      f = [i];
-	      fragmentByStart[f.start = start] = fragmentByEnd[f.end = end] = f;
+	      for (var i = 0, n = topology.arcs.length; i < n; ++i) arcs.push(i);
 	    }
-	  });
 	
-	  function ends(i) {
-	    var arc = topology.arcs[i < 0 ? ~i : i], p0 = arc[0], p1;
-	    if (topology.transform) p1 = [0, 0], arc.forEach(function(dp) { p1[0] += dp[0], p1[1] += dp[1]; });
-	    else p1 = arc[arc.length - 1];
-	    return i < 0 ? [p1, p0] : [p0, p1];
+	    return {type: "MultiLineString", arcs: stitchArcs(topology, arcs)};
 	  }
 	
-	  function flush(fragmentByEnd, fragmentByStart) {
-	    for (var k in fragmentByEnd) {
-	      var f = fragmentByEnd[k];
-	      delete fragmentByStart[f.start];
-	      delete f.start;
-	      delete f.end;
-	      f.forEach(function(i) { stitchedArcs[i < 0 ? ~i : i] = 1; });
-	      fragments.push(f);
+	  function cartesianTriangleArea(triangle) {
+	    var a = triangle[0], b = triangle[1], c = triangle[2];
+	    return Math.abs((a[0] - c[0]) * (b[1] - a[1]) - (a[0] - b[0]) * (c[1] - a[1]));
+	  }
+	
+	  function ring(ring) {
+	    var i = -1,
+	        n = ring.length,
+	        a,
+	        b = ring[n - 1],
+	        area = 0;
+	
+	    while (++i < n) {
+	      a = b;
+	      b = ring[i];
+	      area += a[0] * b[1] - a[1] * b[0];
 	    }
+	
+	    return area / 2;
 	  }
 	
-	  flush(fragmentByEnd, fragmentByStart);
-	  flush(fragmentByStart, fragmentByEnd);
-	  arcs.forEach(function(i) { if (!stitchedArcs[i < 0 ? ~i : i]) fragments.push([i]); });
-	
-	  return fragments;
-	}
-	
-	function mesh(topology) {
-	  return object(topology, meshArcs.apply(this, arguments));
-	}
-	
-	function meshArcs(topology, o, filter) {
-	  var arcs = [];
-	
-	  function arc(i) {
-	    var j = i < 0 ? ~i : i;
-	    (geomsByArc[j] || (geomsByArc[j] = [])).push({i: i, g: geom});
+	  function merge(topology) {
+	    return object(topology, mergeArcs.apply(this, arguments));
 	  }
 	
-	  function line(arcs) {
-	    arcs.forEach(arc);
+	  function mergeArcs(topology, objects) {
+	    var polygonsByArc = {},
+	        polygons = [],
+	        components = [];
+	
+	    objects.forEach(function(o) {
+	      if (o.type === "Polygon") register(o.arcs);
+	      else if (o.type === "MultiPolygon") o.arcs.forEach(register);
+	    });
+	
+	    function register(polygon) {
+	      polygon.forEach(function(ring$$) {
+	        ring$$.forEach(function(arc) {
+	          (polygonsByArc[arc = arc < 0 ? ~arc : arc] || (polygonsByArc[arc] = [])).push(polygon);
+	        });
+	      });
+	      polygons.push(polygon);
+	    }
+	
+	    function area(ring$$) {
+	      return Math.abs(ring(object(topology, {type: "Polygon", arcs: [ring$$]}).coordinates[0]));
+	    }
+	
+	    polygons.forEach(function(polygon) {
+	      if (!polygon._) {
+	        var component = [],
+	            neighbors = [polygon];
+	        polygon._ = 1;
+	        components.push(component);
+	        while (polygon = neighbors.pop()) {
+	          component.push(polygon);
+	          polygon.forEach(function(ring$$) {
+	            ring$$.forEach(function(arc) {
+	              polygonsByArc[arc < 0 ? ~arc : arc].forEach(function(polygon) {
+	                if (!polygon._) {
+	                  polygon._ = 1;
+	                  neighbors.push(polygon);
+	                }
+	              });
+	            });
+	          });
+	        }
+	      }
+	    });
+	
+	    polygons.forEach(function(polygon) {
+	      delete polygon._;
+	    });
+	
+	    return {
+	      type: "MultiPolygon",
+	      arcs: components.map(function(polygons) {
+	        var arcs = [], n;
+	
+	        // Extract the exterior (unique) arcs.
+	        polygons.forEach(function(polygon) {
+	          polygon.forEach(function(ring$$) {
+	            ring$$.forEach(function(arc) {
+	              if (polygonsByArc[arc < 0 ? ~arc : arc].length < 2) {
+	                arcs.push(arc);
+	              }
+	            });
+	          });
+	        });
+	
+	        // Stitch the arcs into one or more rings.
+	        arcs = stitchArcs(topology, arcs);
+	
+	        // If more than one ring is returned,
+	        // at most one of these rings can be the exterior;
+	        // choose the one with the greatest absolute area.
+	        if ((n = arcs.length) > 1) {
+	          for (var i = 1, k = area(arcs[0]), ki, t; i < n; ++i) {
+	            if ((ki = area(arcs[i])) > k) {
+	              t = arcs[0], arcs[0] = arcs[i], arcs[i] = t, k = ki;
+	            }
+	          }
+	        }
+	
+	        return arcs;
+	      })
+	    };
 	  }
 	
-	  function polygon(arcs) {
-	    arcs.forEach(line);
-	  }
+	  function neighbors(objects) {
+	    var indexesByArc = {}, // arc index -> array of object indexes
+	        neighbors = objects.map(function() { return []; });
 	
-	  function geometry(o) {
-	    if (o.type === "GeometryCollection") o.geometries.forEach(geometry);
-	    else if (o.type in geometryType) geom = o, geometryType[o.type](o.arcs);
-	  }
+	    function line(arcs, i) {
+	      arcs.forEach(function(a) {
+	        if (a < 0) a = ~a;
+	        var o = indexesByArc[a];
+	        if (o) o.push(i);
+	        else indexesByArc[a] = [i];
+	      });
+	    }
 	
-	  if (arguments.length > 1) {
-	    var geomsByArc = [],
-	        geom;
+	    function polygon(arcs, i) {
+	      arcs.forEach(function(arc) { line(arc, i); });
+	    }
+	
+	    function geometry(o, i) {
+	      if (o.type === "GeometryCollection") o.geometries.forEach(function(o) { geometry(o, i); });
+	      else if (o.type in geometryType) geometryType[o.type](o.arcs, i);
+	    }
 	
 	    var geometryType = {
 	      LineString: line,
 	      MultiLineString: polygon,
 	      Polygon: polygon,
-	      MultiPolygon: function(arcs) { arcs.forEach(polygon); }
+	      MultiPolygon: function(arcs, i) { arcs.forEach(function(arc) { polygon(arc, i); }); }
 	    };
 	
-	    geometry(o);
+	    objects.forEach(geometry);
 	
-	    geomsByArc.forEach(arguments.length < 3
-	        ? function(geoms) { arcs.push(geoms[0].i); }
-	        : function(geoms) { if (filter(geoms[0].g, geoms[geoms.length - 1].g)) arcs.push(geoms[0].i); });
-	  } else {
-	    for (var i = 0, n = topology.arcs.length; i < n; ++i) arcs.push(i);
-	  }
-	
-	  return {type: "MultiLineString", arcs: stitchArcs(topology, arcs)};
-	}
-	
-	function cartesianTriangleArea(triangle) {
-	  var a = triangle[0], b = triangle[1], c = triangle[2];
-	  return Math.abs((a[0] - c[0]) * (b[1] - a[1]) - (a[0] - b[0]) * (c[1] - a[1]));
-	}
-	
-	function ring(ring) {
-	  var i = -1,
-	      n = ring.length,
-	      a,
-	      b = ring[n - 1],
-	      area = 0;
-	
-	  while (++i < n) {
-	    a = b;
-	    b = ring[i];
-	    area += a[0] * b[1] - a[1] * b[0];
-	  }
-	
-	  return area / 2;
-	}
-	
-	function merge(topology) {
-	  return object(topology, mergeArcs.apply(this, arguments));
-	}
-	
-	function mergeArcs(topology, objects) {
-	  var polygonsByArc = {},
-	      polygons = [],
-	      components = [];
-	
-	  objects.forEach(function(o) {
-	    if (o.type === "Polygon") register(o.arcs);
-	    else if (o.type === "MultiPolygon") o.arcs.forEach(register);
-	  });
-	
-	  function register(polygon) {
-	    polygon.forEach(function(ring$$) {
-	      ring$$.forEach(function(arc) {
-	        (polygonsByArc[arc = arc < 0 ? ~arc : arc] || (polygonsByArc[arc] = [])).push(polygon);
-	      });
-	    });
-	    polygons.push(polygon);
-	  }
-	
-	  function area(ring$$) {
-	    return Math.abs(ring(object(topology, {type: "Polygon", arcs: [ring$$]}).coordinates[0]));
-	  }
-	
-	  polygons.forEach(function(polygon) {
-	    if (!polygon._) {
-	      var component = [],
-	          neighbors = [polygon];
-	      polygon._ = 1;
-	      components.push(component);
-	      while (polygon = neighbors.pop()) {
-	        component.push(polygon);
-	        polygon.forEach(function(ring$$) {
-	          ring$$.forEach(function(arc) {
-	            polygonsByArc[arc < 0 ? ~arc : arc].forEach(function(polygon) {
-	              if (!polygon._) {
-	                polygon._ = 1;
-	                neighbors.push(polygon);
-	              }
-	            });
-	          });
-	        });
+	    for (var i in indexesByArc) {
+	      for (var indexes = indexesByArc[i], m = indexes.length, j = 0; j < m; ++j) {
+	        for (var k = j + 1; k < m; ++k) {
+	          var ij = indexes[j], ik = indexes[k], n;
+	          if ((n = neighbors[ij])[i = bisect(n, ik)] !== ik) n.splice(i, 0, ik);
+	          if ((n = neighbors[ik])[i = bisect(n, ij)] !== ij) n.splice(i, 0, ij);
+	        }
 	      }
 	    }
-	  });
 	
-	  polygons.forEach(function(polygon) {
-	    delete polygon._;
-	  });
+	    return neighbors;
+	  }
 	
-	  return {
-	    type: "MultiPolygon",
-	    arcs: components.map(function(polygons) {
-	      var arcs = [], n;
+	  function compareArea(a, b) {
+	    return a[1][2] - b[1][2];
+	  }
 	
-	      // Extract the exterior (unique) arcs.
-	      polygons.forEach(function(polygon) {
-	        polygon.forEach(function(ring$$) {
-	          ring$$.forEach(function(arc) {
-	            if (polygonsByArc[arc < 0 ? ~arc : arc].length < 2) {
-	              arcs.push(arc);
-	            }
-	          });
-	        });
-	      });
+	  function minAreaHeap() {
+	    var heap = {},
+	        array = [],
+	        size = 0;
 	
-	      // Stitch the arcs into one or more rings.
-	      arcs = stitchArcs(topology, arcs);
+	    heap.push = function(object) {
+	      up(array[object._ = size] = object, size++);
+	      return size;
+	    };
 	
-	      // If more than one ring is returned,
-	      // at most one of these rings can be the exterior;
-	      // choose the one with the greatest absolute area.
-	      if ((n = arcs.length) > 1) {
-	        for (var i = 1, k = area(arcs[0]), ki, t; i < n; ++i) {
-	          if ((ki = area(arcs[i])) > k) {
-	            t = arcs[0], arcs[0] = arcs[i], arcs[i] = t, k = ki;
-	          }
+	    heap.pop = function() {
+	      if (size <= 0) return;
+	      var removed = array[0], object;
+	      if (--size > 0) object = array[size], down(array[object._ = 0] = object, 0);
+	      return removed;
+	    };
+	
+	    heap.remove = function(removed) {
+	      var i = removed._, object;
+	      if (array[i] !== removed) return; // invalid request
+	      if (i !== --size) object = array[size], (compareArea(object, removed) < 0 ? up : down)(array[object._ = i] = object, i);
+	      return i;
+	    };
+	
+	    function up(object, i) {
+	      while (i > 0) {
+	        var j = ((i + 1) >> 1) - 1,
+	            parent = array[j];
+	        if (compareArea(object, parent) >= 0) break;
+	        array[parent._ = i] = parent;
+	        array[object._ = i = j] = object;
+	      }
+	    }
+	
+	    function down(object, i) {
+	      while (true) {
+	        var r = (i + 1) << 1,
+	            l = r - 1,
+	            j = i,
+	            child = array[j];
+	        if (l < size && compareArea(array[l], child) < 0) child = array[j = l];
+	        if (r < size && compareArea(array[r], child) < 0) child = array[j = r];
+	        if (j === i) break;
+	        array[child._ = i] = child;
+	        array[object._ = i = j] = object;
+	      }
+	    }
+	
+	    return heap;
+	  }
+	
+	  function presimplify(topology, triangleArea) {
+	    var absolute = transformAbsolute(topology.transform),
+	        relative = transformRelative(topology.transform),
+	        heap = minAreaHeap();
+	
+	    if (!triangleArea) triangleArea = cartesianTriangleArea;
+	
+	    topology.arcs.forEach(function(arc) {
+	      var triangles = [],
+	          maxArea = 0,
+	          triangle,
+	          i,
+	          n,
+	          p;
+	
+	      // To store each point’s effective area, we create a new array rather than
+	      // extending the passed-in point to workaround a Chrome/V8 bug (getting
+	      // stuck in smi mode). For midpoints, the initial effective area of
+	      // Infinity will be computed in the next step.
+	      for (i = 0, n = arc.length; i < n; ++i) {
+	        p = arc[i];
+	        absolute(arc[i] = [p[0], p[1], Infinity], i);
+	      }
+	
+	      for (i = 1, n = arc.length - 1; i < n; ++i) {
+	        triangle = arc.slice(i - 1, i + 2);
+	        triangle[1][2] = triangleArea(triangle);
+	        triangles.push(triangle);
+	        heap.push(triangle);
+	      }
+	
+	      for (i = 0, n = triangles.length; i < n; ++i) {
+	        triangle = triangles[i];
+	        triangle.previous = triangles[i - 1];
+	        triangle.next = triangles[i + 1];
+	      }
+	
+	      while (triangle = heap.pop()) {
+	        var previous = triangle.previous,
+	            next = triangle.next;
+	
+	        // If the area of the current point is less than that of the previous point
+	        // to be eliminated, use the latter's area instead. This ensures that the
+	        // current point cannot be eliminated without eliminating previously-
+	        // eliminated points.
+	        if (triangle[1][2] < maxArea) triangle[1][2] = maxArea;
+	        else maxArea = triangle[1][2];
+	
+	        if (previous) {
+	          previous.next = next;
+	          previous[2] = triangle[2];
+	          update(previous);
+	        }
+	
+	        if (next) {
+	          next.previous = previous;
+	          next[0] = triangle[0];
+	          update(next);
 	        }
 	      }
 	
-	      return arcs;
-	    })
-	  };
-	}
-	
-	function neighbors(objects) {
-	  var indexesByArc = {}, // arc index -> array of object indexes
-	      neighbors = objects.map(function() { return []; });
-	
-	  function line(arcs, i) {
-	    arcs.forEach(function(a) {
-	      if (a < 0) a = ~a;
-	      var o = indexesByArc[a];
-	      if (o) o.push(i);
-	      else indexesByArc[a] = [i];
+	      arc.forEach(relative);
 	    });
-	  }
 	
-	  function polygon(arcs, i) {
-	    arcs.forEach(function(arc) { line(arc, i); });
-	  }
-	
-	  function geometry(o, i) {
-	    if (o.type === "GeometryCollection") o.geometries.forEach(function(o) { geometry(o, i); });
-	    else if (o.type in geometryType) geometryType[o.type](o.arcs, i);
-	  }
-	
-	  var geometryType = {
-	    LineString: line,
-	    MultiLineString: polygon,
-	    Polygon: polygon,
-	    MultiPolygon: function(arcs, i) { arcs.forEach(function(arc) { polygon(arc, i); }); }
-	  };
-	
-	  objects.forEach(geometry);
-	
-	  for (var i in indexesByArc) {
-	    for (var indexes = indexesByArc[i], m = indexes.length, j = 0; j < m; ++j) {
-	      for (var k = j + 1; k < m; ++k) {
-	        var ij = indexes[j], ik = indexes[k], n;
-	        if ((n = neighbors[ij])[i = bisect(n, ik)] !== ik) n.splice(i, 0, ik);
-	        if ((n = neighbors[ik])[i = bisect(n, ij)] !== ij) n.splice(i, 0, ij);
-	      }
-	    }
-	  }
-	
-	  return neighbors;
-	}
-	
-	function compareArea(a, b) {
-	  return a[1][2] - b[1][2];
-	}
-	
-	function minAreaHeap() {
-	  var heap = {},
-	      array = [],
-	      size = 0;
-	
-	  heap.push = function(object) {
-	    up(array[object._ = size] = object, size++);
-	    return size;
-	  };
-	
-	  heap.pop = function() {
-	    if (size <= 0) return;
-	    var removed = array[0], object;
-	    if (--size > 0) object = array[size], down(array[object._ = 0] = object, 0);
-	    return removed;
-	  };
-	
-	  heap.remove = function(removed) {
-	    var i = removed._, object;
-	    if (array[i] !== removed) return; // invalid request
-	    if (i !== --size) object = array[size], (compareArea(object, removed) < 0 ? up : down)(array[object._ = i] = object, i);
-	    return i;
-	  };
-	
-	  function up(object, i) {
-	    while (i > 0) {
-	      var j = ((i + 1) >> 1) - 1,
-	          parent = array[j];
-	      if (compareArea(object, parent) >= 0) break;
-	      array[parent._ = i] = parent;
-	      array[object._ = i = j] = object;
-	    }
-	  }
-	
-	  function down(object, i) {
-	    while (true) {
-	      var r = (i + 1) << 1,
-	          l = r - 1,
-	          j = i,
-	          child = array[j];
-	      if (l < size && compareArea(array[l], child) < 0) child = array[j = l];
-	      if (r < size && compareArea(array[r], child) < 0) child = array[j = r];
-	      if (j === i) break;
-	      array[child._ = i] = child;
-	      array[object._ = i = j] = object;
-	    }
-	  }
-	
-	  return heap;
-	}
-	
-	function presimplify(topology, triangleArea) {
-	  var absolute = transformAbsolute(topology.transform),
-	      relative = transformRelative(topology.transform),
-	      heap = minAreaHeap();
-	
-	  if (!triangleArea) triangleArea = cartesianTriangleArea;
-	
-	  topology.arcs.forEach(function(arc) {
-	    var triangles = [],
-	        maxArea = 0,
-	        triangle,
-	        i,
-	        n,
-	        p;
-	
-	    // To store each point’s effective area, we create a new array rather than
-	    // extending the passed-in point to workaround a Chrome/V8 bug (getting
-	    // stuck in smi mode). For midpoints, the initial effective area of
-	    // Infinity will be computed in the next step.
-	    for (i = 0, n = arc.length; i < n; ++i) {
-	      p = arc[i];
-	      absolute(arc[i] = [p[0], p[1], Infinity], i);
-	    }
-	
-	    for (i = 1, n = arc.length - 1; i < n; ++i) {
-	      triangle = arc.slice(i - 1, i + 2);
+	    function update(triangle) {
+	      heap.remove(triangle);
 	      triangle[1][2] = triangleArea(triangle);
-	      triangles.push(triangle);
 	      heap.push(triangle);
 	    }
 	
-	    for (i = 0, n = triangles.length; i < n; ++i) {
-	      triangle = triangles[i];
-	      triangle.previous = triangles[i - 1];
-	      triangle.next = triangles[i + 1];
-	    }
-	
-	    while (triangle = heap.pop()) {
-	      var previous = triangle.previous,
-	          next = triangle.next;
-	
-	      // If the area of the current point is less than that of the previous point
-	      // to be eliminated, use the latter's area instead. This ensures that the
-	      // current point cannot be eliminated without eliminating previously-
-	      // eliminated points.
-	      if (triangle[1][2] < maxArea) triangle[1][2] = maxArea;
-	      else maxArea = triangle[1][2];
-	
-	      if (previous) {
-	        previous.next = next;
-	        previous[2] = triangle[2];
-	        update(previous);
-	      }
-	
-	      if (next) {
-	        next.previous = previous;
-	        next[0] = triangle[0];
-	        update(next);
-	      }
-	    }
-	
-	    arc.forEach(relative);
-	  });
-	
-	  function update(triangle) {
-	    heap.remove(triangle);
-	    triangle[1][2] = triangleArea(triangle);
-	    heap.push(triangle);
+	    return topology;
 	  }
 	
-	  return topology;
-	}
+	  var version = "1.6.26";
 	
-	var version = "1.6.27";
+	  exports.version = version;
+	  exports.mesh = mesh;
+	  exports.meshArcs = meshArcs;
+	  exports.merge = merge;
+	  exports.mergeArcs = mergeArcs;
+	  exports.feature = feature;
+	  exports.neighbors = neighbors;
+	  exports.presimplify = presimplify;
 	
-	exports.version = version;
-	exports.mesh = mesh;
-	exports.meshArcs = meshArcs;
-	exports.merge = merge;
-	exports.mergeArcs = mergeArcs;
-	exports.feature = feature;
-	exports.neighbors = neighbors;
-	exports.presimplify = presimplify;
-	
-	Object.defineProperty(exports, '__esModule', { value: true });
-	
-	})));
+	}));
 
 /***/ },
-/* 62 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var normalize = __webpack_require__(63);
+	var normalize = __webpack_require__(66);
 	
 	module.exports = function(inputs) {
 	    return {
@@ -15045,7 +15626,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 63 */
+/* 66 */
 /***/ function(module, exports) {
 
 	module.exports = normalize;
@@ -15094,7 +15675,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 64 */
+/* 67 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -15744,7 +16325,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 65 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -15843,7 +16424,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 66 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -15856,7 +16437,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * BufferGeometry helpers
 	 */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -16114,7 +16695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 67 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16123,11 +16704,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _PickingShader = __webpack_require__(68);
+	var _PickingShader = __webpack_require__(71);
 	
 	var _PickingShader2 = _interopRequireDefault(_PickingShader);
 	
@@ -16169,7 +16750,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 68 */
+/* 71 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16193,7 +16774,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 69 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16226,7 +16807,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: Allow _setBufferAttributes to use a custom function passed in to
 	// generate a custom mesh
 	
-	var _Layer2 = __webpack_require__(30);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -16234,27 +16815,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _geoLatLon = __webpack_require__(5);
+	var _geoLatLon = __webpack_require__(7);
 	
-	var _geoPoint = __webpack_require__(6);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _earcut2 = __webpack_require__(64);
+	var _earcut2 = __webpack_require__(67);
 	
 	var _earcut3 = _interopRequireDefault(_earcut2);
 	
-	var _utilExtrudePolygon = __webpack_require__(65);
+	var _utilExtrudePolygon = __webpack_require__(68);
 	
 	var _utilExtrudePolygon2 = _interopRequireDefault(_utilExtrudePolygon);
 	
-	var _enginePickingMaterial = __webpack_require__(67);
+	var _enginePickingMaterial = __webpack_require__(70);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilBuffer = __webpack_require__(66);
+	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
@@ -16869,7 +17450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.polygonLayer = noNew;
 
 /***/ },
-/* 70 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -16904,7 +17485,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: Allow _setBufferAttributes to use a custom function passed in to
 	// generate a custom mesh
 	
-	var _Layer2 = __webpack_require__(30);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -16912,19 +17493,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _geoLatLon = __webpack_require__(5);
+	var _geoLatLon = __webpack_require__(7);
 	
-	var _geoPoint = __webpack_require__(6);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _enginePickingMaterial = __webpack_require__(67);
+	var _enginePickingMaterial = __webpack_require__(70);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilBuffer = __webpack_require__(66);
+	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
@@ -17390,7 +17971,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.polylineLayer = noNew;
 
 /***/ },
-/* 71 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17431,7 +18012,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// How much control should this layer support? Perhaps a different or custom
 	// layer would be better suited for animation, for example.
 	
-	var _Layer2 = __webpack_require__(30);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -17439,19 +18020,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _geoLatLon = __webpack_require__(5);
+	var _geoLatLon = __webpack_require__(7);
 	
-	var _geoPoint = __webpack_require__(6);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _enginePickingMaterial = __webpack_require__(67);
+	var _enginePickingMaterial = __webpack_require__(70);
 	
 	var _enginePickingMaterial2 = _interopRequireDefault(_enginePickingMaterial);
 	
-	var _utilBuffer = __webpack_require__(66);
+	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
@@ -17898,7 +18479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.pointLayer = noNew;
 
 /***/ },
-/* 72 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17913,7 +18494,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _GeoJSONTileLayer2 = __webpack_require__(54);
+	var _GeoJSONTileLayer2 = __webpack_require__(57);
 	
 	var _GeoJSONTileLayer3 = _interopRequireDefault(_GeoJSONTileLayer2);
 	
@@ -17948,7 +18529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.topoJSONTileLayer = noNew;
 
 /***/ },
-/* 73 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -17963,7 +18544,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _GeoJSONLayer2 = __webpack_require__(56);
+	var _GeoJSONLayer2 = __webpack_require__(59);
 	
 	var _GeoJSONLayer3 = _interopRequireDefault(_GeoJSONLayer2);
 	
@@ -17999,7 +18580,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.topoJSONLayer = noNew;
 
 /***/ },
-/* 74 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -18020,7 +18601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Created by masayuki on 20/07/2016.
 	 */
 	
-	var _SimObjectLayer2 = __webpack_require__(75);
+	var _SimObjectLayer2 = __webpack_require__(78);
 	
 	var _SimObjectLayer3 = _interopRequireDefault(_SimObjectLayer2);
 	
@@ -18028,19 +18609,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _ModelRepository = __webpack_require__(85);
+	var _ModelRepository = __webpack_require__(88);
 	
 	var _ModelRepository2 = _interopRequireDefault(_ModelRepository);
 	
-	var _PedestrianModel = __webpack_require__(86);
+	var _PedestrianModel = __webpack_require__(89);
 	
 	var _PedestrianModel2 = _interopRequireDefault(_PedestrianModel);
 	
-	var _Pedestrian = __webpack_require__(88);
+	var _Pedestrian = __webpack_require__(91);
 	
 	var _Pedestrian2 = _interopRequireDefault(_Pedestrian);
 	
@@ -18117,6 +18698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // create a model
 	        var pedestrianModel = new _PedestrianModel2['default']({
 	          bodyURL: model.file.body,
+	          bodyTextureURL: 'textureFile' in model ? typeof model.textureFile === 'string' ? model.textureFile : typeof model.textureFile === 'object' && 'body' in model.textureFile ? model.textureFile.body : undefined : undefined,
 	          scale: scale,
 	          translation: translation,
 	          rotation: rotation
@@ -18219,7 +18801,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.pedestrianLayer = noNew;
 
 /***/ },
-/* 75 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -18236,7 +18818,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _Layer2 = __webpack_require__(30);
+	var _Layer2 = __webpack_require__(32);
 	
 	var _Layer3 = _interopRequireDefault(_Layer2);
 	
@@ -18244,47 +18826,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _geoLatLon = __webpack_require__(5);
+	var _geoLatLon = __webpack_require__(7);
 	
-	var _geoPoint = __webpack_require__(6);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _earcut = __webpack_require__(64);
+	var _earcut = __webpack_require__(67);
 	
 	var _earcut2 = _interopRequireDefault(_earcut);
 	
-	var _utilExtrudePolygon = __webpack_require__(65);
+	var _utilExtrudePolygon = __webpack_require__(68);
 	
 	var _utilExtrudePolygon2 = _interopRequireDefault(_utilExtrudePolygon);
 	
-	var _utilBuffer = __webpack_require__(66);
+	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
-	var _vendorGPUComputationRenderer = __webpack_require__(76);
+	var _vendorGPUComputationRenderer = __webpack_require__(79);
 	
 	var _vendorGPUComputationRenderer2 = _interopRequireDefault(_vendorGPUComputationRenderer);
 	
-	var _SimObject = __webpack_require__(77);
+	var _SimObject = __webpack_require__(80);
 	
 	var _SimObject2 = _interopRequireDefault(_SimObject);
 	
-	var _VehicleVelocityShader = __webpack_require__(78);
+	var _VehicleVelocityShader = __webpack_require__(81);
 	
 	var _VehicleVelocityShader2 = _interopRequireDefault(_VehicleVelocityShader);
 	
-	var _VehiclePositionShader = __webpack_require__(79);
+	var _VehiclePositionShader = __webpack_require__(82);
 	
 	var _VehiclePositionShader2 = _interopRequireDefault(_VehiclePositionShader);
 	
-	var _VehicleShader = __webpack_require__(80);
+	var _VehicleShader = __webpack_require__(83);
 	
 	var _VehicleShader2 = _interopRequireDefault(_VehicleShader);
 	
-	var _utilObjectUtils = __webpack_require__(81);
+	var _utilObjectUtils = __webpack_require__(84);
 	
 	var _utilObjectUtils2 = _interopRequireDefault(_utilObjectUtils);
 	
@@ -18751,7 +19333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 76 */
+/* 79 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -19169,7 +19751,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 77 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -19189,7 +19771,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Created by masayuki on 20/07/2016.
 	 */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -19362,7 +19944,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 78 */
+/* 81 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -19419,7 +20001,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 79 */
+/* 82 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -19484,7 +20066,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 80 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -19496,7 +20078,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -19521,7 +20103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 81 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -19534,19 +20116,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Object helpers
 	 */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _operative = __webpack_require__(82);
+	var _operative = __webpack_require__(85);
 	
 	var _operative2 = _interopRequireDefault(_operative);
 	
-	var _vendorSimplifyModifier = __webpack_require__(83);
+	var _vendorSimplifyModifier = __webpack_require__(86);
 	
 	var _vendorSimplifyModifier2 = _interopRequireDefault(_vendorSimplifyModifier);
 	
-	var _WorkerUtils = __webpack_require__(84);
+	var _WorkerUtils = __webpack_require__(87);
 	
 	var _WorkerUtils2 = _interopRequireDefault(_WorkerUtils);
 	
@@ -19644,13 +20226,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 82 */
+/* 85 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_82__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_85__;
 
 /***/ },
-/* 83 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -19662,7 +20244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// jscs:disable
 	/* eslint-disable */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -20094,7 +20676,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 84 */
+/* 87 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -20159,7 +20741,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 85 */
+/* 88 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -20207,7 +20789,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 86 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -20220,11 +20802,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Created by masayuki on 20/07/2016.
 	 */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorBinaryLoader = __webpack_require__(87);
+	var _vendorBinaryLoader = __webpack_require__(90);
 	
 	var _vendorBinaryLoader2 = _interopRequireDefault(_vendorBinaryLoader);
 	
@@ -20235,6 +20817,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // file paths
 	  this.bodyURL = p.bodyURL || null;
+	  this.bodyTextureURL = p.bodyTextureURL || null;
 	
 	  // parameters
 	  this.scale = p.scale || 1.0;
@@ -20250,6 +20833,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // internal use
 	  this.bodyGeometry = null;
 	  this.bodyMaterials = null;
+	  this.bodyTexture = null;
 	
 	  // construct
 	  if (scope.bodyURL) {
@@ -20265,6 +20849,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    scope.bodyGeometry = geometry;
 	    scope.bodyMaterials = materials;
 	
+	    // texture
+	    if (scope.bodyTextureURL) {
+	      scope.bodyTexture = _three2['default'].ImageUtils.loadTexture(scope.bodyTextureURL);
+	      if (materials.length > 0) {
+	        materials[0].map = scope.bodyTexture; // FIXME: not sure if this way of setting is ok
+	      }
+	    }
+	
+	    // morph
 	    for (i = 0, max = materials.length; i < max; i = i + 1) {
 	      materials[i].morphTargets = true;
 	    }
@@ -20287,7 +20880,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 87 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -20303,7 +20896,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -20933,7 +21526,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 88 */
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -20957,11 +21550,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Created by masayuki on 20/07/2016.
 	 */
 	
-	var _SimObject2 = __webpack_require__(77);
+	var _SimObject2 = __webpack_require__(80);
 	
 	var _SimObject3 = _interopRequireDefault(_SimObject2);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
@@ -21058,7 +21651,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 89 */
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -21091,7 +21684,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// TODO: Allow _setBufferAttributes to use a custom function passed in to
 	// generate a custom mesh
 	
-	var _SimObjectLayer2 = __webpack_require__(75);
+	var _SimObjectLayer2 = __webpack_require__(78);
 	
 	var _SimObjectLayer3 = _interopRequireDefault(_SimObjectLayer2);
 	
@@ -21099,59 +21692,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashAssign2 = _interopRequireDefault(_lodashAssign);
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _geoLatLon = __webpack_require__(5);
+	var _geoLatLon = __webpack_require__(7);
 	
-	var _geoPoint = __webpack_require__(6);
+	var _geoPoint = __webpack_require__(8);
 	
-	var _earcut = __webpack_require__(64);
+	var _earcut = __webpack_require__(67);
 	
 	var _earcut2 = _interopRequireDefault(_earcut);
 	
-	var _utilExtrudePolygon = __webpack_require__(65);
+	var _utilExtrudePolygon = __webpack_require__(68);
 	
 	var _utilExtrudePolygon2 = _interopRequireDefault(_utilExtrudePolygon);
 	
-	var _utilBuffer = __webpack_require__(66);
+	var _utilBuffer = __webpack_require__(69);
 	
 	var _utilBuffer2 = _interopRequireDefault(_utilBuffer);
 	
-	var _vendorGPUComputationRenderer = __webpack_require__(76);
+	var _vendorGPUComputationRenderer = __webpack_require__(79);
 	
 	var _vendorGPUComputationRenderer2 = _interopRequireDefault(_vendorGPUComputationRenderer);
 	
-	var _VehicleModel = __webpack_require__(90);
+	var _VehicleModel = __webpack_require__(93);
 	
 	var _VehicleModel2 = _interopRequireDefault(_VehicleModel);
 	
-	var _ModelRepository = __webpack_require__(85);
+	var _ModelRepository = __webpack_require__(88);
 	
 	var _ModelRepository2 = _interopRequireDefault(_ModelRepository);
 	
-	var _Vehicle = __webpack_require__(91);
+	var _Vehicle = __webpack_require__(94);
 	
 	var _Vehicle2 = _interopRequireDefault(_Vehicle);
 	
-	var _vendorBinaryLoader = __webpack_require__(87);
+	var _vendorBinaryLoader = __webpack_require__(90);
 	
 	var _vendorBinaryLoader2 = _interopRequireDefault(_vendorBinaryLoader);
 	
-	var _VehicleVelocityShader = __webpack_require__(78);
+	var _VehicleVelocityShader = __webpack_require__(81);
 	
 	var _VehicleVelocityShader2 = _interopRequireDefault(_VehicleVelocityShader);
 	
-	var _VehiclePositionShader = __webpack_require__(79);
+	var _VehiclePositionShader = __webpack_require__(82);
 	
 	var _VehiclePositionShader2 = _interopRequireDefault(_VehiclePositionShader);
 	
-	var _VehicleShader = __webpack_require__(80);
+	var _VehicleShader = __webpack_require__(83);
 	
 	var _VehicleShader2 = _interopRequireDefault(_VehicleShader);
 	
-	var _utilObjectUtils = __webpack_require__(81);
+	var _utilObjectUtils = __webpack_require__(84);
 	
 	var _utilObjectUtils2 = _interopRequireDefault(_utilObjectUtils);
 	
@@ -21376,7 +21969,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.vehicleLayer = noNew;
 
 /***/ },
-/* 90 */
+/* 93 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -21389,15 +21982,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Created by masayuki on 17/07/2016.
 	 */
 	
-	var _three = __webpack_require__(8);
+	var _three = __webpack_require__(10);
 	
 	var _three2 = _interopRequireDefault(_three);
 	
-	var _vendorBinaryLoader = __webpack_require__(87);
+	var _vendorBinaryLoader = __webpack_require__(90);
 	
 	var _vendorBinaryLoader2 = _interopRequireDefault(_vendorBinaryLoader);
 	
-	var _utilObjectUtils = __webpack_require__(81);
+	var _utilObjectUtils = __webpack_require__(84);
 	
 	var _utilObjectUtils2 = _interopRequireDefault(_utilObjectUtils);
 	
@@ -21495,7 +22088,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 91 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -21519,7 +22112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Created by masayuki on 17/07/2016.
 	 */
 	
-	var _SimObject2 = __webpack_require__(77);
+	var _SimObject2 = __webpack_require__(80);
 	
 	var _SimObject3 = _interopRequireDefault(_SimObject2);
 	
@@ -21714,7 +22307,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 92 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -21725,27 +22318,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// TODO: A lot of these utils don't need to be in separate, tiny files
 	
-	var _wrapNum = __webpack_require__(93);
+	var _wrapNum = __webpack_require__(96);
 	
 	var _wrapNum2 = _interopRequireDefault(_wrapNum);
 	
-	var _extrudePolygon = __webpack_require__(65);
+	var _extrudePolygon = __webpack_require__(68);
 	
 	var _extrudePolygon2 = _interopRequireDefault(_extrudePolygon);
 	
-	var _GeoJSON = __webpack_require__(60);
+	var _GeoJSON = __webpack_require__(63);
 	
 	var _GeoJSON2 = _interopRequireDefault(_GeoJSON);
 	
-	var _Buffer = __webpack_require__(66);
+	var _Buffer = __webpack_require__(69);
 	
 	var _Buffer2 = _interopRequireDefault(_Buffer);
 	
-	var _ObjectUtils = __webpack_require__(81);
+	var _ObjectUtils = __webpack_require__(84);
 	
 	var _ObjectUtils2 = _interopRequireDefault(_ObjectUtils);
 	
-	var _WorkerUtils = __webpack_require__(84);
+	var _WorkerUtils = __webpack_require__(87);
 	
 	var _WorkerUtils2 = _interopRequireDefault(_WorkerUtils);
 	
@@ -21762,7 +22355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 93 */
+/* 96 */
 /***/ function(module, exports) {
 
 	Object.defineProperty(exports, "__esModule", {

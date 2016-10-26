@@ -34,6 +34,41 @@ class PedestrianLayer extends Layer {
         scale: 1.0,
         translation: {x: 0, y: 0, z: 0},
         rotation: {x: 0, y: 0, z: 0}
+      },
+      'maleHuman': {
+        file: {
+          body: '/javascripts/maps/json/human/human_walk_0_male.js',
+        },
+        scale: 1.0,
+        translation: {x: 0, y: 0, z: 0},
+        rotation: {x: 0, y: 0, z: 0}
+      },
+      'femaleHuman': {
+        file: {
+          body: '/javascripts/maps/json/human/human_walk_0_female.js',
+        },
+        scale: 1.0,
+        translation: {x: 0, y: 0, z: 0},
+        rotation: {x: 0, y: 0, z: 0}
+      },
+      'elderlyHuman': {
+        file: {
+          body: '/javascripts/maps/json/human/elderlyWalk.js',
+        },
+        scale: 1.0,
+        translation: {x: -1.25, y: 0, z: 0},
+        rotation: {x: 0, y: 90 * Math.PI / 180, z: 0}
+      },
+      'simpleMan': {
+        file: {
+          body: '/javascripts/maps/json/human/simpleMan2.6.json'
+        },
+        textureFile: {
+          body: '/javascripts/maps/json/human/simpleMan2.6.png'
+        },
+        scale: 1.0,
+        translation: {x: 0, y: 2.0, z: 0},
+        rotation: {x: 0, y: 90 * Math.PI / 180, z: 0}
       }
     }, {
       enableGpuComputation: this._options.renderer === 'gpu',

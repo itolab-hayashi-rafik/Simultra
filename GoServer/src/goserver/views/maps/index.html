@@ -188,6 +188,19 @@
             {{end}}
         }
 
+
+        // --------------------------------------------
+        // global variables
+        // --------------------------------------------
+        var vehicles = [];
+        var pedestrians = [];
+        var iterateHandler;
+
+
+        // --------------------------------------------
+        // initializations
+        // --------------------------------------------
+
         // TODO: The Controller
         (function($) {
 
@@ -416,6 +429,7 @@
 
                 simultra.on('onAddVehicle', (function(){
                     return function (id, entry) {
+                        vehicles.push(id);
                         addVehicleTab(id, entry);
                     };
                 })());
@@ -424,9 +438,16 @@
 //                        console.log('!!!!!!!!!!! updated ' + id + " by " + sender + ": location = " + JSON.stringify(entry.data.location));
                     };
                 })());
+                // FIXME: Simultra side not yet implemented
+//                simultra.on('onDeleteVehicle', (function(){
+//                    return function (id, entry) {
+//                        vehicles.splice(vehicles.indexOf(id), 1);
+//                    };
+//                })());
 
                 simultra.on('onAddPedestrian', (function() {
                     return function (id, entry) {
+                        pedestrians.push(id);
                         addPedestrianTab(id, entry);
                     };
                 })());
@@ -435,8 +456,42 @@
 //                        console.log('!!!!!!!!!!! updated ' + id + " by " + sender + ": location = " + JSON.stringify(entry.data.location));
                     };
                 })());
+                // FIXME: Simultra side not yet implemented
+//                simultra.on('onDeletePedestrian', (function() {
+//                    return function (id, entry) {
+//                        pedestrians.splice(pedestrians.indexOf(id), 1);
+//                    };
+//                })());
             });
         })($);
+
+
+//        // TODO: automatically switch the vehicles to focus on
+//        (function($) {
+//
+//            var iterateObjects = (function() {
+//                var i = 0;
+//
+//                return function() {
+//                    // count the total number
+//                    var N = vehicles.length + pedestrians.length;
+//                    // iterate
+//                    i = (i + 1) % N;
+//                    // switch the object to focus on
+//                    if (i < vehicles.length) {
+//                        var index = i;
+//                        simultra.focusOnVehicle(vehicles[index]);
+//                    } else {
+//                        var index = i - vehicles.length;
+//                        simultra.focusOnPedestrian(pedestrians[index]);
+//                    }
+//                };
+//            })();
+//
+//            $(document).ready(function() {
+//                iterateHandler = setInterval(iterateObjects, 2000);
+//            });
+//        })($);
     </script>
 </body>
 </html>
