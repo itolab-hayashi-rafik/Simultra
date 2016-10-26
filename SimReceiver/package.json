@@ -5,7 +5,7 @@
     "start": "./node_modules/.bin/forever start app.js",
     "restart": "./node_modules/.bin/forever restart app.js",
     "stop": "./node_modules/.bin/forever stop app.js",
-    "list": "./node_modules/.bin/forever list",
+    "status": "./node_modules/.bin/forever list",
     "logs": "./node_modules/.bin/forever logs"
   },
   "dependencies": {
