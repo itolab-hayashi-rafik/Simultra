@@ -2,11 +2,8 @@
   "name": "sim-receiver",
   "version": "0.0.1",
   "scripts": {
-    "start": "./node_modules/.bin/forever start app.js",
-    "restart": "./node_modules/.bin/forever restart app.js",
-    "stop": "./node_modules/.bin/forever stop app.js",
-    "status": "./node_modules/.bin/forever list",
-    "logs": "./node_modules/.bin/forever logs"
+    "start": "./node_modules/.bin/forever -w start -l forever.log -o out.log -e err.log app.js",
+    "stop": "./node_modules/.bin/forever stop app.js"
   },
   "dependencies": {
     "forever": "^0.15.2",
