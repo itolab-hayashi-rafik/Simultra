@@ -6,7 +6,7 @@ function Visualizer() {
 	this._map = null;
 	this._mapContainer = null;
 	this._slider = null;
-	this._log = null;
+	this._tracers = null;
 
 	// initialize a visualizer
 	this._init();
@@ -64,6 +64,9 @@ Visualizer.prototype._init = function() {
 		step: 1,
 		slide: (function(self) { return function(event, ui){ self._handleSlide(event, ui); } })(this)
 	});
+
+	// tracer
+	this._tracers = [];
 };
 
 Visualizer.prototype._handleDragOver = function(event) {
@@ -76,32 +79,31 @@ Visualizer.prototype._handleDragOver = function(event) {
 Visualizer.prototype._handleDropFile = function(event) {
     event.stopPropagation();
     event.preventDefault();
-	// FIXME: implement this
-	console.log(event);
+
 	if (event.dataTransfer) {
 		var files = event.dataTransfer.files;
 		if (files.length > 1) {
 			throw Error("More than one file are dropped. This operation is unsupported!!");
 		}
-		this._log = new Log(
-			files[0], 
-			(function(self) { return function(log){ self._handleLogReady(log); } })(this),
-			(function(self) { return function(index, data){ self._handleLogProgress(index, data); } })(this)
-			);
-		this._handleLogChange();
+		var tracer = new Tracer(
+			this._map,
+			files[0],
+			(function(self) { return function(tracer) { self._handleTracerReady(tracer); }; })(this),
+			(function(self) { return function(tracer, index) { self._handleTracerProgress(tracer, index); }; })(this)
+		);
+		this._tracers.push(tracer);
+		this._handleAddTracer();
 	}
 };
 
-Visualizer.prototype._handleLogChange = function() {
+Visualizer.prototype._handleAddTracer = function() {
 	// FIXME: implement this
-	console.log('handleLogChange');
+	console.log('_handleAddTracer');
 };
 
-Visualizer.prototype._handleLogReady = function(log) {
-	// FIXME: implement this
-	console.log('handleLogReady');
-	var range = log.getIndexRange();
-	var index = log.getIndex();
+Visualizer.prototype._handleTracerReady = function(tracer) {
+	var range = tracer.getIndexRange();
+	var index = tracer.getIndex();
 	$(this._slider).slider({
 		value: index,
 		min: range[0],
@@ -110,34 +112,148 @@ Visualizer.prototype._handleLogReady = function(log) {
 	});
 };
 
-Visualizer.prototype._handleLogProgress = function(index, data) {
-	// FIXME: implement this
-	console.log('handleLogProgress');
+Visualizer.prototype._handleTracerProgress = function(tracer, index) {
 	$(this._slider).slider({
 		value: index
 	});
 };
 
 Visualizer.prototype._handleLogPlayClick = function() {
-	if (this._log) {
-		this._log.play();
+	if (this._tracers[0]) { // FIXME: support multiple tracers
+		this._tracers[0].play();
 	}
 };
 
 Visualizer.prototype._handleLogStopClick = function() {
-	if (this._log) {
-		this._log.stop();
+	if (this._tracers[0]) { // FIXME: support multiple tracers
+		this._tracers[0].stop();
 	}
 };
 
 Visualizer.prototype._handleSlide = function(event, ui) {
-	// FIXME: implement this
 	var value = ui.value;
 	console.log('(slide) value = ' + value);
-	if (this._log) {
-		this._log.setIndex(value);
+	if (this._tracers[0]) { // FIXME: support multiple tracers
+		this._tracers[0].setIndex(value);
 	}
 };
+
+
+// ========================================================================================================
+
+
+/**
+ * Tracer
+ */
+function Tracer(map, logfile, onLoadCallback = null, onUpdateCallback = null) {
+	// properties
+	this._map = map;
+	this._log = null;
+	this._latlngs = null;
+	this._polyline = null;
+	this._marker = null;
+
+	this._onLoadCallback = onLoadCallback || function(tracer){};
+	this._onUpdateCallback = onUpdateCallback || function(tracer, index){};
+
+	this._init(logfile);
+};
+
+Tracer.prototype._init = function(logfile) {
+	this._log = new Log(
+		logfile,
+		(function(self) { return function(log, wholeData){ self._onLoad(log, wholeData); } })(this),
+		(function(self) { return function(index, data){ self._onUpdate(index, data); } })(this)
+	);
+};
+
+Tracer.prototype._onLoad = function(log, data) {
+	// Payload:
+	// [{
+	// 	timestamp: 1471100278158,
+	// 	data: {
+	// 		sender: "iphone",
+	// 		data: {
+	// 			id: "0",
+	// 			type: "veyron",
+	// 			location: {
+	// 				lat: 35.12852048504644,
+	// 				lon: 136.9564512838954
+	// 			},
+	// 			angle: 3.936344904000036,
+	// 			velocity: 0,
+	// 			wheel: 0
+	// 		}
+	// 	}
+	// }, ...]
+
+	// draw a polyline on the entire trip
+	this._latlngs = data.map(function(e) { return L.latLng(e.data.data.location.lat, e.data.data.location.lon); });
+	this._polyline = L.polyline(this._latlngs, {color: 'red'}).addTo(this._map);
+	this._map.fitBounds(this._polyline.getBounds());
+
+	// draw a marker at the current latlon
+	var index = this._log.getIndex();
+	this._marker = L.marker(this._latlngs[index], {}).addTo(this._map);
+
+	// onLoad callback
+	if (this._onLoadCallback) {
+		this._onLoadCallback(this);
+	}
+};
+
+Tracer.prototype._onUpdate = function(index, data) {
+	// Payload:
+	// {
+	// 	timestamp: 1471100278158,
+	// 	data: {
+	// 		sender: "iphone",
+	// 		data: {
+	// 			id: "0",
+	// 			type: "veyron",
+	// 			location: {
+	// 				lat: 35.12852048504644,
+	// 				lon: 136.9564512838954
+	// 			},
+	// 			angle: 3.936344904000036,
+	// 			velocity: 0,
+	// 			wheel: 0
+	// 		}
+	// 	}
+	// }
+
+	// update the marker
+	var latlng = this._latlngs[index];
+	this._marker.setLatLng(latlng);
+
+	// onUpdate callback
+	if (this._onUpdateCallback) {
+		this._onUpdateCallback(this, index);
+	}
+};
+
+Tracer.prototype.getIndexRange = function() {
+	return this._log.getIndexRange();
+};
+
+Tracer.prototype.getIndex = function() {
+	return this._log.getIndex();
+};
+
+Tracer.prototype.setIndex = function(index) {
+	this._log.setIndex(index);
+};
+
+Tracer.prototype.play = function() {
+	this._log.play();
+};
+
+Tracer.prototype.stop = function() {
+	this._log.stop();
+};
+
+
+// ========================================================================================================
 
 
 /**
@@ -227,7 +343,7 @@ Log.prototype._handleParseData = function() {
 
 Log.prototype._handleOnLoadComplete = function() {
 	if (this._onLoadComplete) {
-		this._onLoadComplete(this);
+		this._onLoadComplete(this, this._data);
 	}
 };
 
@@ -289,6 +405,10 @@ Log.prototype.stop = function() {
 		this._referenceTime = null;
 	}
 };
+
+
+// ========================================================================================================
+
 
 // onload function
 $(function() {
