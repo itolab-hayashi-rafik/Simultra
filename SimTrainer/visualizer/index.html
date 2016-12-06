@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width" charset="UTF-8">
+<title>visualizer</title>
+<link rel="stylesheet" href="node_modules/jquery-ui-dist/jquery-ui.min.css" />
+<link rel="stylesheet" href="node_modules/jquery-ui-dist/jquery-ui.theme.min.css" />
+<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css" />
+<link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css" />
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
+<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="node_modules/leaflet/dist/leaflet.js"></script>
+
+<link href="css/style.css" rel="stylesheet">
+
+<!--[if IE]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+
+<div id="map">
+	<navigator>
+		<input class="on-map" id="logfile-input" placeholder="Enter a place to go..." type="text">
+		<button class="btn btn-primary on-map" href="#" id="goto" title="Goto Place">
+			<i class="fa fa-arrow-right fa"></i>
+		</button>
+	</navigator>
+	<div class="on-map" id="log-control">
+		<ul class="control-container">
+			<li class="button-control">
+				<button class="btn btn-default on-map" href="#" id="btn-log-play" title="Play">
+					<i class="fa fa-arrow-right fa"></i>
+				</button>
+			</li>
+			<li class="button-control">
+				<button class="btn btn-default on-map" href="#" id="btn-log-stop" title="Stop">
+					<i class="fa fa-arrow-right fa"></i>
+				</button>
+			</li>
+			<li>
+				<div id="slider"></div>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<script type="text/javascript" src="js/visualizer.js"></script>
+</body>
+<html>
