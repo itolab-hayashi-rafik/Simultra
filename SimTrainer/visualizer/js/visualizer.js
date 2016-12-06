@@ -150,6 +150,7 @@ function Tracer(map, logfile, onLoadCallback = null, onUpdateCallback = null) {
 	this._map = map;
 	this._log = null;
 	this._latlngs = null;
+	this._angles = null;
 	this._polyline = null;
 	this._marker = null;
 
@@ -189,12 +190,24 @@ Tracer.prototype._onLoad = function(log, data) {
 
 	// draw a polyline on the entire trip
 	this._latlngs = data.map(function(e) { return L.latLng(e.data.data.location.lat, e.data.data.location.lon); });
-	this._polyline = L.polyline(this._latlngs, {color: 'red'}).addTo(this._map);
+	this._angles = data.map(function(e) { return (e.data.data.angle * 180 / Math.PI); });
+	this._polyline = L.polyline(this._latlngs, {color: 'skyblue'}).addTo(this._map);
 	this._map.fitBounds(this._polyline.getBounds());
 
 	// draw a marker at the current latlon
 	var index = this._log.getIndex();
-	this._marker = L.marker(this._latlngs[index], {}).addTo(this._map);
+	var latlng = this._latlngs[index];
+	var angle = this._angles[index];
+	this._marker = L.marker(latlng, {
+		icon: L.icon({
+			iconUrl: 'img/car.png',
+			iconRetinaUrl: 'img/car@2x.png',
+			iconSize: [50, 50],
+			iconAnchor: [25, 25]
+		}),
+		rotationAngle: angle,
+		rotationOrigin: 'center'
+	}).addTo(this._map);
 
 	// onLoad callback
 	if (this._onLoadCallback) {
@@ -224,7 +237,9 @@ Tracer.prototype._onUpdate = function(index, data) {
 
 	// update the marker
 	var latlng = this._latlngs[index];
+	var angle = this._angles[index];
 	this._marker.setLatLng(latlng);
+	this._marker.setRotationAngle(angle);
 
 	// onUpdate callback
 	if (this._onUpdateCallback) {
@@ -361,7 +376,8 @@ Log.prototype.setIndex = function(index) {
 		this._idx = Math.max(this._minIdx, Math.min(index, this._maxIdx));
 		this.play();
 	} else {
-		this._idx = Math.max(this._minIdx, Math.min(index, this._maxIdx));	
+		this._idx = Math.max(this._minIdx, Math.min(index, this._maxIdx));
+		this._onNext(this._data[this._indx], false);	
 	}
 }
 
@@ -370,7 +386,7 @@ Log.prototype.play = function() {
 	this._pendNext();
 };
 
-Log.prototype._onNext = function(data) {
+Log.prototype._onNext = function(data, proceed = true) {
 	// FIXME: implement this
 	console.log(data);
 	if (this._onProgress) {
@@ -378,8 +394,10 @@ Log.prototype._onNext = function(data) {
 	}
 
 	// iterate
-	this._idx++;
-	this._pendNext();
+	if (proceed) {
+		this._idx++;
+		this._pendNext();
+	}
 };
 
 Log.prototype._pendNext = function() {
