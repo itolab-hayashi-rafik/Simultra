@@ -25,7 +25,8 @@ Visualizer.prototype._init = function() {
 	// add control
 	L.control.zoom({ position: "topright" }).addTo(map);
 	// add tile layer
-	L.tileLayer('http://a.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+	// L.tileLayer('http://a.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+	L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png').addTo(map);
 
 
 	// drag-and-drop
