@@ -1,30 +1,22 @@
 package jp.ac.nitech.itolab.mahayash.mockandroidsimulator
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
-import android.location.Location
+import android.databinding.DataBindingUtil
 import android.location.LocationManager
-import android.location.LocationProvider
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v4.app.ActivityCompat
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
-import android.widget.ImageView
-import android.widget.TextView
-import com.neovisionaries.ws.client.*
-import jp.ac.nitech.itolab.mahayash.mockandroidsimulator.Helper
-import jp.ac.nitech.itolab.mahayash.mockandroidsimulator.WebAPI
+import com.neovisionaries.ws.client.WebSocket
+import com.neovisionaries.ws.client.WebSocketAdapter
+import com.neovisionaries.ws.client.WebSocketException
+import com.neovisionaries.ws.client.WebSocketFrame
+import jp.ac.nitech.itolab.mahayash.mockandroidsimulator.databinding.ActivityMainBinding
 import jp.ac.nitech.itolab.mahayash.mockandroidsimulator.model.Vehicle
 import org.json.JSONObject
-import java.io.IOException
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -42,14 +34,15 @@ class MainActivity : AppCompatActivity(), Helper.LocationListener, Helper.Compas
     private var remoteReady: Boolean = false
     private var locationManager: LocationManager? = null
     private var webSocket: WebSocket? = null
-    private var helper: Helper? = null
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var helper: Helper
 
     private var currentDegrees: Float = 0F
     private var lastUpdate: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
         helper = Helper(this)
 
         setupLocationManager()
@@ -58,10 +51,10 @@ class MainActivity : AppCompatActivity(), Helper.LocationListener, Helper.Compas
 
     fun setupLocationManager() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             permissionGranted = true
         } else {
-            ActivityCompat.requestPermissions(this, Array<String>(1, { Manifest.permission.ACCESS_FINE_LOCATION}), REQUEST_PERMISSION)
+            ActivityCompat.requestPermissions(this, Array<String>(1, { Manifest.permission.ACCESS_FINE_LOCATION }), REQUEST_PERMISSION)
         }
     }
 
@@ -76,10 +69,10 @@ class MainActivity : AppCompatActivity(), Helper.LocationListener, Helper.Compas
         }
     }
 
-    fun setupVehicle() {
+    private fun setupVehicle() {
         WebAPI.Vehicles
                 .createNew(vehicle)
-                .success{ json ->
+                .success { json ->
                     vehicle.update(json)
                     connectWebSocket()
                 }
@@ -88,7 +81,7 @@ class MainActivity : AppCompatActivity(), Helper.LocationListener, Helper.Compas
                 }
     }
 
-    fun connectWebSocket() {
+    private fun connectWebSocket() {
         webSocket = WebAPI.Vehicles.ws(vehicle.id!!)
         webSocket?.addListener(object : WebSocketAdapter() {
             override fun onConnected(websocket: WebSocket?, headers: MutableMap<String, MutableList<String>>?) {
@@ -126,48 +119,49 @@ class MainActivity : AppCompatActivity(), Helper.LocationListener, Helper.Compas
         stopIfNeeded()
     }
 
-    fun startIfReady() {
+    private fun startIfReady() {
         if (permissionGranted && remoteReady) {
             startLocationUpdate()
         }
     }
 
-    fun stopIfNeeded() {
+    private fun stopIfNeeded() {
         if (locationManager != null) {
             stopLocationUpdate()
         }
     }
 
-    fun startLocationUpdate() {
-        helper?.registerLocationListener(this)
-        helper?.registerCompassListener(COMPASS_MIN_INTERVAL, this)
+    private fun startLocationUpdate() {
+        helper.registerLocationListener(this)
+        helper.registerCompassListener(COMPASS_MIN_INTERVAL, this)
         Log.i(TAG, "Started")
     }
 
-    fun stopLocationUpdate() {
-        helper?.unregisterLocationListener(this)
-        helper?.unregisterCompassListener(this)
+    private fun stopLocationUpdate() {
+        helper.unregisterLocationListener(this)
+        helper.unregisterCompassListener(this)
         Log.i(TAG, "Stopped")
     }
 
-    fun updateRemote() {
+    private fun updateRemote() {
         webSocket?.sendText(vehicle.toJson().toString())
     }
 
-    fun updateView() {
+    private fun updateView() {
         val now = System.currentTimeMillis()
 
-        (findViewById(R.id.tvId) as TextView).text = vehicle.id
-        (findViewById(R.id.tvLatitude) as TextView).text = vehicle.location.latitude.toString()
-        (findViewById(R.id.tvLongitude) as TextView).text = vehicle.location.longitude.toString()
-        (findViewById(R.id.tvVelocity) as TextView).text = vehicle.velocity.toString()
+        binding.id = vehicle.id
+        binding.latitude = vehicle.location.latitude.toDouble()
+        binding.longitude = vehicle.location.longitude.toDouble()
+        binding.velocity = vehicle.velocity.toDouble()
 
         val degree = Math.toDegrees(vehicle.angle.toDouble()).toFloat()
-        val anim = RotateAnimation(currentDegrees, -degree, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-        anim.duration = if (0 < lastUpdate) (now - lastUpdate) else COMPASS_MIN_INTERVAL
-        anim.fillBefore = true
-        anim.fillAfter = true
-        (findViewById(R.id.ivCompass) as ImageView).startAnimation(anim);
+        val anim = RotateAnimation(currentDegrees, -degree, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f).apply {
+            duration = if (0 < lastUpdate) (now - lastUpdate) else COMPASS_MIN_INTERVAL
+            fillBefore = true
+            fillAfter = true
+        }
+        binding.mainCompassImageView.startAnimation(anim);
         currentDegrees = -degree
 
         lastUpdate = now

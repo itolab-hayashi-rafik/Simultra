@@ -6,19 +6,15 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
-import jp.ac.nitech.itolab.mahayash.mockandroidsimulator.MainActivity
-import kotlin.concurrent.withLock
 
 /**
  * Created by masayuki on 16/08/2016.
  */
-class Helper(context: Context) {
+class Helper(private val context: Context) {
 
-    private val context: Context = context
     private val locationManager: LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     private val sensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val locationMap: MutableMap<LocationListener, android.location.LocationListener> = mutableMapOf()

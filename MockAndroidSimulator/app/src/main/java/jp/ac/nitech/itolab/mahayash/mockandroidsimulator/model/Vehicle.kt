@@ -1,18 +1,19 @@
 package jp.ac.nitech.itolab.mahayash.mockandroidsimulator.model
 
-import jp.ac.nitech.itolab.mahayash.mockandroidsimulator.model.Location
 import org.json.JSONObject
 
 /**
  * Created by masayuki on 16/08/2016.
  */
-class Vehicle(type: String, latitude: Double, longitude: Double) {
-    var id: String? = null
-    var type: String = type
-    var location: Location = Location(latitude, longitude)
-    var velocity: Number = 0.0
-    var angle: Number = 0.0
-    var wheel: Number = 0.0
+class Vehicle(
+        var id: String?,
+        var type: String,
+        var location: Location,
+        var velocity: Number = 0.0,
+        var angle: Number = 0.0,
+        var wheel: Number = 0.0
+) {
+    constructor(type: String, latitude: Double, longitude: Double) : this(null, type, Location(latitude, longitude))
 
     fun toJson(): JSONObject {
         val root = JSONObject()

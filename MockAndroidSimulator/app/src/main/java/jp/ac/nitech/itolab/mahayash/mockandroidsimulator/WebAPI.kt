@@ -19,48 +19,45 @@ class WebAPI {
         val jsonMediaType = MediaType.parse("application/json")
     }
 
-    class Vehicles {
-        companion object {
-            fun getList(): Result {
-                val request = Request.Builder().url(baseUrl + "/vehicles").get().build()
-                return Result(request)
-            }
+    object Vehicles {
+        fun getList(): Result {
+            val request = Request.Builder().url(baseUrl + "/vehicles").get().build()
+            return Result(request)
+        }
 
-            fun createNew(vehicle: Vehicle): Result {
-                val body = RequestBody.create(jsonMediaType, vehicle.toJson().toString())
-                val request = Request.Builder().url(baseUrl + "/vehicles/new").post(body).build()
-                return Result(request)
-            }
+        fun createNew(vehicle: Vehicle): Result {
+            val body = RequestBody.create(jsonMediaType, vehicle.toJson().toString())
+            val request = Request.Builder().url(baseUrl + "/vehicles/new").post(body).build()
+            return Result(request)
+        }
 
-            fun get(id: String): Result {
-                val request = Request.Builder().url(baseUrl + "/vehicles/" + id).get().build()
-                return Result(request)
-            }
+        fun get(id: String): Result {
+            val request = Request.Builder().url(baseUrl + "/vehicles/" + id).get().build()
+            return Result(request)
+        }
 
-            fun update(id: String, vehicle: Vehicle): Result {
-                val body = RequestBody.create(jsonMediaType, vehicle.toJson().toString())
-                val request = Request.Builder().url(baseUrl + "/vehicles/" + id).put(body).build()
-                return Result(request)
-            }
+        fun update(id: String, vehicle: Vehicle): Result {
+            val body = RequestBody.create(jsonMediaType, vehicle.toJson().toString())
+            val request = Request.Builder().url(baseUrl + "/vehicles/" + id).put(body).build()
+            return Result(request)
+        }
 
-            fun delete(id: String): Result {
-                val request = Request.Builder().url(baseUrl + "/vehicles/" + id).delete().build()
-                return Result(request)
-            }
+        fun delete(id: String): Result {
+            val request = Request.Builder().url(baseUrl + "/vehicles/" + id).delete().build()
+            return Result(request)
+        }
 
-            fun ws(id: String): WebSocket {
-                return WebSocketFactory()
-                        .setConnectionTimeout(10000)
-                        .createSocket(wsBaseUrl + "/vehicles/" + id + "/ws")
-                        .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
-            }
+        fun ws(id: String): WebSocket {
+            return WebSocketFactory()
+                    .setConnectionTimeout(10000)
+                    .createSocket(wsBaseUrl + "/vehicles/" + id + "/ws")
+                    .addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
         }
     }
 
-    class Result(request: Request) {
+    class Result(val request: Request) {
         private var successCallback: ((JSONObject) -> Unit) = {}
         private var failureCallback: ((IOException?) -> Unit) = {}
-        var request: Request = request
         var response: Response? = null
 
         init {
@@ -69,6 +66,7 @@ class WebAPI {
                 override fun onFailure(call: Call?, e: IOException?) {
                     failureCallback(e)
                 }
+
                 override fun onResponse(call: Call?, r: Response?) {
                     response = r
                     successCallback(JSONObject(r?.body()?.string()))
@@ -76,12 +74,12 @@ class WebAPI {
             })
         }
 
-        public fun success(callback: (JSONObject) -> Unit): Result {
+        fun success(callback: (JSONObject) -> Unit): Result {
             this.successCallback = callback
             return this
         }
 
-        public fun failure(callback: (IOException?) -> Unit): Result {
+        fun failure(callback: (IOException?) -> Unit): Result {
             this.failureCallback = callback
             return this
         }

@@ -5,9 +5,11 @@ import org.json.JSONObject
 /**
  * Created by masayuki on 16/08/2016.
  */
-class Location(latitude: Double, longitude: Double) {
-    var latitude: Number = latitude
-    var longitude: Number = longitude
+data class Location(
+        var latitude: Number,
+        var longitude: Number
+) {
+    constructor(latitude: Double, longitude: Double) : this(latitude as Number, longitude as Number)
 
     fun toJson(): JSONObject {
         val root = JSONObject()
